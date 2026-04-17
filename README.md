@@ -59,7 +59,7 @@ alwm validate examples/generated/wiki_report.json report
 
 ### Benchmark harness (prompts × variants × backends)
 
-Runs versioned YAML under `benchmarks/v1/` (see `benchmarks/v1/README.md`). Each variant specifies **agent stack**, **backend** (`mock` / `ollama` / `openai_compatible`), and **execution mode** (`cli`, `browser_mock`, `repo_governed`). Responses are stored as `benchmark_response` JSON, scored with the rubric, then aggregated into **grid** and **pairwise** matrices plus reports.
+Runs versioned YAML under `benchmarks/v1/` (see `benchmarks/v1/README.md`). Each **prompt** is either inline `text:` or a `prompt_ref` into `prompts/registry.yaml` (optional `prompt_registry_ref` on the definition, optional `registry_version` pin per prompt). Each variant specifies **agent stack**, **backend** (`mock` / `ollama` / `openai_compatible`), and **execution mode** (`cli`, `browser_mock`, `repo_governed`). Cells persist **`benchmark_request`** / **`benchmark_response`** with `prompt_source` (`inline` \| `registry`), resolved `prompt_text`, and registry metadata when applicable. Responses are scored with the rubric, then aggregated into **grid** and **pairwise** matrices plus reports.
 
 ```bash
 ALWM_FIXTURE_MODE=1 alwm benchmark run \
@@ -151,7 +151,7 @@ Run `just` with no arguments to list recipes. Common tasks:
 | `alwm report --matrix … --out-json … --out-md …` | Matrix → report JSON + Markdown |
 | `alwm providers show` | Print resolved provider config (API keys redacted) |
 | `alwm benchmark probe` | Check Ollama + OpenAI-compatible HTTP APIs (for live runs) |
-| `alwm benchmark run --definition … --output-dir …` | Full harness: responses → evals → matrices → report |
+| `alwm benchmark run --definition … --output-dir … [--prompt-registry PATH]` | Full harness: responses → evals → matrices → report; optional registry YAML override |
 | `alwm prompts check` / `list` / `show <id>` | Validate and read `prompts/registry.yaml` (paths relative to repo root) |
 
 ## Repository layout

@@ -1,6 +1,6 @@
 # Data model
 
-_Last updated: 2026-04-17 (browser evidence)._
+_Last updated: 2026-04-17 (benchmark prompt registry)._
 
 ## Principles
 
@@ -20,6 +20,10 @@ _Last updated: 2026-04-17 (browser evidence)._
 | `schemas/v1/report.schema.json` | `Report` | Human-facing narrative report |
 | `schemas/v1/note.schema.json` | _(no Pydantic model yet)_ | Lightweight wiki note (Phase 1) |
 | `schemas/v1/browser_evidence.schema.json` | `BrowserEvidence` (`browser.models`) | Navigation + console (+ optional DOM ref) for browser runs |
+| `schemas/v1/benchmark_definition.schema.json` | _(YAML; Pydantic `BenchmarkDefinitionV1`)_ | Benchmark suite: rubric, prompts (inline `text` xor `prompt_ref`), variants |
+| `schemas/v1/prompt_registry.schema.json` | `PromptRegistryDocument` | `prompts/registry.yaml`: ids, paths to prompt bodies, document `version` |
+| `schemas/v1/benchmark_request.schema.json` | `BenchmarkRequestRecord` | Per-cell provider request; includes `prompt_source`, optional `prompt_registry_id`, `registry_document_version`, `prompt_source_relpath` |
+| `schemas/v1/benchmark_response.schema.json` | `BenchmarkResponse` | Same prompt provenance fields as request for traceability |
 
 ## Validation
 

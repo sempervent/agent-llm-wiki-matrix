@@ -2,6 +2,10 @@
 
 Chronological record of repository work. Latest entries first.
 
+## 2026-04-17 — Registry-backed benchmark prompts
+
+**Delivered:** `PromptItem` supports `text` xor `prompt_ref` (+ optional `registry_version` pin); `BenchmarkDefinitionV1.prompt_registry_ref`; `resolve_benchmark_prompts` (`benchmark/prompt_resolution.py`) using `load_prompt_registry_yaml`; `run_benchmark(..., prompt_registry_path=...)` and CLI `--prompt-registry`; `BenchmarkRequestRecord` / `BenchmarkResponse` fields `prompt_source`, `prompt_registry_id`, `registry_document_version`, `prompt_source_relpath`; JSON Schema updates + `schemas/v1/benchmark_definition.schema.json`. Fixtures under `fixtures/prompt_registry/` and `fixtures/benchmarks/registry_*.yaml`; tests `tests/test_benchmark_prompt_registry.py`; example `examples/benchmark_suites/v1/registry.mixed.v1.yaml` + committed run `examples/benchmark_runs/registry-mixed/`. Prompt `bench.sample.prompt.v1` added under `prompts/`.
+
 ## 2026-04-17 — Live benchmark verification (Compose + opt-in integration tests)
 
 **Delivered:** `benchmark/live_probe.py`; CLI `alwm benchmark probe`; Ollama healthcheck + `service_healthy` for `benchmark-ollama`; Compose profile **`benchmark-probe`** (`just benchmark-probe`); integration tests under `tests/integration/` gated by `ALWM_LIVE_BENCHMARK_OLLAMA` / `ALWM_LIVE_BENCHMARK_LLAMACPP` with skips when unreachable; `just test` ignores `tests/integration/`; `tests/test_live_probe.py` unit tests.
@@ -9,8 +13,6 @@ Chronological record of repository work. Latest entries first.
 ## 2026-04-17 — Mission gap audit + prompt registry CLI
 
 **Delivered:** `docs/audits/mission-gap-audit.md` (code-verified status of CLI, providers, browser layer, Compose, Bake; drift notes). **Prompt registry wiring:** `schemas/v1/prompt_registry.schema.json`, `prompt_registry.py` (YAML load + JSON Schema + path safety), CLI `alwm prompts check|list|show`, tests `tests/test_prompt_registry.py`. README and `AGENTS.md` updated for new commands.
-
-**Follow-up:** Benchmark YAML still uses inline prompt `text:`; optional later work is resolving `prompt_id` from the registry in definitions.
 
 ## 2026-04-17 — Browser execution abstraction
 
