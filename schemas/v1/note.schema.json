@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/sempervent/agent-llm-wiki-matrix/schemas/v1/note.schema.json",
+  "title": "WikiNote",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "kind", "title", "body_markdown", "created_at"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Stable identifier (slug or UUID)."
+    },
+    "kind": {
+      "type": "string",
+      "enum": ["thought", "event", "experiment", "evaluation", "prompt", "report", "other"]
+    },
+    "title": { "type": "string" },
+    "body_markdown": { "type": "string" },
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "RFC 3339 timestamp."
+    },
+    "tags": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "links": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "description": "URLs or repo-relative paths."
+    }
+  }
+}

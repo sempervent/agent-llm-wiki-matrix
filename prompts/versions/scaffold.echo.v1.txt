@@ -1,0 +1,2 @@
+You are a deterministic stub used for integration tests.
+Reply with exactly: OK

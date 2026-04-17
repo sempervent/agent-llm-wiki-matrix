@@ -1,0 +1,39 @@
+# Docker Compose orchestration for local development, tests, and benchmarks.
+# Profiles isolate use cases; see docs/workflows/local-dev.md.
+
+services:
+  orchestrator:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runtime
+    image: agent-llm-wiki-matrix:local
+    profiles:
+      - dev
+      - test
+      - benchmark
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      ALWM_LOG_LEVEL: ${ALWM_LOG_LEVEL:-INFO}
+      ALWM_FIXTURE_MODE: ${ALWM_FIXTURE_MODE:-0}
+      ALWM_REPO_ROOT: /workspace
+    working_dir: /workspace
+    volumes:
+      - ${PWD:-.}:/workspace:rw
+    # Override default CMD when using compose run; default shows CLI help.
+    command: ["--help"]
+
+  # Placeholder: wire Ollama in Phase 6+ when model profiles are hardened.
+  # Uncomment and set image when you want a bundled Ollama service.
+  # ollama:
+  #   image: ollama/ollama:latest
+  #   profiles: ["models"]
+  #   ports:
+  #     - "11434:11434"
+  #   volumes:
+  #     - ollama_data:/root/.ollama
+
+# volumes:
+#   ollama_data:

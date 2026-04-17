@@ -1,0 +1,33 @@
+# Orchestration image: CLI, validators, and pipeline entrypoints.
+# Multi-platform builds via docker buildx bake (see docker-bake.hcl).
+
+FROM python:3.11-slim-bookworm AS base
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1
+
+WORKDIR /app
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY pyproject.toml README.md ./
+COPY src ./src
+
+RUN pip install --upgrade pip \
+    && pip install .
+
+FROM base AS runtime
+
+# Non-root user
+RUN useradd --create-home --uid 1000 alwm
+USER alwm
+WORKDIR /workspace
+
+ENV ALWM_REPO_ROOT=/workspace
+
+ENTRYPOINT ["alwm"]
+CMD ["--help"]

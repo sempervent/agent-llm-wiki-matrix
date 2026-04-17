@@ -1,0 +1,53 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "agent-llm-wiki-matrix"
+version = "0.1.0"
+description = "Markdown-first, git-native LLM wiki and agent comparison matrix tooling"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [{ name = "Joshua Grant" }]
+keywords = ["llm", "agents", "benchmark", "wiki", "matrix"]
+dependencies = [
+    "click>=8.1",
+    "pyyaml>=6.0",
+    "jsonschema>=4.22",
+    "structlog>=24.1",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "pytest-cov>=5.0",
+    "mypy>=1.10",
+    "ruff>=0.6",
+    "types-PyYAML",
+    "types-jsonschema",
+]
+
+[project.scripts]
+alwm = "agent_llm_wiki_matrix.cli:main"
+
+[tool.hatch.build.targets.sdist]
+include = ["src/agent_llm_wiki_matrix", "README.md", "pyproject.toml"]
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+packages = ["agent_llm_wiki_matrix"]
+mypy_path = "src"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q --strict-markers"
