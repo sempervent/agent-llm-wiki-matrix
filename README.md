@@ -98,6 +98,7 @@ Detailed diagrams and data flow: `docs/architecture/runtime.md`, `docs/architect
 ├── schemas/               # JSON/YAML schemas
 ├── templates/             # Markdown report templates
 ├── prompts/               # Versioned prompts
+├── config/                # Optional provider YAML (see providers.example.yaml)
 ├── examples/              # Example artifacts
 ├── fixtures/              # Deterministic test inputs (growing)
 ├── src/agent_llm_wiki_matrix/
