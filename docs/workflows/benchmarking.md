@@ -1,5 +1,7 @@
 # Benchmarking workflow
 
+For **offline vs live** modes and Compose profiles, see [live-verification.md](live-verification.md).
+
 ## Goals
 
 - Compare **agent stacks**, **models**, **backends**, **prompts**, and **execution modes** with reproducible inputs.
@@ -38,7 +40,7 @@ Artifacts (under `--output-dir`; lexicographic cell order in `manifest.json`):
 - `matrices/grid.row_inputs.json`, `matrices/pairwise.row_inputs.json` — **matrix_grid_inputs** / **matrix_pairwise_inputs** (row inputs and evaluation refs).
 - `markdown/matrix.grid.md`, `markdown/matrix.pairwise.md` — rendered matrix tables.
 - `reports/report.json`, `reports/report.md` — **report** JSON + generated Markdown.
-- `manifest.json` — run summary with **cells[]** path index.
+- `manifest.json` — run summary with **cells[]** path index; may include **`definition_source_relpath`** and **`prompt_registry_effective_ref`** for reproducibility when the definition path and registry-backed prompts are known.
 
 ## Docker Compose
 

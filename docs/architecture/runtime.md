@@ -14,25 +14,29 @@ See `.env.example`. Notable keys:
 | Variable | Purpose |
 | --- | --- |
 | `ALWM_LOG_LEVEL` | Logging verbosity |
-| `ALWM_REPO_ROOT` | Repository root for schema paths and future pipelines (Compose sets `/workspace`) |
-| `ALWM_FIXTURE_MODE` | Convention: prefer fixtures / no live endpoints when set to `1` |
+| `ALWM_REPO_ROOT` | Repository root for schema paths and pipelines (Compose sets `/workspace`) |
+| `ALWM_FIXTURE_MODE` | When `1`, benchmarks prefer fixtures and force mock backends unless `--no-fixture-mock` |
 | `ALWM_PROVIDER` | `mock`, `ollama`, or `openai_compatible` |
 | `ALWM_PROVIDER_CONFIG` | Optional path to YAML (see `config/providers.example.yaml`) |
 | `OLLAMA_HOST`, `OLLAMA_MODEL` | Ollama endpoint overrides |
 | `OPENAI_BASE_URL`, `OPENAI_API_KEY`, `OPENAI_MODEL` | OpenAI-compatible server overrides |
+| `LLAMACPP_OPENAI_BASE_URL` | Override for Compose **benchmark-llamacpp** (default `host.docker.internal:8080/v1`) |
+| `ALWM_LIVE_BENCHMARK_OLLAMA` | Set `1` to enable opt-in pytest live Ollama benchmark tests |
+| `ALWM_LIVE_BENCHMARK_LLAMACPP` | Set `1` for opt-in OpenAI-compatible benchmark tests |
+| `ALWM_PLAYWRIGHT_SMOKE` | Set `1` for opt-in Playwright integration tests |
 
 ## Browser abstraction
 
-- Offline: `MockBrowserRunner`, `FileBrowserRunner`, JSON under `fixtures/browser_evidence/v1/` (see `docs/architecture/browser.md`).
-- CLI: `alwm browser prompt-block <path>`, `alwm browser run-mock`.
-- Future: `PlaywrightBrowserRunner` / `MCPBrowserRunner` are stubs until live automation is integrated.
-| `LLAMACPP_OPENAI_BASE_URL` | Override for Compose **benchmark-llamacpp** (default `host.docker.internal:8080/v1`) |
+- **Offline / CI:** `MockBrowserRunner`, `FileBrowserRunner`, JSON under `fixtures/browser_evidence/v1/` (see `docs/architecture/browser.md`).
+- **CLI:** `alwm browser prompt-block <path>`, `alwm browser run-mock`, `alwm browser run-playwright` (requires `pip install '.[browser]'`).
+- **Optional live:** `PlaywrightBrowserRunner` in `browser/playwright_runner.py` maps sessions to `BrowserEvidence` (extra `[browser]`).
+- **Stub:** `MCPBrowserRunner` raises `NotImplementedError` until MCP integration lands.
 
 ## Docker
 
-- **Image:** `Dockerfile` `runtime` target (CLI); `test` target installs `.[dev]` for pytest. Non-root user `alwm` (uid 1000); workdir `/workspace`.
-- **Compose:** `orchestrator` (**dev**), `tests` (**test**, pytest), `benchmark` (**benchmark**, `alwm info` smoke), **`benchmark-offline`** (`alwm benchmark run` with `ALWM_FIXTURE_MODE=1` and mock backends), **`benchmark-ollama`** (bundled `ollama` service + `benchmarks/v1/ollama.v1.yaml`), **`benchmark-llamacpp`** (OpenAI-compatible URL toward the host for llama.cpp-style servers). All bind-mount the project to `/workspace`.
-- **Bake:** `docker-bake.hcl` — variable `PLATFORM` (comma-separated) defaults to `linux/amd64,linux/arm64`; targets `orchestrator`, `orchestrator-amd64`, `orchestrator-arm64`.
+- **Image:** `Dockerfile` `runtime` target (CLI); `test` target installs `.[dev]` for pytest; **`browser-test`** adds Playwright + Chromium for the optional **`browser-verify`** Compose profile.
+- **Compose:** `orchestrator` (**dev**), `tests` (**test**), `benchmark` (**benchmark**), **`benchmark-offline`** (mock benchmark run), **`benchmark-ollama`**, **`benchmark-llamacpp`**, **`benchmark-probe`**, **`browser-verify`** (Playwright integration tests). All bind-mount the project to `/workspace`.
+- **Bake:** `docker-bake.hcl` — variable `PLATFORM` (comma-separated) defaults to `linux/amd64,linux/arm64`; targets `orchestrator`, `orchestrator-amd64`, `orchestrator-arm64`, optional **`browser-test`** (amd64-only convenience image).
 
 ## Benchmark execution
 
@@ -42,4 +46,4 @@ See `.env.example`. Notable keys:
 
 ## CI-friendly commands
 
-`just ci` runs Ruff, Mypy, and pytest without Docker. `just benchmark-offline` runs the full harness in a container (mock-only, deterministic).
+`just ci` runs Ruff, Mypy, and pytest **without** `tests/integration/`. `just benchmark-offline` runs the full harness in a container (mock-only, deterministic). Optional live checks are documented in `docs/workflows/live-verification.md`.

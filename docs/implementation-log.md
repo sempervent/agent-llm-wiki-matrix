@@ -2,6 +2,28 @@
 
 Chronological record of repository work. Latest entries first.
 
+## 2026-04-17 — Benchmark expansion: registry suites, comparison rubric, manifest provenance
+
+**Delivered:** Four versioned prompts under `prompts/versions/` (`bench.task.repo_governed.v1`, `markdown_synthesis`, `matrix_reasoning`, `browser_evidence`) registered in `prompts/registry.yaml` (**0.2.0**). New rubric `examples/dataset/rubrics/comparison.v1.json` (structure / task_fit / grounding / brevity). Three example suites: `suite.registry.four_modes.v1.yaml`, `suite.registry.strict_duo.v1.yaml`, `suite.registry.generous_duo.v1.yaml`; fixture mirror `fixtures/benchmarks/suite_four_modes.v1.yaml`. Committed offline runs under `examples/benchmark_runs/registry-four-modes`, `registry-strict-duo`, `registry-generous-duo`. `BenchmarkRunManifest` + `run_benchmark(..., definition_source_relpath=...)` + CLI wiring for optional manifest fields. Tests: `tests/test_benchmark_expansion.py`. Docs: `data-model.md`, `evaluation-pipeline.md`, `benchmarking.md`, `examples/benchmark_suites/v1/README.md`.
+
+## 2026-04-17 — Runtime hardening: live verification paths
+
+**Delivered:** `PlaywrightBrowserRunner` exported from `playwright_runner` (MCP-only stub file); `create_browser_runner(..., "playwright")`; Dockerfile target **`browser-test`** (Playwright + Chromium); Compose profile **`browser-verify`**; `docker-bake.hcl` target `browser-test` (linux/amd64); `just` recipes `verify-live-providers`, `verify-playwright-local`, `browser-verify`; `pytest` marker **`live_playwright`**; `tests/integration/test_playwright_browser.py` marked `integration` + `live_playwright`; **`docs/workflows/live-verification.md`**; `docs/architecture/runtime.md` refresh; workflow cross-links; `.env.example` notes `ALWM_PLAYWRIGHT_SMOKE`. Default **`just ci`** unchanged (`tests/integration/` still excluded).
+
+## 2026-04-17 — Governance: AGENTS manual, multi-agent workflow, capability audit
+
+**Why:** Reduce drift between docs and implementation; make parallel agent work predictable; require evidence-backed labels (“complete” vs partial/stub).
+
+**What changed:**
+
+- **`AGENTS.md`** — Stronger operating manual: non-goals folded into success criteria (evidence-backed claims), multi-agent rules (summary + pointer), expanded anti-patterns, verification table (Playwright opt-in), links to **`docs/audits/capability-classification.md`**, updated browser decision rule (Playwright optional; MCP stub), layout includes `docs/audits/`, `docs/examples/`, `docs/workflows/multi-agent-parallel.md`.
+- **`docs/workflows/multi-agent-parallel.md`** — Branch strategy, file ownership zones, conflict avoidance, merge order, required handoff template.
+- **`docs/audits/capability-classification.md`** — Taxonomy: complete / partial / stub / documented-only / broken + evidence bar and repository examples (re-verify after changes).
+- **`docs/examples/README.md`** — Clarifies repo-root **`examples/`** vs `docs/examples/`.
+- **Drift repair** — **`README.md`**: `alwm browser run-playwright`, optional `[browser]` install comment, pointer to multi-agent doc. **`docs/architecture/browser.md`**, **`current-state.md`**, **`runtime.md`**: Playwright optional; MCP stub; prompt registry **implemented** in current-state. **`docs/audits/mission-gap-audit.md`**: browser §3 and doc-drift rows updated; P3 reframed to MCP runner.
+
+**Verification:** Documentation-only change set; command names cross-checked against `src/agent_llm_wiki_matrix/cli.py` (`browser run-playwright`, `benchmark probe`, `prompts` group).
+
 ## 2026-04-17 — AGENTS.md operating manual
 
 **Why:** The old `AGENTS.md` was principles-only; agents needed actionable rules for this repo (benchmarks, prompt registry, integration tests, browser stubs, documentation touchpoints).

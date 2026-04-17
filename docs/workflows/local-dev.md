@@ -26,6 +26,8 @@ docker run --rm agent-llm-wiki-matrix:local version
 | `benchmark-offline` | `benchmark-offline` | `alwm benchmark run` with mock backends (`ALWM_FIXTURE_MODE=1`) → `out/benchmark-offline` |
 | `benchmark-ollama` | `ollama`, `benchmark-ollama` | Ollama daemon + `benchmarks/v1/ollama.v1.yaml` → `out/benchmark-ollama` |
 | `benchmark-llamacpp` | `benchmark-llamacpp` | OpenAI-compatible URL (default host port 8080) + `llamacpp.v1.yaml` → `out/benchmark-llamacpp` |
+| `benchmark-probe` | `benchmark-probe`, `ollama` | `alwm benchmark probe` (Ollama + host OpenAI-compatible reachability only) |
+| `browser-verify` | `browser-verify` | Builds `Dockerfile` target `browser-test`; runs Playwright integration tests (`ALWM_PLAYWRIGHT_SMOKE=1`) |
 
 Examples:
 
@@ -36,7 +38,9 @@ docker compose --profile benchmark run --rm benchmark
 docker compose --profile benchmark-offline run --rm benchmark-offline
 ```
 
-`just compose-help` validates the Compose file for each profile and prints service names. Shortcut recipes: `just benchmark-offline`, `just benchmark-ollama`, `just benchmark-llamacpp`.
+`just compose-help` validates the Compose file for each profile and prints service names. Shortcut recipes: `just benchmark-offline`, `just benchmark-ollama`, `just benchmark-probe`, `just benchmark-llamacpp`, `just browser-verify`.
+
+Opt-in live checks (providers + Playwright) are summarized in [live-verification.md](live-verification.md).
 
 ## Buildx Bake
 
