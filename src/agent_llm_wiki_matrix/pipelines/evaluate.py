@@ -33,21 +33,16 @@ def _load_subject_text(path: Path) -> tuple[str, str]:
     raise ValueError(msg)
 
 
-def evaluate_subject(
-    subject_path: Path,
-    rubric_path: Path,
+def _evaluate_text_core(
     *,
+    subject_ref: str,
+    text: str,
+    rubric_model: Rubric,
     evaluation_id: str,
     evaluated_at: str,
-    evaluator: Literal["human", "agent", "pipeline"] = "pipeline",
+    evaluator: Literal["human", "agent", "pipeline"],
+    notes_markdown: str | None,
 ) -> Evaluation:
-    """Score ``subject_path`` against ``rubric_path`` using deterministic hashes."""
-    rubric_model = load_artifact_file(rubric_path, "rubric")
-    if not isinstance(rubric_model, Rubric):
-        msg = "Expected a Rubric artifact"
-        raise TypeError(msg)
-    subject_ref, text = _load_subject_text(subject_path)
-
     scores: dict[str, float] = {}
     weights: dict[str, float] = {}
     for c in rubric_model.criteria:
@@ -67,6 +62,57 @@ def evaluate_subject(
         scores=scores,
         weights=weights,
         total_weighted_score=round(total, 6),
+        evaluated_at=evaluated_at,
+        evaluator=evaluator,
+        notes_markdown=notes_markdown,
+    )
+
+
+def evaluate_text(
+    *,
+    subject_ref: str,
+    text: str,
+    rubric_path: Path,
+    evaluation_id: str,
+    evaluated_at: str,
+    evaluator: Literal["human", "agent", "pipeline"] = "pipeline",
+    notes_markdown: str | None = "Deterministic pipeline evaluation (byte-hash scores).",
+) -> Evaluation:
+    """Score arbitrary text against ``rubric_path`` (same hashing as file-based evaluate)."""
+    rubric_model = load_artifact_file(rubric_path, "rubric")
+    if not isinstance(rubric_model, Rubric):
+        msg = "Expected a Rubric artifact"
+        raise TypeError(msg)
+    return _evaluate_text_core(
+        subject_ref=subject_ref,
+        text=text,
+        rubric_model=rubric_model,
+        evaluation_id=evaluation_id,
+        evaluated_at=evaluated_at,
+        evaluator=evaluator,
+        notes_markdown=notes_markdown,
+    )
+
+
+def evaluate_subject(
+    subject_path: Path,
+    rubric_path: Path,
+    *,
+    evaluation_id: str,
+    evaluated_at: str,
+    evaluator: Literal["human", "agent", "pipeline"] = "pipeline",
+) -> Evaluation:
+    """Score ``subject_path`` against ``rubric_path`` using deterministic hashes."""
+    rubric_model = load_artifact_file(rubric_path, "rubric")
+    if not isinstance(rubric_model, Rubric):
+        msg = "Expected a Rubric artifact"
+        raise TypeError(msg)
+    subject_ref, text = _load_subject_text(subject_path)
+    return _evaluate_text_core(
+        subject_ref=subject_ref,
+        text=text,
+        rubric_model=rubric_model,
+        evaluation_id=evaluation_id,
         evaluated_at=evaluated_at,
         evaluator=evaluator,
         notes_markdown="Deterministic pipeline evaluation (byte-hash scores).",

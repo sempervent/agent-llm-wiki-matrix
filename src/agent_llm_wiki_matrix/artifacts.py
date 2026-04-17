@@ -9,6 +9,7 @@ from typing import Any
 from pydantic import BaseModel
 
 from agent_llm_wiki_matrix.models import (
+    BenchmarkResponse,
     ComparisonMatrix,
     Evaluation,
     Event,
@@ -27,6 +28,7 @@ _ARTIFACTS: dict[str, tuple[type[BaseModel], str]] = {
     "matrix": (ComparisonMatrix, "schemas/v1/matrix.schema.json"),
     "report": (Report, "schemas/v1/report.schema.json"),
     "rubric": (Rubric, "schemas/v1/rubric.schema.json"),
+    "benchmark_response": (BenchmarkResponse, "schemas/v1/benchmark_response.schema.json"),
 }
 
 

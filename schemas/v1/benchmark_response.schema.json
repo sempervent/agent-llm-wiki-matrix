@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/sempervent/agent-llm-wiki-matrix/schemas/v1/benchmark_response.schema.json",
+  "title": "BenchmarkResponse",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "id",
+    "benchmark_id",
+    "variant_id",
+    "prompt_id",
+    "agent_stack",
+    "execution_mode",
+    "backend_kind",
+    "backend_model",
+    "prompt_text",
+    "response_text",
+    "created_at"
+  ],
+  "properties": {
+    "schema_version": { "type": "integer", "const": 1 },
+    "id": { "type": "string", "minLength": 1 },
+    "benchmark_id": { "type": "string", "minLength": 1 },
+    "variant_id": { "type": "string", "minLength": 1 },
+    "prompt_id": { "type": "string", "minLength": 1 },
+    "agent_stack": { "type": "string", "minLength": 1 },
+    "execution_mode": {
+      "type": "string",
+      "enum": ["cli", "browser_mock", "repo_governed"]
+    },
+    "backend_kind": {
+      "type": "string",
+      "enum": ["mock", "ollama", "openai_compatible"]
+    },
+    "backend_model": { "type": "string" },
+    "prompt_text": { "type": "string" },
+    "response_text": { "type": "string" },
+    "duration_ms": { "type": "integer", "minimum": 0 },
+    "created_at": { "type": "string", "description": "RFC 3339 date-time" }
+  }
+}

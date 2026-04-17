@@ -128,3 +128,23 @@ class Report(BaseModel):
     period_end: str = Field(description="RFC 3339 date (or date-time)")
     body_markdown: str
     source_refs: list[str] = Field(default_factory=list)
+
+
+class BenchmarkResponse(BaseModel):
+    """Raw model output for one benchmark (variant × prompt) cell."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    schema_version: Literal[1] = 1
+    id: str = Field(min_length=1)
+    benchmark_id: str = Field(min_length=1)
+    variant_id: str = Field(min_length=1)
+    prompt_id: str = Field(min_length=1)
+    agent_stack: str = Field(min_length=1)
+    execution_mode: Literal["cli", "browser_mock", "repo_governed"]
+    backend_kind: Literal["mock", "ollama", "openai_compatible"]
+    backend_model: str
+    prompt_text: str
+    response_text: str
+    duration_ms: int | None = Field(default=None, ge=0)
+    created_at: str = Field(description="RFC 3339 date-time")
