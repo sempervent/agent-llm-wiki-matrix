@@ -11,11 +11,12 @@ from agent_llm_wiki_matrix.artifacts import load_artifact_file
 from agent_llm_wiki_matrix.browser import (
     FileBrowserRunner,
     MockBrowserRunner,
+    PlaywrightBrowserRunner,
     evidence_to_prompt_block,
     load_browser_evidence,
 )
 from agent_llm_wiki_matrix.browser.models import BrowserRunRequest
-from agent_llm_wiki_matrix.browser.stubs import MCPBrowserRunner, PlaywrightBrowserRunner
+from agent_llm_wiki_matrix.browser.stubs import MCPBrowserRunner
 from agent_llm_wiki_matrix.cli import main
 
 _REPO = Path(__file__).resolve().parents[1]
@@ -67,9 +68,19 @@ def test_file_browser_runner_missing_raises() -> None:
         runner.run(BrowserRunRequest(scenario_id="does_not_exist"))
 
 
-def test_playwright_stub_raises() -> None:
-    with pytest.raises(NotImplementedError):
+def test_playwright_runner_requires_start_url() -> None:
+    with pytest.raises(ValueError, match="start_url"):
         PlaywrightBrowserRunner().run(BrowserRunRequest())
+
+
+def test_playwright_runner_missing_package_raises_runtime_error() -> None:
+    try:
+        import playwright.sync_api  # noqa: F401
+    except ImportError:
+        with pytest.raises(RuntimeError, match="Playwright is not installed"):
+            PlaywrightBrowserRunner().run(BrowserRunRequest(start_url="file:///dev/null"))
+    else:
+        pytest.skip("playwright is installed; install-path not exercised")
 
 
 def test_mcp_stub_raises() -> None:

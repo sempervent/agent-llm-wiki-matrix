@@ -46,5 +46,16 @@ target "orchestrator-arm64" {
   platforms = ["linux/arm64"]
 }
 
+// Test image + Playwright Chromium (for optional browser-verify Compose profile).
+target "browser-test" {
+  context    = "."
+  dockerfile = "Dockerfile"
+  target     = "browser-test"
+  platforms  = ["linux/amd64"]
+  tags = [
+    "agent-llm-wiki-matrix:browser-test",
+  ]
+}
+
 // Extension point: other ARM variants (e.g. linux/arm/v7) require explicit
 // base image support and testing; add new targets here when validated.

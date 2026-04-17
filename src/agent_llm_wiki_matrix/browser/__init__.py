@@ -15,7 +15,8 @@ from agent_llm_wiki_matrix.browser.models import (
     ConsoleMessage,
     NavigationStep,
 )
-from agent_llm_wiki_matrix.browser.stubs import MCPBrowserRunner, PlaywrightBrowserRunner
+from agent_llm_wiki_matrix.browser.playwright_runner import PlaywrightBrowserRunner
+from agent_llm_wiki_matrix.browser.stubs import MCPBrowserRunner
 
 __all__ = [
     "BrowserEvidence",

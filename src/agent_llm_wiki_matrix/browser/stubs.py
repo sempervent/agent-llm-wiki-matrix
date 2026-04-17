@@ -1,32 +1,12 @@
-"""Reserved runners for future Playwright and MCP-based browser automation.
+"""Reserved runner for future MCP-based browser automation.
 
-These classes exist so callers can depend on `BrowserRunner` without importing
-optional heavy dependencies. They are not wired into the CLI or Docker image
-until integration work lands.
+`PlaywrightBrowserRunner` lives in `browser.playwright_runner` (optional `playwright` dep).
 """
 
 from __future__ import annotations
 
 from agent_llm_wiki_matrix.browser.base import BrowserRunner
 from agent_llm_wiki_matrix.browser.models import BrowserRunRequest, BrowserRunResult
-
-
-class PlaywrightBrowserRunner(BrowserRunner):
-    """Future: drive Chromium/WebKit/Firefox via Playwright."""
-
-    def __init__(self, *, headless: bool = True) -> None:
-        self._headless = headless
-
-    @property
-    def name(self) -> str:
-        return "playwright"
-
-    def run(self, request: BrowserRunRequest) -> BrowserRunResult:
-        raise NotImplementedError(
-            "PlaywrightBrowserRunner is not implemented yet. "
-            "Use MockBrowserRunner or FileBrowserRunner with JSON fixtures, "
-            "or integrate Playwright here when adding live browser automation."
-        )
 
 
 class MCPBrowserRunner(BrowserRunner):

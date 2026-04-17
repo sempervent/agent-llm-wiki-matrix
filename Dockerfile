@@ -41,3 +41,10 @@ WORKDIR /workspace
 ENV ALWM_REPO_ROOT=/workspace
 ENTRYPOINT []
 CMD ["python", "-m", "pytest", "-q", "tests/"]
+
+# Optional: Playwright + Chromium for `browser-verify` Compose profile (not used by default CI).
+FROM test AS browser-test
+USER root
+RUN pip install "playwright>=1.40" \
+    && python -m playwright install --with-deps chromium
+USER alwm

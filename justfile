@@ -39,6 +39,21 @@ typecheck:
 
 ci: lint typecheck test
 
+# Opt-in: pytest integration/ (Ollama + OpenAI-compatible benchmarks); skips unless env set / reachable
+verify-live-providers:
+    {{python}} -m pytest tests/integration/test_live_benchmark_providers.py -v -m integration --strict-markers
+
+# Opt-in: Playwright file:// smoke (requires `pip install -e ".[browser]"` and `playwright install chromium` on host)
+verify-playwright-local:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    export ALWM_PLAYWRIGHT_SMOKE=1
+    {{python}} -m pytest tests/integration/test_playwright_browser.py -v -m integration --strict-markers
+
+# Build browser-test image and run Playwright integration tests in Compose (headless; no external network)
+browser-verify:
+    docker compose --profile browser-verify run --rm browser-verify
+
 docker-build:
     docker build -t agent-llm-wiki-matrix:local -f Dockerfile .
 
@@ -48,7 +63,7 @@ docker-bake:
 compose-help:
     #!/usr/bin/env bash
     set -euo pipefail
-    profiles=(dev test benchmark benchmark-offline benchmark-ollama benchmark-probe benchmark-llamacpp)
+    profiles=(dev test benchmark benchmark-offline benchmark-ollama benchmark-probe benchmark-llamacpp browser-verify)
     for p in "${profiles[@]}"; do
       docker compose --profile "$p" config >/dev/null
     done

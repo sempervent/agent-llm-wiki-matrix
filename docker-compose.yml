@@ -163,5 +163,27 @@ services:
       - --run-id
       - compose-benchmark-llamacpp
 
+  # Playwright smoke (headless Chromium; optional image target `browser-test` in Dockerfile).
+  browser-verify:
+    <<: *alwm-env
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: browser-test
+    image: agent-llm-wiki-matrix:browser-test
+    profiles:
+      - browser-verify
+    environment:
+      ALWM_LOG_LEVEL: ${ALWM_LOG_LEVEL:-INFO}
+      ALWM_REPO_ROOT: /workspace
+      ALWM_PLAYWRIGHT_SMOKE: "1"
+    command:
+      - python
+      - -m
+      - pytest
+      - tests/integration/test_playwright_browser.py
+      - -v
+      - --strict-markers
+
 volumes:
   ollama_models:
