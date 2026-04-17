@@ -28,6 +28,7 @@ pip install -e ".[dev]"
 alwm version
 alwm info
 alwm validate examples/v1/thought.json thought
+alwm providers show
 make ci
 ```
 
@@ -83,6 +84,7 @@ Detailed diagrams and data flow: `docs/architecture/runtime.md`, `docs/architect
 | `make docker-bake` | Multi-arch bake via `docker-bake.hcl` |
 | `make compose-help` | Validate Compose file and list services |
 | `alwm validate <file> <kind>` | Validate JSON against schema + Pydantic (`thought`, `event`, …) |
+| `alwm providers show` | Print resolved provider config (API keys redacted) |
 
 ## Repository layout
 

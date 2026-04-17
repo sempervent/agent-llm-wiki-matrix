@@ -16,7 +16,10 @@ See `.env.example`. Notable keys:
 | `ALWM_LOG_LEVEL` | Logging verbosity |
 | `ALWM_REPO_ROOT` | Repository root for schema paths and future pipelines (Compose sets `/workspace`) |
 | `ALWM_FIXTURE_MODE` | Future: force fixture-only behavior (no network) |
-| `ALWM_PROVIDER` | Future: `mock`, `ollama`, `openai_compatible` |
+| `ALWM_PROVIDER` | `mock`, `ollama`, or `openai_compatible` |
+| `ALWM_PROVIDER_CONFIG` | Optional path to YAML (see `config/providers.example.yaml`) |
+| `OLLAMA_HOST`, `OLLAMA_MODEL` | Ollama endpoint overrides |
+| `OPENAI_BASE_URL`, `OPENAI_API_KEY`, `OPENAI_MODEL` | OpenAI-compatible server overrides |
 
 ## Docker
 

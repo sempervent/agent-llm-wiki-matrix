@@ -2,6 +2,20 @@
 
 Chronological record of repository work. Latest entries first.
 
+## 2026-04-17 — Phase 3 complete (provider abstraction)
+
+**Delivered:**
+
+- `BaseProvider` + `CompletionRequest` contract.
+- `MockProvider` (deterministic, no network).
+- `OllamaProvider` (`/api/chat`) and `OpenAICompatibleProvider` (`/v1/chat/completions`) using `httpx` with injectable `MockTransport` for tests.
+- `ProviderConfig` loaded from optional YAML + environment overrides (`load_provider_config`).
+- Example YAML: `config/providers.example.yaml`; local `config/providers.yaml` gitignored.
+- CLI: `alwm providers show` prints redacted configuration.
+- Tests in `tests/test_providers.py` (mocked HTTP only).
+
+**Next:** Phase 4 — ingest pipeline, claim extraction stubs, rubric evaluation, matrix persistence.
+
 ## 2026-04-17 — Phase 2 complete (domain models + schemas)
 
 **Delivered:**

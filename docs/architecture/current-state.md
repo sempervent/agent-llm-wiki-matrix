@@ -1,10 +1,10 @@
 # Current architecture
 
-_Last updated: 2026-04-17 (Phase 2)._
+_Last updated: 2026-04-17 (Phase 3)._
 
 ## Summary
 
-The repository is a **docs-first** workspace for an LLM wiki and comparison matrix, with a Python orchestration package and Docker-based build/run tooling. Phase 2 added **domain models** and **JSON Schemas** for core entities, **fixtures**, **examples**, **markdown templates**, and a **`validate`** CLI command.
+The repository is a **docs-first** workspace for an LLM wiki and comparison matrix, with a Python orchestration package and Docker-based build/run tooling. Phases 1–2 delivered schemas, fixtures, and validation; **Phase 3** adds **provider adapters** (mock, Ollama, OpenAI-compatible HTTP) with YAML/env configuration and **`alwm providers show`**.
 
 ## Components
 
@@ -15,7 +15,7 @@ The repository is a **docs-first** workspace for an LLM wiki and comparison matr
 | Wiki `WikiNote` schema | Implemented | `note.schema.json`; examples still JSON-only |
 | Prompt registry | Skeleton | `prompts/registry.yaml` |
 | Markdown templates | Skeleton | `templates/*.md` plus weekly report stub |
-| Provider layer | Not implemented | Phase 3 |
+| Provider layer | Implemented (adapters) | Mock / Ollama / OpenAI-compatible HTTP; no benchmark wiring yet |
 | Pipelines (ingest/evaluate) | Not implemented | Phases 4–5 |
 | Browser evidence layer | Not implemented | Planned: mock + fixtures |
 

@@ -1,0 +1,13 @@
+# Example provider configuration (optional). Environment variables override these values.
+# Typical usage: copy to config/providers.local.yaml (gitignored) or pass via ALWM_* env vars.
+
+kind: mock
+
+ollama:
+  host: http://127.0.0.1:11434
+  model: llama3.2
+
+openai_compatible:
+  base_url: http://127.0.0.1:8080/v1
+  api_key: ""
+  model: gpt-oss

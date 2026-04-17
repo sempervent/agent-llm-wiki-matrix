@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 import os
 import sys
 from pathlib import Path
@@ -11,6 +12,7 @@ import click
 from agent_llm_wiki_matrix import __version__
 from agent_llm_wiki_matrix.artifacts import list_artifact_kinds, load_artifact_file
 from agent_llm_wiki_matrix.logging_config import configure_logging, get_logger
+from agent_llm_wiki_matrix.providers.config import load_provider_config
 
 
 @click.group(context_settings={"help_option_names": ["-h", "--help"]})
@@ -36,6 +38,39 @@ def main(ctx: click.Context, log_level: str) -> None:
 def cmd_version() -> None:
     """Print version string."""
     click.echo(__version__)
+
+
+@main.group("providers")
+def providers_cmd() -> None:
+    """Inspect provider configuration (Phase 3)."""
+
+
+@providers_cmd.command("show")
+@click.option(
+    "--config-yaml",
+    type=click.Path(path_type=Path, exists=True, dir_okay=False, readable=True),
+    default=None,
+    help=(
+        "Optional YAML file. Defaults: $ALWM_PROVIDER_CONFIG, else "
+        "<repo>/config/providers.yaml if present."
+    ),
+)
+def cmd_providers_show(config_yaml: Path | None) -> None:
+    """Print resolved provider configuration (API keys redacted)."""
+    repo = Path(os.environ.get("ALWM_REPO_ROOT", ".")).resolve()
+    path = config_yaml
+    if path is None:
+        env_path = os.environ.get("ALWM_PROVIDER_CONFIG")
+        if env_path:
+            path = Path(env_path)
+        else:
+            candidate = repo / "config" / "providers.yaml"
+            path = candidate if candidate.is_file() else None
+    cfg = load_provider_config(yaml_path=path, environ=os.environ)
+    data = cfg.model_dump()
+    key = data["openai_compatible"]["api_key"]
+    data["openai_compatible"]["api_key"] = "***" if key else ""
+    click.echo(json.dumps(data, indent=2, sort_keys=True))
 
 
 @main.command("validate")
