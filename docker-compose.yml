@@ -46,14 +46,92 @@ services:
       - benchmark
     command: ["info"]
 
-  # Optional: bundle Ollama when model profiles are hardened (see docs/workflows/benchmarking.md).
-  # ollama:
-  #   image: ollama/ollama:latest
-  #   profiles: ["models"]
-  #   ports:
-  #     - "11434:11434"
-  #   volumes:
-  #     - ollama_data:/root/.ollama
-#
-# volumes:
-#   ollama_data:
+  benchmark-offline:
+    <<: *alwm-env
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runtime
+    image: agent-llm-wiki-matrix:local
+    profiles:
+      - benchmark-offline
+    environment:
+      ALWM_LOG_LEVEL: ${ALWM_LOG_LEVEL:-INFO}
+      ALWM_FIXTURE_MODE: "1"
+      ALWM_REPO_ROOT: /workspace
+    command:
+      - benchmark
+      - run
+      - --definition
+      - /workspace/fixtures/benchmarks/offline.v1.yaml
+      - --output-dir
+      - /workspace/out/benchmark-offline
+      - --created-at
+      - "1970-01-01T00:00:00Z"
+      - --run-id
+      - compose-benchmark-offline
+
+  ollama:
+    image: ollama/ollama:latest
+    profiles:
+      - benchmark-ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_models:/root/.ollama
+
+  benchmark-ollama:
+    <<: *alwm-env
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runtime
+    image: agent-llm-wiki-matrix:local
+    profiles:
+      - benchmark-ollama
+    depends_on:
+      - ollama
+    environment:
+      ALWM_LOG_LEVEL: ${ALWM_LOG_LEVEL:-INFO}
+      ALWM_FIXTURE_MODE: "0"
+      ALWM_REPO_ROOT: /workspace
+      OLLAMA_HOST: http://ollama:11434
+    command:
+      - benchmark
+      - run
+      - --definition
+      - /workspace/benchmarks/v1/ollama.v1.yaml
+      - --output-dir
+      - /workspace/out/benchmark-ollama
+      - --no-fixture-mock
+      - --run-id
+      - compose-benchmark-ollama
+
+  benchmark-llamacpp:
+    <<: *alwm-env
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runtime
+    image: agent-llm-wiki-matrix:local
+    profiles:
+      - benchmark-llamacpp
+    environment:
+      ALWM_LOG_LEVEL: ${ALWM_LOG_LEVEL:-INFO}
+      ALWM_FIXTURE_MODE: "0"
+      ALWM_REPO_ROOT: /workspace
+      OPENAI_BASE_URL: ${LLAMACPP_OPENAI_BASE_URL:-http://host.docker.internal:8080/v1}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-not-needed-local}
+    command:
+      - benchmark
+      - run
+      - --definition
+      - /workspace/benchmarks/v1/llamacpp.v1.yaml
+      - --output-dir
+      - /workspace/out/benchmark-llamacpp
+      - --no-fixture-mock
+      - --run-id
+      - compose-benchmark-llamacpp
+
+volumes:
+  ollama_models:
