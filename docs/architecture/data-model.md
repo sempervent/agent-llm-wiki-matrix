@@ -1,6 +1,6 @@
 # Data model
 
-_Last updated: 2026-04-17 (Phase 2)._
+_Last updated: 2026-04-17 (browser evidence)._
 
 ## Principles
 
@@ -19,11 +19,12 @@ _Last updated: 2026-04-17 (Phase 2)._
 | `schemas/v1/matrix.schema.json` | `ComparisonMatrix` | Pairwise/grid scores with labels |
 | `schemas/v1/report.schema.json` | `Report` | Human-facing narrative report |
 | `schemas/v1/note.schema.json` | _(no Pydantic model yet)_ | Lightweight wiki note (Phase 1) |
+| `schemas/v1/browser_evidence.schema.json` | `BrowserEvidence` (`browser.models`) | Navigation + console (+ optional DOM ref) for browser runs |
 
 ## Validation
 
 - `agent_llm_wiki_matrix.artifacts.parse_artifact(kind, data)` runs JSON Schema validation then Pydantic parsing.
-- CLI: `alwm validate <path> <kind>` with `kind` ∈ `thought|event|experiment|evaluation|matrix|report`.
+- CLI: `alwm validate <path> <kind>` — includes `browser_evidence` and benchmark/matrix kinds (see `list_artifact_kinds()`).
 
 ## Templates
 

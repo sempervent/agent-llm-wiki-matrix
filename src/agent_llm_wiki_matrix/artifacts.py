@@ -8,6 +8,7 @@ from typing import Any
 
 from pydantic import BaseModel
 
+from agent_llm_wiki_matrix.browser.models import BrowserEvidence
 from agent_llm_wiki_matrix.models import (
     BenchmarkCase,
     BenchmarkRequestRecord,
@@ -40,6 +41,7 @@ _ARTIFACTS: dict[str, tuple[type[BaseModel], str]] = {
         MatrixPairwiseInputs,
         "schemas/v1/matrix_pairwise_inputs.schema.json",
     ),
+    "browser_evidence": (BrowserEvidence, "schemas/v1/browser_evidence.schema.json"),
 }
 
 

@@ -30,6 +30,8 @@ alwm version
 alwm info
 alwm validate examples/v1/thought.json thought
 alwm validate examples/v1/rubric.json rubric
+alwm validate examples/browser_evidence/v1/export_flow.json browser_evidence
+alwm browser prompt-block examples/browser_evidence/v1/export_flow.json
 alwm providers show
 just ci
 ```
@@ -138,7 +140,9 @@ Run `just` with no arguments to list recipes. Common tasks:
 | `just benchmark-offline` | Run mock benchmark via Compose → `out/benchmark-offline` |
 | `just benchmark-ollama` | Ollama service + smoke benchmark → `out/benchmark-ollama` |
 | `just benchmark-llamacpp` | OpenAI-compatible endpoint on host → `out/benchmark-llamacpp` |
-| `alwm validate <file> <kind>` | Validate JSON against schema + Pydantic |
+| `alwm validate <file> <kind>` | Validate JSON against schema + Pydantic (includes `browser_evidence`) |
+| `alwm browser prompt-block <file>` | Load browser evidence JSON → stable prompt-sized text |
+| `alwm browser run-mock` | Run `MockBrowserRunner` (deterministic; no browser binary) |
 | `alwm ingest <input_dir> <output_dir>` | Markdown pages → Thought JSON |
 | `alwm evaluate --subject … --rubric … --out …` | Deterministic rubric scoring |
 | `alwm compare <eval.json>… --out … [--out-md …]` | Evaluations → matrix JSON (+ optional matrix Markdown) |
@@ -159,9 +163,9 @@ Run `just` with no arguments to list recipes. Common tasks:
 ├── templates/             # Markdown report templates
 ├── prompts/               # Versioned prompts
 ├── config/                # Optional provider YAML (see providers.example.yaml)
-├── examples/              # Example artifacts + dataset + generated matrix/report
+├── examples/              # Example artifacts + dataset + generated matrix/report + browser evidence
 ├── benchmarks/v1/         # Versioned benchmark YAML
-├── fixtures/              # Deterministic test inputs (+ benchmarks/)
+├── fixtures/              # Deterministic test inputs (+ benchmarks/, browser_evidence/)
 ├── src/agent_llm_wiki_matrix/
 ├── tests/
 └── docs/

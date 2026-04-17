@@ -13,6 +13,12 @@ import click
 from agent_llm_wiki_matrix import __version__
 from agent_llm_wiki_matrix.artifacts import list_artifact_kinds, load_artifact_file
 from agent_llm_wiki_matrix.benchmark import load_benchmark_definition, run_benchmark
+from agent_llm_wiki_matrix.browser import (
+    MockBrowserRunner,
+    evidence_to_prompt_block,
+    load_browser_evidence,
+)
+from agent_llm_wiki_matrix.browser.models import BrowserRunRequest
 from agent_llm_wiki_matrix.logging_config import configure_logging, get_logger
 from agent_llm_wiki_matrix.models import ComparisonMatrix
 from agent_llm_wiki_matrix.pipelines.compare import evaluations_to_matrix
@@ -82,6 +88,47 @@ def cmd_providers_show(config_yaml: Path | None) -> None:
     key = data["openai_compatible"]["api_key"]
     data["openai_compatible"]["api_key"] = "***" if key else ""
     click.echo(json.dumps(data, indent=2, sort_keys=True))
+
+
+@main.group("browser")
+def browser_grp() -> None:
+    """Browser execution abstraction (mock + file fixtures; no live automation)."""
+
+
+@browser_grp.command("prompt-block")
+@click.argument(
+    "path",
+    type=click.Path(path_type=Path, exists=True, dir_okay=False, readable=True),
+)
+def cmd_browser_prompt_block(path: Path) -> None:
+    """Load a browser_evidence JSON file and print a stable prompt-sized block."""
+    evidence = load_browser_evidence(path)
+    click.echo(evidence_to_prompt_block(evidence))
+
+
+@browser_grp.command("run-mock")
+@click.option("--scenario-id", default=None, help="Logical id for deterministic output.")
+@click.option("--start-url", default=None, help="Optional start URL for the mock trace.")
+@click.option(
+    "--step",
+    "steps",
+    multiple=True,
+    help="Optional step labels appended to the trace.",
+)
+def cmd_browser_run_mock(
+    scenario_id: str | None,
+    start_url: str | None,
+    steps: tuple[str, ...],
+) -> None:
+    """Run MockBrowserRunner and print JSON (offline; no browser binary)."""
+    runner = MockBrowserRunner()
+    req = BrowserRunRequest(
+        scenario_id=scenario_id,
+        start_url=start_url,
+        steps=list(steps),
+    )
+    result = runner.run(req)
+    click.echo(result.model_dump_json(indent=2))
 
 
 @main.command("validate")

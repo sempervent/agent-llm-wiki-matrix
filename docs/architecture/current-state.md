@@ -17,7 +17,7 @@ The repository is a **docs-first** workspace for an LLM wiki and comparison matr
 | Markdown templates | Implemented | `templates/matrix.md`, `templates/report.md`, weekly stub |
 | Provider layer | Implemented | Mock / Ollama / OpenAI-compatible HTTP; YAML/env config |
 | Pipelines | Implemented | Ingest → evaluate → compare → report; **benchmark run** (responses → evals → grid + pairwise matrices + report) |
-| Browser evidence layer | Not implemented | Planned: mock + fixtures |
+| Browser evidence layer | Implemented (abstraction) | `MockBrowserRunner`, `FileBrowserRunner`, JSON fixtures; Playwright/MCP **stubs** only |
 
 ## Runtime
 

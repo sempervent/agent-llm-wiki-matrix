@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "id": "evidence.export_flow.v1",
+  "title": "Abstract trace: Home → Settings → Export",
+  "navigation_sequence": [
+    {
+      "url": "https://example.test/",
+      "title": "Home",
+      "action": "navigate"
+    },
+    {
+      "url": "https://example.test/settings",
+      "title": "Settings",
+      "action": "navigate"
+    },
+    {
+      "url": "https://example.test/settings/export",
+      "title": "Export",
+      "action": "click"
+    }
+  ],
+  "console_messages": [
+    { "level": "log", "text": "export clicked once" },
+    { "level": "log", "text": "no errors in console" }
+  ],
+  "notes": "Deterministic fixture (no PII). Matches benchmark case.browser.evidence narrative."
+}

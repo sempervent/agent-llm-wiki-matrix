@@ -20,6 +20,12 @@ See `.env.example`. Notable keys:
 | `ALWM_PROVIDER_CONFIG` | Optional path to YAML (see `config/providers.example.yaml`) |
 | `OLLAMA_HOST`, `OLLAMA_MODEL` | Ollama endpoint overrides |
 | `OPENAI_BASE_URL`, `OPENAI_API_KEY`, `OPENAI_MODEL` | OpenAI-compatible server overrides |
+
+## Browser abstraction
+
+- Offline: `MockBrowserRunner`, `FileBrowserRunner`, JSON under `fixtures/browser_evidence/v1/` (see `docs/architecture/browser.md`).
+- CLI: `alwm browser prompt-block <path>`, `alwm browser run-mock`.
+- Future: `PlaywrightBrowserRunner` / `MCPBrowserRunner` are stubs until live automation is integrated.
 | `LLAMACPP_OPENAI_BASE_URL` | Override for Compose **benchmark-llamacpp** (default `host.docker.internal:8080/v1`) |
 
 ## Docker

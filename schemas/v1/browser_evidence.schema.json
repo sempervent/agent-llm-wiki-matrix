@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/sempervent/agent-llm-wiki-matrix/schemas/v1/browser_evidence.schema.json",
+  "title": "BrowserEvidence",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "id", "navigation_sequence"],
+  "properties": {
+    "schema_version": { "type": "integer", "const": 1 },
+    "id": { "type": "string", "minLength": 1 },
+    "title": { "type": "string" },
+    "navigation_sequence": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["url"],
+        "properties": {
+          "url": { "type": "string", "minLength": 1 },
+          "title": { "type": "string" },
+          "action": {
+            "type": "string",
+            "description": "High-level action label (navigate, click, submit, ...)"
+          }
+        }
+      }
+    },
+    "console_messages": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["level", "text"],
+        "properties": {
+          "level": {
+            "type": "string",
+            "enum": ["log", "warn", "error", "debug"]
+          },
+          "text": { "type": "string" }
+        }
+      },
+      "default": []
+    },
+    "dom_snapshot_ref": {
+      "type": "string",
+      "description": "Opaque id or repo-relative path to a snapshot artifact (future)"
+    },
+    "notes": { "type": "string" }
+  }
+}

@@ -2,6 +2,12 @@
 
 Chronological record of repository work. Latest entries first.
 
+## 2026-04-17 — Browser execution abstraction
+
+**Delivered:** `BrowserRunner` ABC; `BrowserEvidence` JSON Schema + Pydantic models; `MockBrowserRunner` and `FileBrowserRunner`; fixture `fixtures/browser_evidence/v1/export_flow.json`; `PlaywrightBrowserRunner` / `MCPBrowserRunner` stubs (`NotImplementedError`); `load_browser_evidence`, `evidence_to_prompt_block`; artifact kind `browser_evidence` for `alwm validate`; CLI `alwm browser prompt-block` and `alwm browser run-mock`; tests `tests/test_browser.py`; `docs/architecture/browser.md`.
+
+**Not in scope:** live Playwright or MCP browser automation (stubs only).
+
 ## 2026-04-17 — Benchmark run artifact persistence
 
 **Delivered:** Structured output under `cells/`, `matrices/`, `markdown/`, `reports/` with stable `cell_id` slugs, **benchmark_request** + raw/normalized response text files, aggregate **benchmark_response**, per-cell **evaluation**, **matrix_grid_inputs** / **matrix_pairwise_inputs**, and manifest **cells[]** index; execution layer returns raw vs normalized text.
