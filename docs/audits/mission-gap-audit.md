@@ -3,7 +3,7 @@
 **Last verified:** 2026-04-17 (stabilization refresh)  
 **Method:** Inspect `src/agent_llm_wiki_matrix/`, run `just ci`, `just compose-help`, `just verify-live-providers`, `just verify-playwright-local`, representative `alwm` commands, and `docker buildx bake --print`. Claims below are backed by command output unless marked *static review*.
 
-**Related:** `docs/audits/current-capability-status.md` (summary table), `docs/audits/capability-classification.md` (labeling rules).
+**Related:** `docs/audits/current-capability-status.md` (summary table), `docs/audits/capability-classification.md` (labeling rules), `docs/release-readiness.md` and `docs/audits/release-readiness-audit.md` (v0.1.0 tagging scope).
 
 ## Classification key
 

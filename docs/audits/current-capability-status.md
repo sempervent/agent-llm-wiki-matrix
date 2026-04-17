@@ -2,6 +2,8 @@
 
 **Last verified:** 2026-04-17 (stabilization pass; `just ci`, compose profiles, optional integration recipes).
 
+**v0.1.0 release:** See [docs/release-readiness.md](../release-readiness.md) and [release-readiness-audit.md](release-readiness-audit.md).
+
 This document is a **high-level snapshot**. For command-level evidence, see `docs/audits/mission-gap-audit.md` (refreshed with the same pass). For labeling rules in PRs, see `docs/audits/capability-classification.md`.
 
 ## Legend

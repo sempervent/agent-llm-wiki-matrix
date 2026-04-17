@@ -33,11 +33,15 @@ browser = [
     "playwright>=1.40",
 ]
 
+[project.urls]
+Repository = "https://github.com/sempervent/agent-llm-wiki-matrix"
+Changelog = "https://github.com/sempervent/agent-llm-wiki-matrix/blob/main/CHANGELOG.md"
+
 [project.scripts]
 alwm = "agent_llm_wiki_matrix.cli:main"
 
 [tool.hatch.build.targets.sdist]
-include = ["src/agent_llm_wiki_matrix", "README.md", "pyproject.toml"]
+include = ["src/agent_llm_wiki_matrix", "README.md", "CHANGELOG.md", "pyproject.toml"]
 
 [tool.ruff]
 target-version = "py311"

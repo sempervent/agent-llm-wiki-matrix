@@ -10,6 +10,8 @@
 | `suite.registry.strict_duo.v1.yaml` | Strict | `bench.task.repo_governed.v1` + `bench.task.matrix_reasoning.v1` | 2 (`cli`, `repo_governed`) | Cross-mode deltas under strict scoring |
 | `suite.registry.generous_duo.v1.yaml` | Generous | `bench.task.markdown_synthesis.v1` + `bench.task.browser_evidence.v1` | 2 (`cli`, `browser_mock`) | Markdown + browser-tagged outputs |
 
+After a run, validate the output index: `alwm validate examples/benchmark_runs/<id>/manifest.json benchmark_manifest`.
+
 Run offline (mock) and write `examples/benchmark_runs/<id>/`:
 
 ```bash

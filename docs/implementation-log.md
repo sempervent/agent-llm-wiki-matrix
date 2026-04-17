@@ -2,6 +2,10 @@
 
 Chronological record of repository work. Latest entries first.
 
+## 2026-04-17 — v0.1.0 release preparation
+
+**Delivered:** First semver release tag readiness: `CHANGELOG.md`, `docs/releases/v0.1.0.md`, `docs/release-readiness.md`, `docs/audits/release-readiness-audit.md`, `docs/workflows/walkthrough-v0.1.0.md`. README quickstarts (exact local, benchmark, prompt registry, manifest validate, optional live verification) and `pyproject.toml` `urls` + sdist `CHANGELOG.md` include. Version metadata remains **0.1.0** (`pyproject.toml`, `__version__`). Evidence: `just ci` (85 passed, 1 skipped), `just compose-help`, `docker buildx bake --print`.
+
 ## 2026-04-17 — Post-merge stabilization (parallel tracks)
 
 **Delivered:** Single coherent tree on `main`: lazy `run_benchmark` in `benchmark/__init__.py` to avoid `artifacts` ↔ `pipelines` import cycles after manifest consolidation; audit docs refreshed (`mission-gap-audit.md`, **`current-capability-status.md`**) with **85 passed, 1 skipped** from `just ci`; staged governance and benchmark expansion artifacts (registry suites, example runs, `test_benchmark_expansion`).

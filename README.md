@@ -2,7 +2,8 @@
 
 Markdown-first, git-native **LLM wiki + comparison matrix** system for capturing ideas, experiments, evaluations, prompts, and reports as structured files. It supports reproducible benchmarking of multiple agent stacks and model backends (including local models via **Ollama** or switchable **OpenAI-compatible / llama.cpp** HTTP servers).
 
-**Repository:** [github.com/sempervent/agent-llm-wiki-matrix](https://github.com/sempervent/agent-llm-wiki-matrix)
+**Repository:** [github.com/sempervent/agent-llm-wiki-matrix](https://github.com/sempervent/agent-llm-wiki-matrix)  
+**Changelog:** [CHANGELOG.md](CHANGELOG.md) · **v0.1.0 notes:** [docs/releases/v0.1.0.md](docs/releases/v0.1.0.md) · **Release scope:** [docs/release-readiness.md](docs/release-readiness.md)
 
 Contributors and coding agents should follow **`AGENTS.md`** for the full operating manual (contribution loop, decision rules, prompt registry policy, verification expectations, **multi-agent parallel work**, capability labels). Parallel agents: see **`docs/workflows/multi-agent-parallel.md`**.
 
@@ -14,22 +15,23 @@ Contributors and coding agents should follow **`AGENTS.md`** for the full operat
 - **Deterministic pipelines** where possible: typed contracts, schemas, fixtures, and testable ingest → evaluate → compare → summarize flows.
 - **Provider abstraction** for Ollama and OpenAI-compatible endpoints (see `docs/architecture/target-state.md`).
 
-## Quickstart
-
-### Prerequisites
+## Prerequisites
 
 - [just](https://github.com/casey/just) for project tasks (`brew install just` or see upstream install options)
-- Docker with Buildx, Docker Compose v2
-- Python **3.11+** recommended (matches the `Dockerfile`; use `pyenv`/`brew` if your system Python is older)
+- Docker with Buildx, Docker Compose v2 (for container workflows)
+- Python **3.11+** (see `pyproject.toml` `requires-python`; the `Dockerfile` uses 3.11)
 
-### Local Python
+---
+
+## Exact quickstart (local Python)
+
+From the repository root:
 
 ```bash
 python3.11 -m venv .venv
-source .venv/bin/activate
+source .venv/bin/activate   # Windows: .venv\Scripts\activate
 pip install -e ".[dev]"
-# Optional — live browser capture via Playwright (not required for `just ci`):
-# pip install -e ".[browser]" && playwright install chromium
+
 alwm version
 alwm info
 alwm validate examples/v1/thought.json thought
@@ -40,7 +42,87 @@ alwm providers show
 just ci
 ```
 
-### End-to-end pipeline (offline scoring)
+Optional Playwright-based browser capture (not required for `just ci`):
+
+```bash
+# pip install -e ".[browser]" && playwright install chromium
+# alwm browser run-playwright …
+```
+
+---
+
+## Benchmark quickstart (offline)
+
+Runs versioned YAML under `benchmarks/v1/` or `fixtures/benchmarks/` (see `benchmarks/v1/README.md`). Each **prompt** is inline `text:` and/or a `prompt_ref` into `prompts/registry.yaml`. Variants choose **agent stack**, **backend** (`mock` / `ollama` / `openai_compatible`), and **execution mode** (`cli`, `browser_mock`, `repo_governed`). With **`ALWM_FIXTURE_MODE=1`**, backends resolve to deterministic mock output unless you opt out.
+
+```bash
+ALWM_FIXTURE_MODE=1 alwm benchmark run \
+  --definition fixtures/benchmarks/offline.v1.yaml \
+  --output-dir out/benchmark-offline \
+  --created-at 1970-01-01T00:00:00Z \
+  --run-id local-bench
+
+alwm validate out/benchmark-offline/manifest.json benchmark_manifest
+alwm validate out/benchmark-offline/cells/v-cli__p-one/benchmark_response.json benchmark_response
+```
+
+Compose shortcuts (writes under `out/` in the mounted repo):
+
+```bash
+just benchmark-offline
+just benchmark-ollama    # pull a model into the ollama service first
+just benchmark-llamacpp  # start llama-server on the host (default :8080/v1)
+```
+
+---
+
+## Prompt registry quickstart
+
+The registry file is `prompts/registry.yaml` (versioned prompt bodies under `prompts/versions/`).
+
+```bash
+alwm prompts check
+alwm prompts list
+alwm prompts show scaffold.echo.v1
+```
+
+Benchmark definitions may reference prompts with `prompt_ref` (and optional `registry_version` pins). See `examples/benchmark_suites/v1/` and `docs/workflows/benchmarking.md`.
+
+---
+
+## Manifest validation example
+
+Benchmark runs write `manifest.json`, validated as artifact kind **`benchmark_manifest`** (JSON Schema `schemas/v1/manifest.schema.json`).
+
+```bash
+alwm validate examples/v1/manifest.json benchmark_manifest
+```
+
+Example run trees under `examples/benchmark_runs/*/manifest.json` are also valid for spot checks.
+
+---
+
+## Optional live verification commands
+
+These are **not** part of default `just ci`. They need live HTTP endpoints, env vars, and/or the `[browser]` extra.
+
+| Command | Purpose |
+| --- | --- |
+| `just verify-live-providers` | Integration tests for Ollama / OpenAI-compatible benchmark paths (skip when unreachable) |
+| `just verify-playwright-local` | Playwright smoke (`ALWM_PLAYWRIGHT_SMOKE=1`; install `[browser]` + browsers first) |
+| `just test-integration` | Full `tests/integration/` |
+| `just benchmark-probe` | `alwm benchmark probe` inside Compose (see `justfile`) |
+| `docker compose --profile browser-verify run --rm browser-verify` | Playwright tests in container (profile `browser-verify`) |
+
+Details: `docs/workflows/benchmarking.md`, `docs/workflows/live-verification.md`.
+
+---
+
+## End-to-end pipeline (offline scoring)
+
+Full scripted walkthrough (committed paths only, temp dir for outputs): **`docs/workflows/walkthrough-v0.1.0.md`**.
+
+Compact inline example:
 
 ```bash
 alwm ingest examples/dataset/pages examples/dataset/thoughts --created-at 1970-01-01T00:00:00Z
@@ -61,28 +143,9 @@ alwm validate examples/generated/wiki_matrix.json matrix
 alwm validate examples/generated/wiki_report.json report
 ```
 
-### Benchmark harness (prompts × variants × backends)
+---
 
-Runs versioned YAML under `benchmarks/v1/` (see `benchmarks/v1/README.md`). Each **prompt** is either inline `text:` or a `prompt_ref` into `prompts/registry.yaml` (optional `prompt_registry_ref` on the definition, optional `registry_version` pin per prompt). Each variant specifies **agent stack**, **backend** (`mock` / `ollama` / `openai_compatible`), and **execution mode** (`cli`, `browser_mock`, `repo_governed`). Cells persist **`benchmark_request`** / **`benchmark_response`** with `prompt_source` (`inline` \| `registry`), resolved `prompt_text`, and registry metadata when applicable. Responses are scored with the rubric, then aggregated into **grid** and **pairwise** matrices plus reports.
-
-```bash
-ALWM_FIXTURE_MODE=1 alwm benchmark run \
-  --definition fixtures/benchmarks/offline.v1.yaml \
-  --output-dir out/benchmark-offline \
-  --created-at 1970-01-01T00:00:00Z \
-  --run-id local-bench
-alwm validate out/benchmark-offline/cells/v-cli__p-one/benchmark_response.json benchmark_response
-```
-
-Compose shortcuts (writes under `out/` in the mounted repo):
-
-```bash
-just benchmark-offline
-just benchmark-ollama    # pull a model into the ollama service first
-just benchmark-llamacpp    # start llama-server on the host (default :8080/v1)
-```
-
-### Docker
+## Docker
 
 ```bash
 cp .env.example .env
@@ -90,16 +153,17 @@ docker build -t agent-llm-wiki-matrix:local -f Dockerfile .
 docker run --rm agent-llm-wiki-matrix:local version
 ```
 
-### Buildx Bake (multi-arch)
+## Buildx Bake (multi-arch)
+
+Default platforms: **linux/amd64** and **linux/arm64** (`docker-bake.hcl`).
 
 ```bash
 docker buildx bake
-# Single architecture (faster iteration):
 docker buildx bake orchestrator-amd64
 docker buildx bake orchestrator-arm64
 ```
 
-### Compose (profiles)
+## Compose (profiles)
 
 ```bash
 docker compose --profile dev run --rm orchestrator version
@@ -109,7 +173,9 @@ docker compose --profile benchmark-offline run --rm benchmark-offline
 just compose-help
 ```
 
-See `docs/workflows/local-dev.md` for profile details (`dev`, `test`, `benchmark`, `benchmark-offline`, `benchmark-ollama`, `benchmark-llamacpp`).
+See `docs/workflows/local-dev.md` for profile details (`dev`, `test`, `benchmark`, `benchmark-offline`, `benchmark-ollama`, `benchmark-llamacpp`, `browser-verify`).
+
+---
 
 ## Architecture (summary)
 
@@ -146,7 +212,7 @@ Run `just` with no arguments to list recipes. Common tasks:
 | `just benchmark-ollama` | Ollama service + smoke benchmark → `out/benchmark-ollama` |
 | `just benchmark-probe` | `alwm benchmark probe` in Compose (Ollama + host OpenAI URL) |
 | `just benchmark-llamacpp` | OpenAI-compatible endpoint on host → `out/benchmark-llamacpp` |
-| `alwm validate <file> <kind>` | Validate JSON against schema + Pydantic (includes `browser_evidence`) |
+| `alwm validate <file> <kind>` | Validate JSON against schema + Pydantic (includes `browser_evidence`, `benchmark_manifest`) |
 | `alwm browser prompt-block <file>` | Load browser evidence JSON → stable prompt-sized text |
 | `alwm browser run-mock` | Run `MockBrowserRunner` (deterministic; no browser binary) |
 | `alwm browser run-playwright` | Run `PlaywrightBrowserRunner` (requires `pip install -e ".[browser]"` and `playwright install …`; not used in default CI) |
@@ -163,6 +229,7 @@ Run `just` with no arguments to list recipes. Common tasks:
 
 ```
 ├── AGENTS.md              # Operating manual for agents (mission, loops, verification, prompts)
+├── CHANGELOG.md           # Version history
 ├── docker-compose.yml
 ├── docker-bake.hcl
 ├── Dockerfile
