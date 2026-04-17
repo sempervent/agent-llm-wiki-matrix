@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "id": "case.repo.scaffold.v1",
+  "title": "Repository scaffolding task",
+  "task_kind": "repo_scaffolding",
+  "prompt": "Design a minimal Python package layout for a CLI tool named `alwm` that ships JSON-schema-validated artifacts under `schemas/v1/`, source under `src/`, and contributor docs at `AGENTS.md`. List the top-level directories and one sentence each for their purpose. Output should be suitable for pasting into a planning doc.",
+  "expected_artifact_kinds": ["thought", "experiment", "report"],
+  "rubric_ref": "fixtures/v1/rubric.json",
+  "execution": {
+    "mode": "repo_governed",
+    "agent_stack_label": "repo-governed-cli",
+    "backend_policy": "mock",
+    "notes": "Prefer committed fixtures and `alwm validate`; no live network in deterministic runs."
+  },
+  "deterministic_fixture_mode": true
+}

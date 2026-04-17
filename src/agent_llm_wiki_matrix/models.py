@@ -148,3 +148,49 @@ class BenchmarkResponse(BaseModel):
     response_text: str
     duration_ms: int | None = Field(default=None, ge=0)
     created_at: str = Field(description="RFC 3339 date-time")
+
+
+class BenchmarkExecutionMetadata(BaseModel):
+    """Hints for how to run a benchmark case (stack, backend policy, execution mode)."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    mode: Literal["cli", "browser_mock", "repo_governed"]
+    agent_stack_label: str = Field(min_length=1)
+    backend_policy: Literal["mock", "ollama", "openai_compatible", "any"]
+    notes: str | None = None
+
+
+class BenchmarkCase(BaseModel):
+    """Versioned benchmark task template (prompt + rubric + expected outputs)."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    schema_version: Literal[1] = 1
+    id: str = Field(min_length=1)
+    title: str = Field(min_length=1)
+    task_kind: Literal[
+        "repo_scaffolding",
+        "markdown_synthesis",
+        "comparison_matrix",
+        "browser_evidence",
+    ]
+    prompt: str = Field(min_length=1)
+    expected_artifact_kinds: list[str] = Field(
+        min_length=1,
+        description="Expected structured outputs for scoring (alwm artifact kind names)",
+    )
+    rubric_ref: str = Field(min_length=1, description="Path to rubric JSON relative to repo root")
+    execution: BenchmarkExecutionMetadata
+    deterministic_fixture_mode: bool
+
+    @model_validator(mode="after")
+    def expected_kinds_are_registered(self) -> Self:
+        from agent_llm_wiki_matrix.artifacts import list_artifact_kinds
+
+        allowed = frozenset(list_artifact_kinds())
+        for k in self.expected_artifact_kinds:
+            if k not in allowed:
+                msg = f"Unknown expected artifact kind: {k} (not in {sorted(allowed)})"
+                raise ValueError(msg)
+        return self

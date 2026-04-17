@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/sempervent/agent-llm-wiki-matrix/schemas/v1/benchmark_case.schema.json",
+  "title": "BenchmarkCase",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "id",
+    "title",
+    "task_kind",
+    "prompt",
+    "expected_artifact_kinds",
+    "rubric_ref",
+    "execution",
+    "deterministic_fixture_mode"
+  ],
+  "properties": {
+    "schema_version": { "type": "integer", "const": 1 },
+    "id": { "type": "string", "minLength": 1 },
+    "title": { "type": "string", "minLength": 1 },
+    "task_kind": {
+      "type": "string",
+      "enum": [
+        "repo_scaffolding",
+        "markdown_synthesis",
+        "comparison_matrix",
+        "browser_evidence"
+      ]
+    },
+    "prompt": { "type": "string", "minLength": 1 },
+    "expected_artifact_kinds": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "description": "Subset of alwm artifact kinds (e.g. thought, matrix, report)"
+      }
+    },
+    "rubric_ref": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Path to rubric JSON relative to repository root"
+    },
+    "execution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mode", "agent_stack_label", "backend_policy"],
+      "properties": {
+        "mode": {
+          "type": "string",
+          "enum": ["cli", "browser_mock", "repo_governed"]
+        },
+        "agent_stack_label": { "type": "string", "minLength": 1 },
+        "backend_policy": {
+          "type": "string",
+          "enum": ["mock", "ollama", "openai_compatible", "any"]
+        },
+        "notes": { "type": "string" }
+      }
+    },
+    "deterministic_fixture_mode": {
+      "type": "boolean",
+      "description": "When true, runs must use offline fixtures / mock backends only"
+    }
+  }
+}

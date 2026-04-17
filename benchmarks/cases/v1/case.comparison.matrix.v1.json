@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "id": "case.comparison.matrix.v1",
+  "title": "Comparison matrix task",
+  "task_kind": "comparison_matrix",
+  "prompt": "Given two hypothetical model variants A and B with scores (latency ms, quality 0–1): A=(120, 0.82), B=(95, 0.88). Emit a brief explanation, then describe how you would encode this as a grid `ComparisonMatrix` JSON with row labels [A,B] and column labels [latency_ms, quality] (values only in the scores grid).",
+  "expected_artifact_kinds": ["matrix", "evaluation"],
+  "rubric_ref": "fixtures/v1/rubric.json",
+  "execution": {
+    "mode": "cli",
+    "agent_stack_label": "matrix-eval-runner",
+    "backend_policy": "any",
+    "notes": "Structured comparison outputs; rubric scores the explanation and matrix plan."
+  },
+  "deterministic_fixture_mode": true
+}

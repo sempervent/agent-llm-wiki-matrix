@@ -2,6 +2,15 @@
 
 Chronological record of repository work. Latest entries first.
 
+## 2026-04-17 — Benchmark case schema (v1) + task examples
+
+**Delivered:**
+
+- JSON Schema `schemas/v1/benchmark_case.schema.json` and Pydantic `BenchmarkCase` / `BenchmarkExecutionMetadata` with validation that `expected_artifact_kinds` references registered `alwm validate` kinds.
+- Loader `benchmark/cases.py` (`load_benchmark_case`, `validate_benchmark_case_file`).
+- Catalog `benchmarks/cases/v1/` with four task kinds: repo scaffolding, Markdown synthesis, comparison matrix, browser-evidence interpretation; mirrored under `fixtures/benchmark_cases/v1/` and `examples/benchmark_cases/v1/`.
+- Tests: `tests/test_benchmark_cases.py`.
+
 ## 2026-04-17 — Phase 5 complete (benchmark harness)
 
 **Delivered:**

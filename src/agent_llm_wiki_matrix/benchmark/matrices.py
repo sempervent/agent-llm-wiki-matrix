@@ -54,9 +54,7 @@ def pairwise_mean_delta_matrix(
                 row.append(0.0)
             else:
                 vi, vj = variant_ids[i], variant_ids[j]
-                deltas = [
-                    abs(float(scores[(vi, p)]) - float(scores[(vj, p)])) for p in prompt_ids
-                ]
+                deltas = [abs(float(scores[(vi, p)]) - float(scores[(vj, p)])) for p in prompt_ids]
                 row.append(sum(deltas) / len(deltas) if deltas else 0.0)
         mat.append(row)
     return ComparisonMatrix(

@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "id": "case.browser.evidence.v1",
+  "title": "Browser-evidence interpretation task",
+  "task_kind": "browser_evidence",
+  "prompt": "Interpret the following abstract browser trace (no PII): page sequence Home → Settings → Export; export clicked once; no errors in console. Summarize as an `event` observation and what you would record in a `report` for auditors.",
+  "expected_artifact_kinds": ["event", "report"],
+  "rubric_ref": "fixtures/v1/rubric.json",
+  "execution": {
+    "mode": "browser_mock",
+    "agent_stack_label": "browser-mock-evidence",
+    "backend_policy": "mock",
+    "notes": "Use fixture traces only; deterministic_fixture_mode requires mock backend and no real browser."
+  },
+  "deterministic_fixture_mode": true
+}

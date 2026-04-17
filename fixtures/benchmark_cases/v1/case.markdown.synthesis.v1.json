@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "id": "case.markdown.synthesis.v1",
+  "title": "Markdown synthesis task",
+  "task_kind": "markdown_synthesis",
+  "prompt": "Write a short Markdown section (3–6 bullet points) summarizing why JSON Schema plus Pydantic dual validation helps keep agent outputs reproducible. Use `## Validation` as the heading.",
+  "expected_artifact_kinds": ["thought", "report"],
+  "rubric_ref": "fixtures/v1/rubric.json",
+  "execution": {
+    "mode": "cli",
+    "agent_stack_label": "alwm-cli",
+    "backend_policy": "mock",
+    "notes": "Single-turn synthesis; evaluate emitted Markdown against rubric after capture."
+  },
+  "deterministic_fixture_mode": true
+}
