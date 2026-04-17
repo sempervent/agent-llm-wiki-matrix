@@ -12,6 +12,7 @@ import click
 
 from agent_llm_wiki_matrix import __version__
 from agent_llm_wiki_matrix.artifacts import list_artifact_kinds, load_artifact_file
+from agent_llm_wiki_matrix.benchmark import load_benchmark_definition, run_benchmark
 from agent_llm_wiki_matrix.logging_config import configure_logging, get_logger
 from agent_llm_wiki_matrix.models import ComparisonMatrix
 from agent_llm_wiki_matrix.pipelines.compare import evaluations_to_matrix
@@ -259,6 +260,73 @@ def cmd_report(
     out_md.write_text(render_report_markdown(report), encoding="utf-8")
     click.echo(f"wrote {out_json}")
     click.echo(f"wrote {out_md}")
+
+
+@main.group("benchmark")
+def benchmark_cmd() -> None:
+    """Run versioned benchmark harnesses (prompts × variants × backends)."""
+
+
+@benchmark_cmd.command("run")
+@click.option(
+    "--definition",
+    "definition_path",
+    type=click.Path(path_type=Path, exists=True, dir_okay=False, readable=True),
+    required=True,
+    help="Benchmark YAML or JSON (see benchmarks/v1/).",
+)
+@click.option(
+    "--output-dir",
+    "output_dir",
+    type=click.Path(path_type=Path, file_okay=False, writable=True),
+    required=True,
+)
+@click.option(
+    "--run-id",
+    default=None,
+    help="Run identifier (default: benchmark id).",
+)
+@click.option(
+    "--created-at",
+    default="1970-01-01T00:00:00Z",
+    show_default=True,
+    help="RFC 3339 timestamp for artifacts (use fixed value for reproducible JSON).",
+)
+@click.option(
+    "--provider-config",
+    type=click.Path(path_type=Path, exists=True, dir_okay=False, readable=True),
+    default=None,
+    help="Optional providers YAML (defaults same as alwm providers show).",
+)
+@click.option(
+    "--no-fixture-mock",
+    is_flag=True,
+    help="Do not force mock when ALWM_FIXTURE_MODE=1 (for live integration runs).",
+)
+def cmd_benchmark_run(
+    definition_path: Path,
+    output_dir: Path,
+    run_id: str | None,
+    created_at: str,
+    provider_config: Path | None,
+    no_fixture_mock: bool,
+) -> None:
+    """Execute a benchmark definition: responses, evaluations, matrices, report."""
+    repo = Path(os.environ.get("ALWM_REPO_ROOT", ".")).resolve()
+    dfn = load_benchmark_definition(definition_path)
+    rid = run_id or dfn.id
+    output_dir.mkdir(parents=True, exist_ok=True)
+    run_benchmark(
+        dfn,
+        repo_root=repo,
+        output_dir=output_dir.resolve(),
+        created_at=created_at,
+        run_id=rid,
+        provider_yaml=provider_config,
+        environ=os.environ,
+        fixture_mode_force_mock=not no_fixture_mock,
+    )
+    click.echo(f"wrote benchmark run under {output_dir}")
 
 
 @main.command("info")

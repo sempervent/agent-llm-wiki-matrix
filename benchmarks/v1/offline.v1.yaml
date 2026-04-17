@@ -1,0 +1,29 @@
+# Same as fixtures/benchmarks/offline.v1.yaml — versioned catalog entry for humans.
+schema_version: 1
+id: bench.offline.v1
+title: Offline benchmark harness (mock backends)
+rubric_ref: fixtures/v1/rubric.json
+prompts:
+  - id: p-one
+    text: "Reply with the single word OK."
+  - id: p-two
+    text: "Name one benefit of small benchmark fixtures."
+variants:
+  - id: v-cli
+    agent_stack: alwm-cli
+    execution_mode: cli
+    backend:
+      kind: mock
+      model: mock-model
+  - id: v-browser
+    agent_stack: browser-mock
+    execution_mode: browser_mock
+    backend:
+      kind: mock
+      model: mock-model
+  - id: v-repo
+    agent_stack: repo-governed
+    execution_mode: repo_governed
+    backend:
+      kind: mock
+      model: mock-model

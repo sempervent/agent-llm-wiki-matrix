@@ -32,7 +32,7 @@ def load_provider_config_for_benchmark_variant(
     backend_model: str,
     fixture_mode_force_mock: bool = True,
 ) -> ProviderConfig:
-    """Load config then apply variant backend; optionally force mock when ``ALWM_FIXTURE_MODE=1``."""
+    """Load config, apply variant backend; optionally force mock if fixture mode is on."""
     cfg = load_provider_config(yaml_path=yaml_path, environ=environ)
     kind = backend_kind
     model = backend_model

@@ -1,0 +1,15 @@
+# Run against Ollama (pull a model first). Use with profile benchmark-ollama or local ALWM_PROVIDER=ollama.
+schema_version: 1
+id: bench.ollama.v1
+title: Ollama smoke benchmark
+rubric_ref: fixtures/v1/rubric.json
+prompts:
+  - id: p-one
+    text: "Reply with OK."
+variants:
+  - id: v-ollama
+    agent_stack: alwm-cli
+    execution_mode: cli
+    backend:
+      kind: ollama
+      model: llama3.2

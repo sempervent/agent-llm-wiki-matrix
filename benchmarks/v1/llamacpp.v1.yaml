@@ -1,0 +1,15 @@
+# Run against an OpenAI-compatible llama.cpp HTTP server (e.g. llama-server). Use profile benchmark-llamacpp.
+schema_version: 1
+id: bench.llamacpp.v1
+title: llama.cpp OpenAI-compatible smoke benchmark
+rubric_ref: fixtures/v1/rubric.json
+prompts:
+  - id: p-one
+    text: "Reply with OK."
+variants:
+  - id: v-llamacpp
+    agent_stack: alwm-cli
+    execution_mode: cli
+    backend:
+      kind: openai_compatible
+      model: gpt-oss
