@@ -37,6 +37,13 @@
     "prompt_text": { "type": "string" },
     "response_text": { "type": "string" },
     "duration_ms": { "type": "integer", "minimum": 0 },
-    "created_at": { "type": "string", "description": "RFC 3339 date-time" }
+    "created_at": { "type": "string", "description": "RFC 3339 date-time" },
+    "prompt_source": {
+      "type": "string",
+      "enum": ["inline", "registry"]
+    },
+    "prompt_registry_id": { "type": ["string", "null"] },
+    "registry_document_version": { "type": ["string", "null"] },
+    "prompt_source_relpath": { "type": ["string", "null"] }
   }
 }

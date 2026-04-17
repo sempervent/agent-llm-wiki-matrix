@@ -1,0 +1,16 @@
+{
+  "agent_stack": "alwm-cli",
+  "backend_kind": "mock",
+  "backend_model": "mock-model",
+  "benchmark_id": "bench.examples.registry.mixed.v1",
+  "created_at": "1970-01-01T00:00:00Z",
+  "duration_ms": 0,
+  "execution_mode": "cli",
+  "id": "resp-v-cli-p-inline",
+  "prompt_id": "p-inline",
+  "prompt_source": "inline",
+  "prompt_text": "Reply with INLINE-OK.",
+  "response_text": "[mock:mock-model] f529621c7b84b92b",
+  "schema_version": 1,
+  "variant_id": "v-cli"
+}

@@ -148,6 +148,13 @@ class BenchmarkResponse(BaseModel):
     response_text: str
     duration_ms: int | None = Field(default=None, ge=0)
     created_at: str = Field(description="RFC 3339 date-time")
+    prompt_source: Literal["inline", "registry"] = "inline"
+    prompt_registry_id: str | None = None
+    registry_document_version: str | None = None
+    prompt_source_relpath: str | None = Field(
+        default=None,
+        description="Repo-relative path to prompt body file when prompt_source is registry",
+    )
 
 
 class BenchmarkRequestRecord(BaseModel):
@@ -166,6 +173,13 @@ class BenchmarkRequestRecord(BaseModel):
     model: str
     temperature: float | None = None
     created_at: str = Field(description="RFC 3339 date-time")
+    prompt_source: Literal["inline", "registry"] = "inline"
+    prompt_registry_id: str | None = None
+    registry_document_version: str | None = None
+    prompt_source_relpath: str | None = Field(
+        default=None,
+        description="Repo-relative path to prompt body file when prompt_source is registry",
+    )
 
 
 class MatrixGridInputEntry(BaseModel):

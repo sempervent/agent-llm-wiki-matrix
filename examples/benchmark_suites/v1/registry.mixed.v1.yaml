@@ -1,0 +1,17 @@
+# Mixed inline text and registry-backed prompt (see prompts/registry.yaml).
+schema_version: 1
+id: bench.examples.registry.mixed.v1
+title: Example mixed inline + registry prompts
+rubric_ref: examples/dataset/rubrics/balanced.v1.json
+prompts:
+  - id: p-inline
+    text: "Reply with INLINE-OK."
+  - id: p-reg
+    prompt_ref: bench.sample.prompt.v1
+variants:
+  - id: v-cli
+    agent_stack: alwm-cli
+    execution_mode: cli
+    backend:
+      kind: mock
+      model: mock-model

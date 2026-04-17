@@ -14,6 +14,9 @@ from agent_llm_wiki_matrix.browser.models import BrowserRunRequest, BrowserRunRe
 class PlaywrightBrowserRunner(BrowserRunner):
     """Future: drive Chromium/WebKit/Firefox via Playwright."""
 
+    def __init__(self, *, headless: bool = True) -> None:
+        self._headless = headless
+
     @property
     def name(self) -> str:
         return "playwright"

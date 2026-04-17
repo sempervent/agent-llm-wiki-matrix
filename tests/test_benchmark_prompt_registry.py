@@ -14,7 +14,12 @@ from agent_llm_wiki_matrix.benchmark import (
     resolve_benchmark_prompts,
     run_benchmark,
 )
-from agent_llm_wiki_matrix.benchmark.definitions import BenchmarkDefinitionV1, PromptItem
+from agent_llm_wiki_matrix.benchmark.definitions import (
+    BackendSpec,
+    BenchmarkDefinitionV1,
+    PromptItem,
+    VariantSpec,
+)
 from agent_llm_wiki_matrix.models import BenchmarkRequestRecord, BenchmarkResponse
 
 _REPO = Path(__file__).resolve().parents[1]
@@ -82,17 +87,17 @@ def test_path_escape_rejected(tmp_path: Path) -> None:
         id="bench.tmp.escape",
         title="t",
         rubric_ref="fixtures/v1/rubric.json",
-        prompt_registry_ref=str(reg.relative_to(tmp_path)).replace("\\", "/"),
+        prompt_registry_ref="bad_registry.yaml",
         prompts=[
             PromptItem(id="p1", prompt_ref="evil.v1"),
         ],
         variants=[
-            {
-                "id": "v-cli",
-                "agent_stack": "alwm-cli",
-                "execution_mode": "cli",
-                "backend": {"kind": "mock", "model": "mock-model"},
-            },
+            VariantSpec(
+                id="v-cli",
+                agent_stack="alwm-cli",
+                execution_mode="cli",
+                backend=BackendSpec(kind="mock", model="mock-model"),
+            ),
         ],
     )
     with pytest.raises(BenchmarkPromptResolutionError, match="escape|Prompt path escapes"):
@@ -176,12 +181,12 @@ def test_prompt_registry_path_override(tmp_path: Path) -> None:
         rubric_ref="fixtures/v1/rubric.json",
         prompts=[PromptItem(id="p1", prompt_ref="custom.id.v1")],
         variants=[
-            {
-                "id": "v-cli",
-                "agent_stack": "alwm-cli",
-                "execution_mode": "cli",
-                "backend": {"kind": "mock", "model": "mock-model"},
-            },
+            VariantSpec(
+                id="v-cli",
+                agent_stack="alwm-cli",
+                execution_mode="cli",
+                backend=BackendSpec(kind="mock", model="mock-model"),
+            ),
         ],
     )
     resolved = resolve_benchmark_prompts(

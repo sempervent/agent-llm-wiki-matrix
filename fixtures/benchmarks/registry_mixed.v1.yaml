@@ -1,0 +1,17 @@
+# Mixed inline + default registry (prompts/registry.yaml).
+schema_version: 1
+id: bench.fixtures.registry_mixed.v1
+title: Mixed inline and registry prompts
+rubric_ref: fixtures/v1/rubric.json
+prompts:
+  - id: p-inline
+    text: "Reply with INLINE-OK."
+  - id: p-reg
+    prompt_ref: scaffold.echo.v1
+variants:
+  - id: v-cli
+    agent_stack: alwm-cli
+    execution_mode: cli
+    backend:
+      kind: mock
+      model: mock-model

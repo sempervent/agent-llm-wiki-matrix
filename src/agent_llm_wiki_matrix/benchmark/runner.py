@@ -21,6 +21,7 @@ from agent_llm_wiki_matrix.benchmark.matrices import (
     pairwise_mean_delta_matrix,
 )
 from agent_llm_wiki_matrix.benchmark.persistence import write_pydantic_json, write_utf8_text
+from agent_llm_wiki_matrix.benchmark.prompt_resolution import resolve_benchmark_prompts
 from agent_llm_wiki_matrix.models import (
     BenchmarkRequestRecord,
     BenchmarkResponse,
@@ -61,13 +62,21 @@ def run_benchmark(
     provider_yaml: Path | None = None,
     environ: Mapping[str, str] | None = None,
     fixture_mode_force_mock: bool = True,
+    prompt_registry_path: Path | None = None,
 ) -> BenchmarkRunManifest:
     """Run all variant × prompt cells, write artifacts under ``output_dir``."""
     env: Mapping[str, str] = os.environ if environ is None else environ
+    repo_root = repo_root.resolve()
     rubric_path = (repo_root / definition.rubric_ref).resolve()
     if not rubric_path.is_file():
         msg = f"Rubric not found: {rubric_path}"
         raise FileNotFoundError(msg)
+
+    resolved_prompts = resolve_benchmark_prompts(
+        repo_root,
+        definition,
+        prompt_registry_path=prompt_registry_path,
+    )
 
     cells_root = output_dir / "cells"
     matrices_dir = output_dir / "matrices"
@@ -93,13 +102,13 @@ def run_benchmark(
             fixture_mode_force_mock=fixture_mode_force_mock,
         )
         provider = create_provider(cfg)
-        for prompt in definition.prompts:
+        for prompt, resolved in zip(definition.prompts, resolved_prompts, strict=True):
             base = f"{_safe_segment(variant.id)}__{_safe_segment(prompt.id)}"
             cell_dir = cells_root / base
             cell_dir.mkdir(parents=True, exist_ok=True)
 
             req = CompletionRequest(
-                prompt=prompt.text,
+                prompt=resolved.rendered_text,
                 model=variant.backend.model,
                 temperature=None,
             )
@@ -117,10 +126,14 @@ def run_benchmark(
                 benchmark_id=definition.id,
                 variant_id=variant.id,
                 prompt_id=prompt.id,
-                prompt_text=prompt.text,
+                prompt_text=resolved.rendered_text,
                 model=variant.backend.model,
                 temperature=req.temperature,
                 created_at=created_at,
+                prompt_source=resolved.prompt_source,
+                prompt_registry_id=resolved.prompt_registry_id,
+                registry_document_version=resolved.registry_document_version,
+                prompt_source_relpath=resolved.prompt_source_relpath,
             )
             write_pydantic_json(cell_dir / "request.json", req_rec)
             write_utf8_text(cell_dir / "response.raw.txt", raw_text)
@@ -137,10 +150,14 @@ def run_benchmark(
                 execution_mode=variant.execution_mode,
                 backend_kind=cast(BackendKind, cfg.kind),
                 backend_model=variant.backend.model,
-                prompt_text=prompt.text,
+                prompt_text=resolved.rendered_text,
                 response_text=normalized_text,
                 duration_ms=duration_ms,
                 created_at=created_at,
+                prompt_source=resolved.prompt_source,
+                prompt_registry_id=resolved.prompt_registry_id,
+                registry_document_version=resolved.registry_document_version,
+                prompt_source_relpath=resolved.prompt_source_relpath,
             )
             aggregate_path = cell_dir / "benchmark_response.json"
             write_pydantic_json(aggregate_path, br)

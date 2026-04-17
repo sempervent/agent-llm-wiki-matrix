@@ -1,0 +1,16 @@
+schema_version: 1
+id: bench.fixtures.registry_version_ok.v1
+title: Registry version pin matches
+rubric_ref: fixtures/v1/rubric.json
+prompt_registry_ref: fixtures/prompt_registry/test_registry.yaml
+prompts:
+  - id: p-pin
+    prompt_ref: fixture.pin.v1
+    registry_version: "1.0.0"
+variants:
+  - id: v-cli
+    agent_stack: alwm-cli
+    execution_mode: cli
+    backend:
+      kind: mock
+      model: mock-model

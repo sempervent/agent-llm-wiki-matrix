@@ -8,3 +8,7 @@ prompts:
     description: "Minimal echo prompt for wiring provider adapters (mock in Phase 1)."
     path: prompts/versions/scaffold.echo.v1.txt
     tags: [scaffold, smoke]
+  - id: bench.sample.prompt.v1
+    description: "Sample prompt for registry-backed benchmark examples."
+    path: prompts/versions/bench.sample.prompt.v1.txt
+    tags: [benchmark, example]

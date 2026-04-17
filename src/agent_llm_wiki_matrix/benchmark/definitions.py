@@ -3,10 +3,10 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Literal
+from typing import Literal, Self
 
 import yaml
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 
 class BackendSpec(BaseModel):
@@ -26,10 +26,44 @@ class VariantSpec(BaseModel):
 
 
 class PromptItem(BaseModel):
+    """One prompt slot: either inline ``text`` or a ``prompt_ref`` into the registry."""
+
     model_config = ConfigDict(extra="forbid")
 
     id: str = Field(min_length=1)
-    text: str
+    text: str | None = Field(
+        default=None,
+        description="Inline prompt body (mutually exclusive with prompt_ref).",
+    )
+    prompt_ref: str | None = Field(
+        default=None,
+        description="Registry prompt id (see prompts/registry.yaml or prompt_registry_ref).",
+    )
+    registry_version: str | None = Field(
+        default=None,
+        description=(
+            "Optional pin: must equal the registry file's top-level version when set "
+            "(only valid with prompt_ref)."
+        ),
+    )
+
+    @model_validator(mode="after")
+    def _inline_xor_registry(self) -> Self:
+        has_text = self.text is not None
+        has_ref = self.prompt_ref is not None
+        if has_text == has_ref:
+            msg = f"Prompt {self.id!r}: set exactly one of text or prompt_ref"
+            raise ValueError(msg)
+        if self.registry_version is not None and not has_ref:
+            msg = f"Prompt {self.id!r}: registry_version requires prompt_ref"
+            raise ValueError(msg)
+        if has_text and self.text is not None and not self.text.strip():
+            msg = f"Prompt {self.id!r}: inline text must be non-empty"
+            raise ValueError(msg)
+        if has_ref and (not self.prompt_ref or not str(self.prompt_ref).strip()):
+            msg = f"Prompt {self.id!r}: prompt_ref must be a non-empty string"
+            raise ValueError(msg)
+        return self
 
 
 class BenchmarkDefinitionV1(BaseModel):
@@ -43,6 +77,13 @@ class BenchmarkDefinitionV1(BaseModel):
     rubric_ref: str = Field(
         min_length=1,
         description="Path relative to repository root",
+    )
+    prompt_registry_ref: str | None = Field(
+        default=None,
+        description=(
+            "Optional path to prompt registry YAML relative to repo root. "
+            "Defaults to prompts/registry.yaml when any prompt uses prompt_ref."
+        ),
     )
     prompts: list[PromptItem] = Field(min_length=1)
     variants: list[VariantSpec] = Field(min_length=1)

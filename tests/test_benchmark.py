@@ -10,6 +10,7 @@ import pytest
 from agent_llm_wiki_matrix.artifacts import load_artifact_file
 from agent_llm_wiki_matrix.benchmark import load_benchmark_definition, run_benchmark
 from agent_llm_wiki_matrix.models import (
+    BenchmarkRequestRecord,
     BenchmarkResponse,
     ComparisonMatrix,
     MatrixGridInputs,
@@ -66,6 +67,10 @@ def test_offline_benchmark_pipeline_is_deterministic(
 
     sample = load_artifact_file(out / first["aggregate_response_relpath"], "benchmark_response")
     assert isinstance(sample, BenchmarkResponse)
+    req = load_artifact_file(out / first["request_relpath"], "benchmark_request")
+    assert isinstance(req, BenchmarkRequestRecord)
+    assert req.prompt_source == "inline"
+    assert req.prompt_registry_id is None
 
     grid = load_artifact_file(out / "matrices" / "grid.json", "matrix")
     assert isinstance(grid, ComparisonMatrix)

@@ -1,0 +1,15 @@
+schema_version: 1
+id: bench.fixtures.registry_missing_ref.v1
+title: Missing registry prompt id
+rubric_ref: fixtures/v1/rubric.json
+prompt_registry_ref: fixtures/prompt_registry/test_registry.yaml
+prompts:
+  - id: p-missing
+    prompt_ref: does.not.exist.v1
+variants:
+  - id: v-cli
+    agent_stack: alwm-cli
+    execution_mode: cli
+    backend:
+      kind: mock
+      model: mock-model

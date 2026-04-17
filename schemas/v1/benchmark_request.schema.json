@@ -31,6 +31,23 @@
     "prompt_text": { "type": "string" },
     "model": { "type": "string" },
     "temperature": { "type": ["number", "null"] },
-    "created_at": { "type": "string", "description": "RFC 3339 date-time" }
+    "created_at": { "type": "string", "description": "RFC 3339 date-time" },
+    "prompt_source": {
+      "type": "string",
+      "enum": ["inline", "registry"],
+      "description": "Whether prompt_text came from inline definition or prompt registry"
+    },
+    "prompt_registry_id": {
+      "type": ["string", "null"],
+      "description": "Registry prompt id when prompt_source is registry"
+    },
+    "registry_document_version": {
+      "type": ["string", "null"],
+      "description": "Top-level version field of the registry YAML when resolved from registry"
+    },
+    "prompt_source_relpath": {
+      "type": ["string", "null"],
+      "description": "Repo-relative path to the prompt body file when prompt_source is registry"
+    }
   }
 }

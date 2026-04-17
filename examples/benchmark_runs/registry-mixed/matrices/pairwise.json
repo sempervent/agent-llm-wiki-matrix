@@ -1,0 +1,18 @@
+{
+  "col_labels": [
+    "v-cli"
+  ],
+  "created_at": "1970-01-01T00:00:00Z",
+  "id": "examples-registry-mixed-pairwise",
+  "matrix_kind": "pairwise",
+  "metric": "mean_abs_total_score_delta",
+  "row_labels": [
+    "v-cli"
+  ],
+  "scores": [
+    [
+      0.0
+    ]
+  ],
+  "title": "Example mixed inline + registry prompts (mean abs score delta across prompts)"
+}
