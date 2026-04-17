@@ -1,4 +1,8 @@
-"""HTTP probes for live Ollama and OpenAI-compatible (e.g. llama.cpp) endpoints."""
+"""HTTP probes for live Ollama and OpenAI-compatible (e.g. llama.cpp) endpoints.
+
+Used by ``tests/integration/test_live_benchmark_providers.py`` and ``alwm benchmark probe``.
+Not imported by default unit tests under ``tests/`` (integration is excluded from ``just ci``).
+"""
 
 from __future__ import annotations
 
