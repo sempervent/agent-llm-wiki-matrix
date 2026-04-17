@@ -2,6 +2,10 @@
 
 Chronological record of repository work. Latest entries first.
 
+## 2026-04-17 — Benchmark run artifact persistence
+
+**Delivered:** Structured output under `cells/`, `matrices/`, `markdown/`, `reports/` with stable `cell_id` slugs, **benchmark_request** + raw/normalized response text files, aggregate **benchmark_response**, per-cell **evaluation**, **matrix_grid_inputs** / **matrix_pairwise_inputs**, and manifest **cells[]** index; execution layer returns raw vs normalized text.
+
 ## 2026-04-17 — Replace Makefile with justfile
 
 **Delivered:** [just](https://github.com/casey/just) `justfile` with the same recipes as the former Makefile (`ci`, lint, compose-help, benchmark profiles, etc.); removed `Makefile`; documentation and `AGENTS.md` now reference `just …`.

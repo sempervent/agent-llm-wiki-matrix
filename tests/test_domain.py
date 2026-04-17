@@ -26,6 +26,9 @@ _FIXTURES = _REPO / "fixtures" / "v1"
         ("report.json", "report"),
         ("rubric.json", "rubric"),
         ("benchmark_response.json", "benchmark_response"),
+        ("benchmark_request.json", "benchmark_request"),
+        ("matrix_grid_inputs.json", "matrix_grid_inputs"),
+        ("matrix_pairwise_inputs.json", "matrix_pairwise_inputs"),
     ],
 )
 def test_fixture_validates(filename: str, kind: str) -> None:

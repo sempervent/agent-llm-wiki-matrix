@@ -65,7 +65,7 @@ ALWM_FIXTURE_MODE=1 alwm benchmark run \
   --output-dir out/benchmark-offline \
   --created-at 1970-01-01T00:00:00Z \
   --run-id local-bench
-alwm validate out/benchmark-offline/responses/v-cli__p-one.response.json benchmark_response
+alwm validate out/benchmark-offline/cells/v-cli__p-one/benchmark_response.json benchmark_response
 ```
 
 Compose shortcuts (writes under `out/` in the mounted repo):

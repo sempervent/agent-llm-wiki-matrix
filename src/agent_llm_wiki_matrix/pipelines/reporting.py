@@ -61,7 +61,7 @@ def build_report_from_matrix(
         "- See the companion matrix Markdown for the full score grid.",
         "",
     ]
-    source_refs = [f"matrices/{matrix.id}.json"]
+    source_refs = ["matrices/grid.json", "markdown/matrix.grid.md"]
     return Report(
         id=report_id,
         title=f"Report: {matrix.title}",

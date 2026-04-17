@@ -131,7 +131,7 @@ class Report(BaseModel):
 
 
 class BenchmarkResponse(BaseModel):
-    """Raw model output for one benchmark (variant × prompt) cell."""
+    """Aggregate cell record; ``response_text`` is normalized (post execution-mode tag)."""
 
     model_config = ConfigDict(extra="forbid")
 
@@ -148,6 +148,78 @@ class BenchmarkResponse(BaseModel):
     response_text: str
     duration_ms: int | None = Field(default=None, ge=0)
     created_at: str = Field(description="RFC 3339 date-time")
+
+
+class BenchmarkRequestRecord(BaseModel):
+    """Persisted provider request (prompt + model) for one benchmark cell."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    schema_version: Literal[1] = 1
+    id: str = Field(min_length=1)
+    run_id: str = Field(min_length=1)
+    cell_id: str = Field(min_length=1)
+    benchmark_id: str = Field(min_length=1)
+    variant_id: str = Field(min_length=1)
+    prompt_id: str = Field(min_length=1)
+    prompt_text: str
+    model: str
+    temperature: float | None = None
+    created_at: str = Field(description="RFC 3339 date-time")
+
+
+class MatrixGridInputEntry(BaseModel):
+    """One cell of the grid matrix with pointers to evaluation artifacts."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    row_label: str
+    col_label: str
+    variant_id: str
+    prompt_id: str
+    evaluation_relpath: str
+    total_weighted_score: float
+
+
+class MatrixGridInputs(BaseModel):
+    """Row/column inputs and evaluation refs used to build the grid matrix."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    schema_version: Literal[1] = 1
+    run_id: str = Field(min_length=1)
+    benchmark_id: str = ""
+    matrix_id: str = Field(min_length=1)
+    metric: str = Field(min_length=1)
+    created_at: str
+    entries: list[MatrixGridInputEntry] = Field(min_length=1)
+
+
+class MatrixPairwiseInputEntry(BaseModel):
+    """One cell of the pairwise matrix with contributing prompt ids."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    row_label: str
+    col_label: str
+    variant_i: str
+    variant_j: str
+    mean_abs_score_delta: float
+    prompt_ids: list[str]
+
+
+class MatrixPairwiseInputs(BaseModel):
+    """Inputs used to build the pairwise delta matrix."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    schema_version: Literal[1] = 1
+    run_id: str = Field(min_length=1)
+    benchmark_id: str = ""
+    matrix_id: str = Field(min_length=1)
+    metric: str = Field(min_length=1)
+    created_at: str
+    entries: list[MatrixPairwiseInputEntry] = Field(min_length=1)
 
 
 class BenchmarkExecutionMetadata(BaseModel):

@@ -10,11 +10,14 @@ from pydantic import BaseModel
 
 from agent_llm_wiki_matrix.models import (
     BenchmarkCase,
+    BenchmarkRequestRecord,
     BenchmarkResponse,
     ComparisonMatrix,
     Evaluation,
     Event,
     Experiment,
+    MatrixGridInputs,
+    MatrixPairwiseInputs,
     Report,
     Rubric,
     Thought,
@@ -31,6 +34,12 @@ _ARTIFACTS: dict[str, tuple[type[BaseModel], str]] = {
     "rubric": (Rubric, "schemas/v1/rubric.schema.json"),
     "benchmark_response": (BenchmarkResponse, "schemas/v1/benchmark_response.schema.json"),
     "benchmark_case": (BenchmarkCase, "schemas/v1/benchmark_case.schema.json"),
+    "benchmark_request": (BenchmarkRequestRecord, "schemas/v1/benchmark_request.schema.json"),
+    "matrix_grid_inputs": (MatrixGridInputs, "schemas/v1/matrix_grid_inputs.schema.json"),
+    "matrix_pairwise_inputs": (
+        MatrixPairwiseInputs,
+        "schemas/v1/matrix_pairwise_inputs.schema.json",
+    ),
 }
 
 

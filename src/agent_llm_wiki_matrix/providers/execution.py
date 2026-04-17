@@ -14,18 +14,22 @@ def run_prompt_with_execution_mode(
     provider: BaseProvider,
     request: CompletionRequest,
     execution_mode: ExecutionMode,
-) -> tuple[str, int]:
-    """Run ``provider.complete`` and tag output by ``execution_mode`` (deterministic wrappers)."""
+) -> tuple[str, str, int]:
+    """Run ``provider.complete``; return (raw_response, normalized_response, duration_ms).
+
+    ``raw_response`` is the provider string before execution-mode tagging.
+    ``normalized_response`` is tagged (and used for rubric scoring / persistence).
+    """
     t0 = time.monotonic()
     raw = provider.complete(request)
     if execution_mode == "cli":
-        text = raw
+        normalized = raw
     elif execution_mode == "browser_mock":
-        text = f"[browser_mock]{raw}"
+        normalized = f"[browser_mock]{raw}"
     elif execution_mode == "repo_governed":
-        text = f"[repo_governed]{raw}"
+        normalized = f"[repo_governed]{raw}"
     else:
         msg = f"Unknown execution_mode: {execution_mode}"
         raise ValueError(msg)
     duration_ms = int((time.monotonic() - t0) * 1000)
-    return text, duration_ms
+    return raw, normalized, duration_ms

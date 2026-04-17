@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "id": "req__fixture__v__p",
+  "run_id": "fixture-run",
+  "cell_id": "v__p",
+  "benchmark_id": "bench.fixture",
+  "variant_id": "v",
+  "prompt_id": "p",
+  "prompt_text": "hello",
+  "model": "mock-model",
+  "temperature": null,
+  "created_at": "1970-01-01T00:00:00Z"
+}

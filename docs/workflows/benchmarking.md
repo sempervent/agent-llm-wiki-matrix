@@ -27,18 +27,22 @@ alwm benchmark run \
   --run-id local
 ```
 
-Artifacts:
+Artifacts (under `--output-dir`; lexicographic cell order in `manifest.json`):
 
-- `responses/*.response.json` — raw provider outputs (`benchmark_response` schema).
-- `evaluations/*.eval.json` — rubric scores per cell.
-- `matrix.grid.json` / `matrix.grid.md` — variants × prompts (total weighted score).
-- `matrix.pairwise.json` / `matrix.pairwise.md` — variants × variants (mean absolute score delta across prompts).
-- `report.json` / `report.md` — summary report from the grid matrix.
-- `manifest.json` — index of paths for the run.
+- `cells/{variant}__{prompt}/request.json` — persisted **benchmark_request** (prompt + model + ids).
+- `cells/.../response.raw.txt` — provider output **before** execution-mode tagging.
+- `cells/.../response.normalized.txt` — text after tagging (what the rubric scores).
+- `cells/.../benchmark_response.json` — aggregate **benchmark_response** record.
+- `cells/.../evaluation.json` — **evaluation** result for that cell.
+- `matrices/grid.json`, `matrices/pairwise.json` — **matrix** artifacts.
+- `matrices/grid.row_inputs.json`, `matrices/pairwise.row_inputs.json` — **matrix_grid_inputs** / **matrix_pairwise_inputs** (row inputs and evaluation refs).
+- `markdown/matrix.grid.md`, `markdown/matrix.pairwise.md` — rendered matrix tables.
+- `reports/report.json`, `reports/report.md` — **report** JSON + generated Markdown.
+- `manifest.json` — run summary with **cells[]** path index.
 
 ## Docker Compose
 
-| Make target | Profile | Notes |
+| Recipe | Profile | Notes |
 | --- | --- | --- |
 | `just benchmark-offline` | `benchmark-offline` | Mock-only; `ALWM_FIXTURE_MODE=1`; writes `out/benchmark-offline`. |
 | `just benchmark-ollama` | `benchmark-ollama` | Starts `ollama/ollama`; run `docker compose exec ollama ollama pull llama3.2` (or your model) before benchmarking. |
