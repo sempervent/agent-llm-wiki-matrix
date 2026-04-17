@@ -19,7 +19,11 @@ install-dev:
     {{pip}} install -e ".[dev]"
 
 test:
-    {{python}} -m pytest tests/
+    {{python}} -m pytest tests/ --ignore=tests/integration
+
+# Live Ollama / llama.cpp benchmark verification (opt-in env vars; skips if unreachable)
+test-integration:
+    {{python}} -m pytest tests/integration/ -v -m integration
 
 smoke:
     {{python}} -m pytest tests/test_smoke.py -v
@@ -44,7 +48,7 @@ docker-bake:
 compose-help:
     #!/usr/bin/env bash
     set -euo pipefail
-    profiles=(dev test benchmark benchmark-offline benchmark-ollama benchmark-llamacpp)
+    profiles=(dev test benchmark benchmark-offline benchmark-ollama benchmark-probe benchmark-llamacpp)
     for p in "${profiles[@]}"; do
       docker compose --profile "$p" config >/dev/null
     done
@@ -57,6 +61,10 @@ benchmark-offline:
 
 benchmark-ollama:
     docker compose --profile benchmark-ollama run --rm benchmark-ollama
+
+# Ollama + host OpenAI-compatible probe (inside compose; pulls ollama service)
+benchmark-probe:
+    docker compose --profile benchmark-probe run --rm benchmark-probe
 
 benchmark-llamacpp:
     docker compose --profile benchmark-llamacpp run --rm benchmark-llamacpp

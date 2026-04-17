@@ -13,8 +13,14 @@ import click
 from agent_llm_wiki_matrix import __version__
 from agent_llm_wiki_matrix.artifacts import list_artifact_kinds, load_artifact_file
 from agent_llm_wiki_matrix.benchmark import load_benchmark_definition, run_benchmark
+from agent_llm_wiki_matrix.benchmark.live_probe import (
+    ollama_model_available,
+    probe_ollama_api,
+    probe_openai_compatible_api,
+)
 from agent_llm_wiki_matrix.browser import (
     MockBrowserRunner,
+    PlaywrightBrowserRunner,
     evidence_to_prompt_block,
     load_browser_evidence,
 )
@@ -161,7 +167,7 @@ def cmd_prompts_show(prompt_id: str, registry_path: Path) -> None:
 
 @main.group("browser")
 def browser_grp() -> None:
-    """Browser execution abstraction (mock + file fixtures; no live automation)."""
+    """Browser evidence: mock/file fixtures, or optional Playwright (`run-playwright`)."""
 
 
 @browser_grp.command("prompt-block")
@@ -197,6 +203,47 @@ def cmd_browser_run_mock(
         steps=list(steps),
     )
     result = runner.run(req)
+    click.echo(result.model_dump_json(indent=2))
+
+
+@browser_grp.command("run-playwright")
+@click.option("--scenario-id", default=None, help="Logical id for evidence labeling.")
+@click.option(
+    "--start-url",
+    required=True,
+    help="Initial URL (http(s) or file://); each --step resolves relative to the current URL.",
+)
+@click.option(
+    "--step",
+    "steps",
+    multiple=True,
+    help="Additional navigation targets (relative path or absolute URL).",
+)
+@click.option(
+    "--headless/--no-headless",
+    default=True,
+    show_default=True,
+    help="Run browser headless (default) or headed.",
+)
+def cmd_browser_run_playwright(
+    scenario_id: str | None,
+    start_url: str,
+    steps: tuple[str, ...],
+    headless: bool,
+) -> None:
+    """Run PlaywrightBrowserRunner and print JSON (needs `pip install '.[browser]'`)."""
+    runner = PlaywrightBrowserRunner(headless=headless)
+    req = BrowserRunRequest(
+        scenario_id=scenario_id,
+        start_url=start_url,
+        steps=list(steps),
+    )
+    try:
+        result = runner.run(req)
+    except RuntimeError as e:
+        raise click.ClickException(str(e)) from e
+    except ValueError as e:
+        raise click.ClickException(str(e)) from e
     click.echo(result.model_dump_json(indent=2))
 
 
@@ -419,6 +466,16 @@ def benchmark_cmd() -> None:
     is_flag=True,
     help="Do not force mock when ALWM_FIXTURE_MODE=1 (for live integration runs).",
 )
+@click.option(
+    "--prompt-registry",
+    "prompt_registry_path",
+    type=click.Path(path_type=Path, exists=True, dir_okay=False, readable=True),
+    default=None,
+    help=(
+        "Override prompt registry YAML (defaults to definition.prompt_registry_ref "
+        "or prompts/registry.yaml when prompts use prompt_ref)."
+    ),
+)
 def cmd_benchmark_run(
     definition_path: Path,
     output_dir: Path,
@@ -426,6 +483,7 @@ def cmd_benchmark_run(
     created_at: str,
     provider_config: Path | None,
     no_fixture_mock: bool,
+    prompt_registry_path: Path | None,
 ) -> None:
     """Execute a benchmark definition: responses, evaluations, matrices, report."""
     repo = Path(os.environ.get("ALWM_REPO_ROOT", ".")).resolve()
@@ -441,8 +499,47 @@ def cmd_benchmark_run(
         provider_yaml=provider_config,
         environ=os.environ,
         fixture_mode_force_mock=not no_fixture_mock,
+        prompt_registry_path=prompt_registry_path,
     )
     click.echo(f"wrote benchmark run under {output_dir}")
+
+
+@benchmark_cmd.command("probe")
+@click.option(
+    "--ollama-host",
+    envvar="OLLAMA_HOST",
+    default="http://127.0.0.1:11434",
+    show_default=True,
+    help="Ollama base URL (no trailing path).",
+)
+@click.option(
+    "--openai-base-url",
+    envvar="OPENAI_BASE_URL",
+    default="http://127.0.0.1:8080/v1",
+    show_default=True,
+    help="OpenAI-compatible base URL (includes /v1).",
+)
+@click.option(
+    "--ollama-model",
+    envvar="OLLAMA_MODEL",
+    default="llama3.2",
+    show_default=True,
+    help="Model name to check in GET /api/tags (when Ollama is up).",
+)
+def cmd_benchmark_probe(ollama_host: str, openai_base_url: str, ollama_model: str) -> None:
+    """Check reachability of Ollama and OpenAI-compatible HTTP APIs (for live benchmarks)."""
+    o_api = probe_ollama_api(ollama_host)
+    o_model = ollama_model_available(ollama_host, ollama_model) if o_api else False
+    oa = probe_openai_compatible_api(openai_base_url)
+    payload = {
+        "ollama_api_reachable": o_api,
+        "ollama_model_available": o_model,
+        "openai_compatible_api_reachable": oa,
+        "ollama_host": ollama_host,
+        "openai_base_url": openai_base_url,
+        "ollama_model_checked": ollama_model,
+    }
+    click.echo(json.dumps(payload, indent=2, sort_keys=True))
 
 
 @main.command("info")

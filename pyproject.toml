@@ -29,6 +29,9 @@ dev = [
     "types-PyYAML",
     "types-jsonschema",
 ]
+browser = [
+    "playwright>=1.40",
+]
 
 [project.scripts]
 alwm = "agent_llm_wiki_matrix.cli:main"
@@ -50,9 +53,19 @@ strict = true
 packages = ["agent_llm_wiki_matrix"]
 mypy_path = "src"
 
+[[tool.mypy.overrides]]
+# Optional dependency; stubs not required for default CI
+module = "agent_llm_wiki_matrix.browser.playwright_runner"
+ignore_errors = true
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-q --strict-markers"
+markers = [
+    "integration: opt-in live provider tests (network; see docs/workflows/benchmarking.md)",
+    "live_ollama: requires Ollama HTTP API",
+    "live_llamacpp: requires OpenAI-compatible (e.g. llama.cpp) HTTP API",
+]
 
 [dependency-groups]
 dev = [

@@ -45,8 +45,36 @@ Artifacts (under `--output-dir`; lexicographic cell order in `manifest.json`):
 | Recipe | Profile | Notes |
 | --- | --- | --- |
 | `just benchmark-offline` | `benchmark-offline` | Mock-only; `ALWM_FIXTURE_MODE=1`; writes `out/benchmark-offline`. |
-| `just benchmark-ollama` | `benchmark-ollama` | Starts `ollama/ollama`; run `docker compose exec ollama ollama pull llama3.2` (or your model) before benchmarking. |
+| `just benchmark-ollama` | `benchmark-ollama` | Ollama service has a **healthcheck** (`ollama list`); `benchmark-ollama` waits for **healthy**. Pull a model first, e.g. `docker compose --profile benchmark-ollama exec ollama ollama pull llama3.2`. |
+| `just benchmark-probe` | `benchmark-probe` | Runs `alwm benchmark probe` with `OLLAMA_HOST=http://ollama:11434` and host `OPENAI_BASE_URL` for llama.cpp — no full benchmark, only API reachability. |
 | `just benchmark-llamacpp` | `benchmark-llamacpp` | Points `OPENAI_BASE_URL` at `LLAMACPP_OPENAI_BASE_URL` (default `http://host.docker.internal:8080/v1`); start `llama-server` on the host first. |
+
+### Live API checks (CLI)
+
+```bash
+alwm benchmark probe
+# With explicit hosts:
+OLLAMA_HOST=http://127.0.0.1:11434 OPENAI_BASE_URL=http://127.0.0.1:8080/v1 alwm benchmark probe
+```
+
+## Integration tests (opt-in)
+
+Default **`just test`** / **`just ci`** run **`pytest tests/ --ignore=tests/integration`** so CI never requires Ollama or llama.cpp.
+
+To verify end-to-end benchmark cells against **live** backends:
+
+1. Start services (or use Compose profiles above).
+2. Export **one or both** flags:
+   - `ALWM_LIVE_BENCHMARK_OLLAMA=1` — uses `OLLAMA_HOST` (default `http://127.0.0.1:11434`) and `OLLAMA_MODEL` (default `llama3.2`).
+   - `ALWM_LIVE_BENCHMARK_LLAMACPP=1` — uses `OPENAI_BASE_URL` and `OPENAI_MODEL` (default `gpt-oss` to match `benchmarks/v1/llamacpp.v1.yaml`).
+3. Run:
+
+```bash
+just test-integration
+# or: pytest tests/integration/ -v -m integration
+```
+
+Tests **skip** (fixture-safe) when the flag is unset, when the HTTP probe fails (connection error), or when Ollama has no matching model pulled. The OpenAI-compatible probe treats any HTTP response on ``GET …/v1/models`` with a non-server-error status as reachable (some llama.cpp builds return 404 for that route while chat still works).
 
 ## Determinism
 
@@ -57,4 +85,4 @@ Artifacts (under `--output-dir`; lexicographic cell order in `manifest.json`):
 ## Current state
 
 - End-to-end harness is implemented (`alwm benchmark run`).
-- Ollama and OpenAI-compatible paths require running services and models; offline tests stay on **mock** only.
+- Live verification: `alwm benchmark probe`, Compose **`benchmark-probe`** profile, and **opt-in** integration tests under `tests/integration/`.

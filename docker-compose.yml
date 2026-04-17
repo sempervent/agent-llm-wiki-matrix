@@ -75,10 +75,18 @@ services:
     image: ollama/ollama:latest
     profiles:
       - benchmark-ollama
+      - benchmark-probe
     ports:
       - "11434:11434"
     volumes:
       - ollama_models:/root/.ollama
+    # ollama image has the `ollama` CLI; HTTP tools may be absent.
+    healthcheck:
+      test: ["CMD-SHELL", "ollama list >/dev/null 2>&1 || exit 1"]
+      interval: 5s
+      timeout: 15s
+      retries: 18
+      start_period: 30s
 
   benchmark-ollama:
     <<: *alwm-env
@@ -90,7 +98,8 @@ services:
     profiles:
       - benchmark-ollama
     depends_on:
-      - ollama
+      ollama:
+        condition: service_healthy
     environment:
       ALWM_LOG_LEVEL: ${ALWM_LOG_LEVEL:-INFO}
       ALWM_FIXTURE_MODE: "0"
@@ -106,6 +115,27 @@ services:
       - --no-fixture-mock
       - --run-id
       - compose-benchmark-ollama
+
+  # Live API smoke: GET /api/tags (Ollama) + GET /v1/models (OpenAI-compatible on host).
+  benchmark-probe:
+    <<: *alwm-env
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runtime
+    image: agent-llm-wiki-matrix:local
+    profiles:
+      - benchmark-probe
+    depends_on:
+      ollama:
+        condition: service_healthy
+    environment:
+      ALWM_LOG_LEVEL: ${ALWM_LOG_LEVEL:-INFO}
+      ALWM_FIXTURE_MODE: "0"
+      ALWM_REPO_ROOT: /workspace
+      OLLAMA_HOST: http://ollama:11434
+      OPENAI_BASE_URL: ${LLAMACPP_OPENAI_BASE_URL:-http://host.docker.internal:8080/v1}
+    command: [benchmark, probe]
 
   benchmark-llamacpp:
     <<: *alwm-env

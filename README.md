@@ -128,7 +128,8 @@ Run `just` with no arguments to list recipes. Common tasks:
 | Command | Description |
 | --- | --- |
 | `just install-dev` | Editable install with dev dependencies |
-| `just test` | Run pytest |
+| `just test` | Run pytest (excludes `tests/integration/` live provider tests) |
+| `just test-integration` | Opt-in live Ollama / OpenAI-compatible benchmark checks (`ALWM_LIVE_BENCHMARK_*`) |
 | `just smoke` | Smoke tests only |
 | `just lint` | Ruff check |
 | `just fmt` | Ruff format |
@@ -139,6 +140,7 @@ Run `just` with no arguments to list recipes. Common tasks:
 | `just compose-help` | Validate Compose for dev/test/benchmark + benchmark-offline/ollama/llamacpp |
 | `just benchmark-offline` | Run mock benchmark via Compose → `out/benchmark-offline` |
 | `just benchmark-ollama` | Ollama service + smoke benchmark → `out/benchmark-ollama` |
+| `just benchmark-probe` | `alwm benchmark probe` in Compose (Ollama + host OpenAI URL) |
 | `just benchmark-llamacpp` | OpenAI-compatible endpoint on host → `out/benchmark-llamacpp` |
 | `alwm validate <file> <kind>` | Validate JSON against schema + Pydantic (includes `browser_evidence`) |
 | `alwm browser prompt-block <file>` | Load browser evidence JSON → stable prompt-sized text |
@@ -148,6 +150,7 @@ Run `just` with no arguments to list recipes. Common tasks:
 | `alwm compare <eval.json>… --out … [--out-md …]` | Evaluations → matrix JSON (+ optional matrix Markdown) |
 | `alwm report --matrix … --out-json … --out-md …` | Matrix → report JSON + Markdown |
 | `alwm providers show` | Print resolved provider config (API keys redacted) |
+| `alwm benchmark probe` | Check Ollama + OpenAI-compatible HTTP APIs (for live runs) |
 | `alwm benchmark run --definition … --output-dir …` | Full harness: responses → evals → matrices → report |
 | `alwm prompts check` / `list` / `show <id>` | Validate and read `prompts/registry.yaml` (paths relative to repo root) |
 

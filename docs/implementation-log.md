@@ -2,6 +2,10 @@
 
 Chronological record of repository work. Latest entries first.
 
+## 2026-04-17 — Live benchmark verification (Compose + opt-in integration tests)
+
+**Delivered:** `benchmark/live_probe.py`; CLI `alwm benchmark probe`; Ollama healthcheck + `service_healthy` for `benchmark-ollama`; Compose profile **`benchmark-probe`** (`just benchmark-probe`); integration tests under `tests/integration/` gated by `ALWM_LIVE_BENCHMARK_OLLAMA` / `ALWM_LIVE_BENCHMARK_LLAMACPP` with skips when unreachable; `just test` ignores `tests/integration/`; `tests/test_live_probe.py` unit tests.
+
 ## 2026-04-17 — Mission gap audit + prompt registry CLI
 
 **Delivered:** `docs/audits/mission-gap-audit.md` (code-verified status of CLI, providers, browser layer, Compose, Bake; drift notes). **Prompt registry wiring:** `schemas/v1/prompt_registry.schema.json`, `prompt_registry.py` (YAML load + JSON Schema + path safety), CLI `alwm prompts check|list|show`, tests `tests/test_prompt_registry.py`. README and `AGENTS.md` updated for new commands.
