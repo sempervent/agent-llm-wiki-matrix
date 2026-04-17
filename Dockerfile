@@ -31,3 +31,13 @@ ENV ALWM_REPO_ROOT=/workspace
 
 ENTRYPOINT ["alwm"]
 CMD ["--help"]
+
+# Dev/test image: pytest + linters for Compose `test` profile (CI parity: prefer `make ci` locally).
+FROM base AS test
+RUN pip install -e ".[dev]"
+RUN useradd --create-home --uid 1000 alwm
+USER alwm
+WORKDIR /workspace
+ENV ALWM_REPO_ROOT=/workspace
+ENTRYPOINT []
+CMD ["python", "-m", "pytest", "-q", "tests/"]

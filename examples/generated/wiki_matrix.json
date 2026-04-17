@@ -1,0 +1,25 @@
+{
+  "id": "wiki-matrix-001",
+  "title": "Wiki pages (example dataset)",
+  "matrix_kind": "grid",
+  "row_labels": [
+    "retrieval-basics",
+    "chunking-strategies"
+  ],
+  "col_labels": [
+    "clarity",
+    "traceability"
+  ],
+  "scores": [
+    [
+      0.246497,
+      0.719362
+    ],
+    [
+      0.407987,
+      0.530512
+    ]
+  ],
+  "metric": "per_criterion_score",
+  "created_at": "1970-01-01T00:00:00Z"
+}

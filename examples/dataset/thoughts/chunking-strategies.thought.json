@@ -1,0 +1,11 @@
+{
+  "id": "thought-chunking-strategies",
+  "title": "Chunking strategies",
+  "body_markdown": "# Chunking strategies\n\nChunk size and overlap materially affect recall for long documents.\n\n## Checklist\n\n- Record tokenizer and chunk parameters in experiment metadata.\n- Link evaluations back to the rubric version used for scoring.\n\nFor retrieval context, compare with `retrieval-basics.md`.\n",
+  "created_at": "1970-01-01T00:00:00Z",
+  "status": "draft",
+  "tags": [
+    "ingested"
+  ],
+  "links": []
+}

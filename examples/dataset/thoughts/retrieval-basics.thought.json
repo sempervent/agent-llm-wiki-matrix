@@ -1,0 +1,11 @@
+{
+  "id": "thought-retrieval-basics",
+  "title": "Retrieval basics",
+  "body_markdown": "# Retrieval basics\n\nThis page summarizes how lexical and dense retrieval differ in agent pipelines.\n\n## Notes\n\n- Start with a small corpus before scaling benchmarks.\n- Prefer deterministic fixtures when comparing backends.\n\nSee also the companion page on chunking strategies.\n",
+  "created_at": "1970-01-01T00:00:00Z",
+  "status": "draft",
+  "tags": [
+    "ingested"
+  ],
+  "links": []
+}

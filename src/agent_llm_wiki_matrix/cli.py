@@ -6,12 +6,22 @@ import json
 import os
 import sys
 from pathlib import Path
+from typing import Literal, cast
 
 import click
 
 from agent_llm_wiki_matrix import __version__
 from agent_llm_wiki_matrix.artifacts import list_artifact_kinds, load_artifact_file
 from agent_llm_wiki_matrix.logging_config import configure_logging, get_logger
+from agent_llm_wiki_matrix.models import ComparisonMatrix
+from agent_llm_wiki_matrix.pipelines.compare import evaluations_to_matrix
+from agent_llm_wiki_matrix.pipelines.evaluate import evaluate_subject, evaluation_to_json
+from agent_llm_wiki_matrix.pipelines.ingest import ingest_markdown_pages
+from agent_llm_wiki_matrix.pipelines.reporting import (
+    build_report_from_matrix,
+    render_matrix_markdown,
+    render_report_markdown,
+)
 from agent_llm_wiki_matrix.providers.config import load_provider_config
 
 
@@ -83,6 +93,172 @@ def cmd_validate(path: Path, kind: str) -> None:
     """Validate a JSON artifact file against schema + domain model."""
     load_artifact_file(path, kind)
     click.echo(f"ok: {path} ({kind})")
+
+
+@main.command("ingest")
+@click.argument(
+    "input_dir",
+    type=click.Path(path_type=Path, exists=True, file_okay=False, readable=True),
+)
+@click.argument("output_dir", type=click.Path(path_type=Path, file_okay=False))
+@click.option(
+    "--created-at",
+    default="1970-01-01T00:00:00Z",
+    show_default=True,
+    help="RFC 3339 timestamp written on each Thought (deterministic ingest).",
+)
+@click.option(
+    "--status",
+    type=click.Choice(["draft", "published"]),
+    default="draft",
+    show_default=True,
+)
+def cmd_ingest(input_dir: Path, output_dir: Path, created_at: str, status: str) -> None:
+    """Convert Markdown pages in INPUT_DIR to Thought JSON files in OUTPUT_DIR."""
+    written = ingest_markdown_pages(
+        input_dir,
+        output_dir,
+        created_at=created_at,
+        status=cast(Literal["draft", "published"], status),
+    )
+    for p in written:
+        click.echo(f"wrote {p}")
+
+
+@main.command("evaluate")
+@click.option(
+    "--subject",
+    "subject_path",
+    type=click.Path(path_type=Path, exists=True, dir_okay=False, readable=True),
+    required=True,
+    help="Markdown page or Thought JSON to score.",
+)
+@click.option(
+    "--rubric",
+    "rubric_path",
+    type=click.Path(path_type=Path, exists=True, dir_okay=False, readable=True),
+    required=True,
+)
+@click.option(
+    "--out",
+    "out_path",
+    type=click.Path(path_type=Path, file_okay=True, writable=True),
+    required=True,
+)
+@click.option(
+    "--id",
+    "evaluation_id",
+    default=None,
+    help="Evaluation id (default: derived from subject and rubric paths).",
+)
+@click.option("--evaluated-at", default="1970-01-01T00:00:00Z", show_default=True)
+def cmd_evaluate(
+    subject_path: Path,
+    rubric_path: Path,
+    out_path: Path,
+    evaluation_id: str | None,
+    evaluated_at: str,
+) -> None:
+    """Run deterministic rubric scoring (pipeline evaluator; no network)."""
+    eid = evaluation_id or f"eval-{subject_path.stem}-{rubric_path.stem}"
+    ev = evaluate_subject(
+        subject_path,
+        rubric_path,
+        evaluation_id=eid,
+        evaluated_at=evaluated_at,
+    )
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    out_path.write_text(evaluation_to_json(ev), encoding="utf-8")
+    click.echo(f"wrote {out_path}")
+
+
+@main.command("compare")
+@click.argument(
+    "eval_files",
+    nargs=-1,
+    required=True,
+    type=click.Path(path_type=Path, exists=True, dir_okay=False, readable=True),
+)
+@click.option("--out", "out_path", type=click.Path(path_type=Path), required=True)
+@click.option("--id", "matrix_id", required=True)
+@click.option("--title", required=True)
+@click.option("--metric", default="per_criterion_score", show_default=True)
+@click.option("--created-at", default="1970-01-01T00:00:00Z", show_default=True)
+@click.option(
+    "--out-md",
+    "out_md",
+    type=click.Path(path_type=Path),
+    default=None,
+    help="Optional path to render templates/matrix.md for the same matrix.",
+)
+def cmd_compare(
+    eval_files: tuple[Path, ...],
+    out_path: Path,
+    matrix_id: str,
+    title: str,
+    metric: str,
+    created_at: str,
+    out_md: Path | None,
+) -> None:
+    """Build a comparison matrix JSON from evaluation artifacts."""
+    matrix = evaluations_to_matrix(
+        list(eval_files),
+        matrix_id=matrix_id,
+        title=title,
+        metric=metric,
+        created_at=created_at,
+    )
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    out_path.write_text(
+        matrix.model_dump_json(indent=2, exclude_none=True) + "\n",
+        encoding="utf-8",
+    )
+    click.echo(f"wrote {out_path}")
+    if out_md is not None:
+        out_md.parent.mkdir(parents=True, exist_ok=True)
+        out_md.write_text(render_matrix_markdown(matrix), encoding="utf-8")
+        click.echo(f"wrote {out_md}")
+
+
+@main.command("report")
+@click.option(
+    "--matrix",
+    "matrix_path",
+    type=click.Path(path_type=Path, exists=True, dir_okay=False, readable=True),
+    required=True,
+)
+@click.option("--out-json", "out_json", type=click.Path(path_type=Path), required=True)
+@click.option("--out-md", "out_md", type=click.Path(path_type=Path), required=True)
+@click.option("--id", "report_id", required=True)
+@click.option("--period-start", default="1970-01-01", show_default=True)
+@click.option("--period-end", default="1970-01-07", show_default=True)
+def cmd_report(
+    matrix_path: Path,
+    out_json: Path,
+    out_md: Path,
+    report_id: str,
+    period_start: str,
+    period_end: str,
+) -> None:
+    """Render a Report JSON plus Markdown from a matrix artifact."""
+    raw = load_artifact_file(matrix_path, "matrix")
+    if not isinstance(raw, ComparisonMatrix):
+        msg = "Expected a matrix artifact"
+        raise TypeError(msg)
+    report = build_report_from_matrix(
+        raw,
+        report_id=report_id,
+        period_start=period_start,
+        period_end=period_end,
+    )
+    out_json.parent.mkdir(parents=True, exist_ok=True)
+    out_json.write_text(
+        report.model_dump_json(indent=2, exclude_none=True) + "\n",
+        encoding="utf-8",
+    )
+    out_md.write_text(render_report_markdown(report), encoding="utf-8")
+    click.echo(f"wrote {out_json}")
+    click.echo(f"wrote {out_md}")
 
 
 @main.command("info")

@@ -49,4 +49,8 @@ docker-bake:
 
 compose-help:
 	docker compose --profile dev config >/dev/null \
-		&& docker compose --profile dev config --services
+		&& docker compose --profile test config >/dev/null \
+		&& docker compose --profile benchmark config >/dev/null \
+		&& docker compose --profile dev config --services \
+		&& docker compose --profile test config --services \
+		&& docker compose --profile benchmark config --services

@@ -1,7 +1,7 @@
 # Report: `TITLE`
 
 - **id:** `ID`
-- **kind:** weekly | model_comparison | agent_stack | browser_evidence
+- **kind:** `REPORT_KIND`
 - **period:** `PERIOD_START` → `PERIOD_END`
 
 ## Body

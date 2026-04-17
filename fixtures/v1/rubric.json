@@ -1,0 +1,17 @@
+{
+  "id": "rubric.smoke.v1",
+  "title": "Smoke rubric",
+  "version": "1",
+  "criteria": [
+    {
+      "id": "clarity",
+      "weight": 0.5,
+      "description": "Readability and structure."
+    },
+    {
+      "id": "traceability",
+      "weight": 0.5,
+      "description": "Links and provenance."
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "evaluated_at": "1970-01-01T00:00:00Z",
+  "evaluator": "pipeline",
+  "id": "eval-chunking",
+  "notes_markdown": "Deterministic pipeline evaluation (byte-hash scores).",
+  "rubric_id": "rubric.wiki.v1",
+  "scores": {
+    "clarity": 0.407987,
+    "traceability": 0.530512
+  },
+  "subject_ref": "examples/dataset/pages/chunking-strategies.md",
+  "total_weighted_score": 0.469249,
+  "weights": {
+    "clarity": 0.5,
+    "traceability": 0.5
+  }
+}

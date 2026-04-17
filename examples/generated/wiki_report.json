@@ -1,0 +1,11 @@
+{
+  "id": "wiki-report-001",
+  "title": "Report: Wiki pages (example dataset)",
+  "kind": "model_comparison",
+  "period_start": "1970-01-01",
+  "period_end": "1970-01-07",
+  "body_markdown": "## Wiki pages (example dataset)\n\n- **metric:** `per_criterion_score`\n- **shape:** 2×2 (grid)\n\n### Highlights\n\n- See the companion matrix Markdown for the full score grid.\n",
+  "source_refs": [
+    "matrices/wiki-matrix-001.json"
+  ]
+}

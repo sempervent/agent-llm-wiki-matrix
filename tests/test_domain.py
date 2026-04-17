@@ -24,6 +24,7 @@ _FIXTURES = _REPO / "fixtures" / "v1"
         ("evaluation.json", "evaluation"),
         ("matrix.json", "matrix"),
         ("report.json", "report"),
+        ("rubric.json", "rubric"),
     ],
 )
 def test_fixture_validates(filename: str, kind: str) -> None:

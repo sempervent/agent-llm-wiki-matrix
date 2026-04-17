@@ -1,0 +1,17 @@
+{
+  "id": "rubric.wiki.v1",
+  "title": "Wiki page comparison rubric",
+  "version": "1",
+  "criteria": [
+    {
+      "id": "clarity",
+      "weight": 0.5,
+      "description": "Clear headings and prose."
+    },
+    {
+      "id": "traceability",
+      "weight": 0.5,
+      "description": "References, links, or citations."
+    }
+  ]
+}

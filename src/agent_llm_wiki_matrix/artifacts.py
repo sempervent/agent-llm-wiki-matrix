@@ -14,6 +14,7 @@ from agent_llm_wiki_matrix.models import (
     Event,
     Experiment,
     Report,
+    Rubric,
     Thought,
 )
 from agent_llm_wiki_matrix.schema import load_schema, validate_json
@@ -25,6 +26,7 @@ _ARTIFACTS: dict[str, tuple[type[BaseModel], str]] = {
     "evaluation": (Evaluation, "schemas/v1/evaluation.schema.json"),
     "matrix": (ComparisonMatrix, "schemas/v1/matrix.schema.json"),
     "report": (Report, "schemas/v1/report.schema.json"),
+    "rubric": (Rubric, "schemas/v1/rubric.schema.json"),
 }
 
 

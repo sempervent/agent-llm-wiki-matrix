@@ -95,6 +95,27 @@ class ComparisonMatrix(BaseModel):
         return self
 
 
+class RubricCriterion(BaseModel):
+    """Single weighted criterion in a rubric."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    id: str = Field(min_length=1)
+    weight: float = Field(ge=0.0)
+    description: str = ""
+
+
+class Rubric(BaseModel):
+    """Weighted rubric for deterministic or LLM-assisted evaluation."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    id: str = Field(min_length=1)
+    title: str = Field(min_length=1)
+    version: str = "1"
+    criteria: list[RubricCriterion] = Field(min_length=1)
+
+
 class Report(BaseModel):
     """Aggregated narrative report for humans."""
 

@@ -1,7 +1,7 @@
 # Comparison matrix: `TITLE`
 
 - **id:** `ID`
-- **kind:** pairwise | grid
+- **kind:** `MATRIX_KIND`
 - **metric:** `METRIC`
 - **created:** `CREATED_AT`
 
