@@ -149,6 +149,7 @@ Run `just` with no arguments to list recipes. Common tasks:
 | `alwm report --matrix … --out-json … --out-md …` | Matrix → report JSON + Markdown |
 | `alwm providers show` | Print resolved provider config (API keys redacted) |
 | `alwm benchmark run --definition … --output-dir …` | Full harness: responses → evals → matrices → report |
+| `alwm prompts check` / `list` / `show <id>` | Validate and read `prompts/registry.yaml` (paths relative to repo root) |
 
 ## Repository layout
 

@@ -2,6 +2,12 @@
 
 Chronological record of repository work. Latest entries first.
 
+## 2026-04-17 — Mission gap audit + prompt registry CLI
+
+**Delivered:** `docs/audits/mission-gap-audit.md` (code-verified status of CLI, providers, browser layer, Compose, Bake; drift notes). **Prompt registry wiring:** `schemas/v1/prompt_registry.schema.json`, `prompt_registry.py` (YAML load + JSON Schema + path safety), CLI `alwm prompts check|list|show`, tests `tests/test_prompt_registry.py`. README and `AGENTS.md` updated for new commands.
+
+**Follow-up:** Benchmark YAML still uses inline prompt `text:`; optional later work is resolving `prompt_id` from the registry in definitions.
+
 ## 2026-04-17 — Browser execution abstraction
 
 **Delivered:** `BrowserRunner` ABC; `BrowserEvidence` JSON Schema + Pydantic models; `MockBrowserRunner` and `FileBrowserRunner`; fixture `fixtures/browser_evidence/v1/export_flow.json`; `PlaywrightBrowserRunner` / `MCPBrowserRunner` stubs (`NotImplementedError`); `load_browser_evidence`, `evidence_to_prompt_block`; artifact kind `browser_evidence` for `alwm validate`; CLI `alwm browser prompt-block` and `alwm browser run-mock`; tests `tests/test_browser.py`; `docs/architecture/browser.md`.

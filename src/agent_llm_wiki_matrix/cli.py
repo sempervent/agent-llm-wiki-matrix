@@ -29,6 +29,11 @@ from agent_llm_wiki_matrix.pipelines.reporting import (
     render_matrix_markdown,
     render_report_markdown,
 )
+from agent_llm_wiki_matrix.prompt_registry import (
+    find_prompt_entry,
+    load_prompt_registry_yaml,
+    resolve_prompt_text,
+)
 from agent_llm_wiki_matrix.providers.config import load_provider_config
 
 
@@ -88,6 +93,70 @@ def cmd_providers_show(config_yaml: Path | None) -> None:
     key = data["openai_compatible"]["api_key"]
     data["openai_compatible"]["api_key"] = "***" if key else ""
     click.echo(json.dumps(data, indent=2, sort_keys=True))
+
+
+@main.group("prompts")
+def prompts_grp() -> None:
+    """Versioned prompt registry under ``prompts/registry.yaml`` (YAML + schema)."""
+
+
+@prompts_grp.command("check")
+@click.option(
+    "--registry",
+    "registry_path",
+    type=click.Path(path_type=Path, dir_okay=False),
+    default="prompts/registry.yaml",
+    show_default=True,
+    help="Registry YAML path relative to ALWM_REPO_ROOT.",
+)
+def cmd_prompts_check(registry_path: Path) -> None:
+    """Validate ``prompts/registry.yaml`` against JSON Schema + Pydantic."""
+    repo = Path(os.environ.get("ALWM_REPO_ROOT", ".")).resolve()
+    full = (repo / registry_path).resolve()
+    if not full.is_file():
+        raise click.ClickException(f"Registry file not found: {full}")
+    load_prompt_registry_yaml(full)
+    click.echo(f"ok: {full}")
+
+
+@prompts_grp.command("list")
+@click.option(
+    "--registry",
+    "registry_path",
+    type=click.Path(path_type=Path, dir_okay=False),
+    default="prompts/registry.yaml",
+    show_default=True,
+)
+def cmd_prompts_list(registry_path: Path) -> None:
+    """Print prompt ids and paths (tab-separated)."""
+    repo = Path(os.environ.get("ALWM_REPO_ROOT", ".")).resolve()
+    full = (repo / registry_path).resolve()
+    doc = load_prompt_registry_yaml(full)
+    for p in doc.prompts:
+        click.echo(f"{p.id}\t{p.path}")
+
+
+@prompts_grp.command("show")
+@click.argument("prompt_id")
+@click.option(
+    "--registry",
+    "registry_path",
+    type=click.Path(path_type=Path, dir_okay=False),
+    default="prompts/registry.yaml",
+    show_default=True,
+)
+def cmd_prompts_show(prompt_id: str, registry_path: Path) -> None:
+    """Print prompt body for ``prompt_id`` (path resolved from registry)."""
+    repo = Path(os.environ.get("ALWM_REPO_ROOT", ".")).resolve()
+    full = (repo / registry_path).resolve()
+    doc = load_prompt_registry_yaml(full)
+    try:
+        entry = find_prompt_entry(doc, prompt_id)
+    except KeyError:
+        raise click.ClickException(f"Unknown prompt id: {prompt_id}") from None
+    text = resolve_prompt_text(repo_root=repo, entry=entry)
+    # Avoid double newline when the file already ends with one.
+    click.echo(text, nl=not text.endswith("\n"))
 
 
 @main.group("browser")
