@@ -4,6 +4,8 @@ Markdown-first, git-native **LLM wiki + comparison matrix** system for capturing
 
 **Repository:** [github.com/sempervent/agent-llm-wiki-matrix](https://github.com/sempervent/agent-llm-wiki-matrix)
 
+Contributors and coding agents should follow **`AGENTS.md`** for the full operating manual (contribution loop, decision rules, prompt registry policy, verification expectations).
+
 ## Goals
 
 - **Markdown-first, git-native** artifacts: notes, matrices, rubrics, and reports live in the repo.
@@ -157,7 +159,7 @@ Run `just` with no arguments to list recipes. Common tasks:
 ## Repository layout
 
 ```
-├── AGENTS.md              # Agent / contributor conventions
+├── AGENTS.md              # Operating manual for agents (mission, loops, verification, prompts)
 ├── docker-compose.yml
 ├── docker-bake.hcl
 ├── Dockerfile

@@ -2,6 +2,14 @@
 
 Chronological record of repository work. Latest entries first.
 
+## 2026-04-17 — AGENTS.md operating manual
+
+**Why:** The old `AGENTS.md` was principles-only; agents needed actionable rules for this repo (benchmarks, prompt registry, integration tests, browser stubs, documentation touchpoints).
+
+**What changed:** Expanded `AGENTS.md` with mission/success criteria, required contribution loop, decision table (including **prefer `prompt_ref` over duplicated inline prompt text** where appropriate), anti-patterns, verification/reporting table, documentation update rules, completion vs partial vs stubbed definitions, and project-specific examples (implementation, auditing, drift repair, benchmarks, browser). README now points contributors to `AGENTS.md` for the full manual.
+
+**How to use it:** Before sizable work, read Mission, Contribution loop, and Prompt registry sections; after work, satisfy Verification + Documentation update rules and add an implementation-log entry when behavior or contracts shift.
+
 ## 2026-04-17 — Registry-backed benchmark prompts
 
 **Delivered:** `PromptItem` supports `text` xor `prompt_ref` (+ optional `registry_version` pin); `BenchmarkDefinitionV1.prompt_registry_ref`; `resolve_benchmark_prompts` (`benchmark/prompt_resolution.py`) using `load_prompt_registry_yaml`; `run_benchmark(..., prompt_registry_path=...)` and CLI `--prompt-registry`; `BenchmarkRequestRecord` / `BenchmarkResponse` fields `prompt_source`, `prompt_registry_id`, `registry_document_version`, `prompt_source_relpath`; JSON Schema updates + `schemas/v1/benchmark_definition.schema.json`. Fixtures under `fixtures/prompt_registry/` and `fixtures/benchmarks/registry_*.yaml`; tests `tests/test_benchmark_prompt_registry.py`; example `examples/benchmark_suites/v1/registry.mixed.v1.yaml` + committed run `examples/benchmark_runs/registry-mixed/`. Prompt `bench.sample.prompt.v1` added under `prompts/`.
