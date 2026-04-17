@@ -1,0 +1,130 @@
+{
+  "benchmark_id": "bench.examples.campaign.neutral.v1",
+  "created_at": "1970-01-01T00:00:00Z",
+  "entries": [
+    {
+      "col_label": "q01",
+      "evaluation_relpath": "cells/v-cli__q01/evaluation.json",
+      "prompt_id": "q01",
+      "row_label": "v-cli",
+      "total_weighted_score": 0.802863,
+      "variant_id": "v-cli"
+    },
+    {
+      "col_label": "q02",
+      "evaluation_relpath": "cells/v-cli__q02/evaluation.json",
+      "prompt_id": "q02",
+      "row_label": "v-cli",
+      "total_weighted_score": 0.174851,
+      "variant_id": "v-cli"
+    },
+    {
+      "col_label": "q03",
+      "evaluation_relpath": "cells/v-cli__q03/evaluation.json",
+      "prompt_id": "q03",
+      "row_label": "v-cli",
+      "total_weighted_score": 0.579847,
+      "variant_id": "v-cli"
+    },
+    {
+      "col_label": "q04",
+      "evaluation_relpath": "cells/v-cli__q04/evaluation.json",
+      "prompt_id": "q04",
+      "row_label": "v-cli",
+      "total_weighted_score": 0.63956,
+      "variant_id": "v-cli"
+    },
+    {
+      "col_label": "q05",
+      "evaluation_relpath": "cells/v-cli__q05/evaluation.json",
+      "prompt_id": "q05",
+      "row_label": "v-cli",
+      "total_weighted_score": 0.353562,
+      "variant_id": "v-cli"
+    },
+    {
+      "col_label": "q01",
+      "evaluation_relpath": "cells/v-browser__q01/evaluation.json",
+      "prompt_id": "q01",
+      "row_label": "v-browser",
+      "total_weighted_score": 0.580946,
+      "variant_id": "v-browser"
+    },
+    {
+      "col_label": "q02",
+      "evaluation_relpath": "cells/v-browser__q02/evaluation.json",
+      "prompt_id": "q02",
+      "row_label": "v-browser",
+      "total_weighted_score": 0.7472,
+      "variant_id": "v-browser"
+    },
+    {
+      "col_label": "q03",
+      "evaluation_relpath": "cells/v-browser__q03/evaluation.json",
+      "prompt_id": "q03",
+      "row_label": "v-browser",
+      "total_weighted_score": 0.61658,
+      "variant_id": "v-browser"
+    },
+    {
+      "col_label": "q04",
+      "evaluation_relpath": "cells/v-browser__q04/evaluation.json",
+      "prompt_id": "q04",
+      "row_label": "v-browser",
+      "total_weighted_score": 0.38272,
+      "variant_id": "v-browser"
+    },
+    {
+      "col_label": "q05",
+      "evaluation_relpath": "cells/v-browser__q05/evaluation.json",
+      "prompt_id": "q05",
+      "row_label": "v-browser",
+      "total_weighted_score": 0.394781,
+      "variant_id": "v-browser"
+    },
+    {
+      "col_label": "q01",
+      "evaluation_relpath": "cells/v-repo__q01/evaluation.json",
+      "prompt_id": "q01",
+      "row_label": "v-repo",
+      "total_weighted_score": 0.428831,
+      "variant_id": "v-repo"
+    },
+    {
+      "col_label": "q02",
+      "evaluation_relpath": "cells/v-repo__q02/evaluation.json",
+      "prompt_id": "q02",
+      "row_label": "v-repo",
+      "total_weighted_score": 0.438847,
+      "variant_id": "v-repo"
+    },
+    {
+      "col_label": "q03",
+      "evaluation_relpath": "cells/v-repo__q03/evaluation.json",
+      "prompt_id": "q03",
+      "row_label": "v-repo",
+      "total_weighted_score": 0.47981,
+      "variant_id": "v-repo"
+    },
+    {
+      "col_label": "q04",
+      "evaluation_relpath": "cells/v-repo__q04/evaluation.json",
+      "prompt_id": "q04",
+      "row_label": "v-repo",
+      "total_weighted_score": 0.601354,
+      "variant_id": "v-repo"
+    },
+    {
+      "col_label": "q05",
+      "evaluation_relpath": "cells/v-repo__q05/evaluation.json",
+      "prompt_id": "q05",
+      "row_label": "v-repo",
+      "total_weighted_score": 0.475405,
+      "variant_id": "v-repo"
+    }
+  ],
+  "matrix_id": "examples-campaign-neutral-grid",
+  "metric": "total_weighted_rubric_score",
+  "run_id": "examples-campaign-neutral",
+  "schema_version": 1
+}

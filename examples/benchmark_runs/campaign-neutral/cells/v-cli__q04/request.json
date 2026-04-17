@@ -1,0 +1,12 @@
+{
+  "benchmark_id": "bench.examples.campaign.neutral.v1",
+  "cell_id": "v-cli__q04",
+  "created_at": "1970-01-01T00:00:00Z",
+  "id": "req__examples-campaign-neutral__v-cli__q04",
+  "model": "mock-model",
+  "prompt_id": "q04",
+  "prompt_text": "Explain why pairwise comparison matrices are easier to audit than ad-hoc prose when comparing more than two models.",
+  "run_id": "examples-campaign-neutral",
+  "schema_version": 1,
+  "variant_id": "v-cli"
+}

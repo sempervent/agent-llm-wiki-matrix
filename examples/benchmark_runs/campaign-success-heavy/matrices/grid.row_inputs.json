@@ -1,0 +1,90 @@
+{
+  "benchmark_id": "bench.examples.campaign.success_heavy.v1",
+  "created_at": "1970-01-01T00:00:00Z",
+  "entries": [
+    {
+      "col_label": "q11",
+      "evaluation_relpath": "cells/v-cli__q11/evaluation.json",
+      "prompt_id": "q11",
+      "row_label": "v-cli",
+      "total_weighted_score": 0.381738,
+      "variant_id": "v-cli"
+    },
+    {
+      "col_label": "q12",
+      "evaluation_relpath": "cells/v-cli__q12/evaluation.json",
+      "prompt_id": "q12",
+      "row_label": "v-cli",
+      "total_weighted_score": 0.811068,
+      "variant_id": "v-cli"
+    },
+    {
+      "col_label": "q13",
+      "evaluation_relpath": "cells/v-cli__q13/evaluation.json",
+      "prompt_id": "q13",
+      "row_label": "v-cli",
+      "total_weighted_score": 0.938569,
+      "variant_id": "v-cli"
+    },
+    {
+      "col_label": "q14",
+      "evaluation_relpath": "cells/v-cli__q14/evaluation.json",
+      "prompt_id": "q14",
+      "row_label": "v-cli",
+      "total_weighted_score": 0.682866,
+      "variant_id": "v-cli"
+    },
+    {
+      "col_label": "q15",
+      "evaluation_relpath": "cells/v-cli__q15/evaluation.json",
+      "prompt_id": "q15",
+      "row_label": "v-cli",
+      "total_weighted_score": 0.591463,
+      "variant_id": "v-cli"
+    },
+    {
+      "col_label": "q11",
+      "evaluation_relpath": "cells/v-browser__q11/evaluation.json",
+      "prompt_id": "q11",
+      "row_label": "v-browser",
+      "total_weighted_score": 0.685176,
+      "variant_id": "v-browser"
+    },
+    {
+      "col_label": "q12",
+      "evaluation_relpath": "cells/v-browser__q12/evaluation.json",
+      "prompt_id": "q12",
+      "row_label": "v-browser",
+      "total_weighted_score": 0.246453,
+      "variant_id": "v-browser"
+    },
+    {
+      "col_label": "q13",
+      "evaluation_relpath": "cells/v-browser__q13/evaluation.json",
+      "prompt_id": "q13",
+      "row_label": "v-browser",
+      "total_weighted_score": 0.7274,
+      "variant_id": "v-browser"
+    },
+    {
+      "col_label": "q14",
+      "evaluation_relpath": "cells/v-browser__q14/evaluation.json",
+      "prompt_id": "q14",
+      "row_label": "v-browser",
+      "total_weighted_score": 0.416897,
+      "variant_id": "v-browser"
+    },
+    {
+      "col_label": "q15",
+      "evaluation_relpath": "cells/v-browser__q15/evaluation.json",
+      "prompt_id": "q15",
+      "row_label": "v-browser",
+      "total_weighted_score": 0.375616,
+      "variant_id": "v-browser"
+    }
+  ],
+  "matrix_id": "examples-campaign-success-heavy-grid",
+  "metric": "total_weighted_rubric_score",
+  "run_id": "examples-campaign-success-heavy",
+  "schema_version": 1
+}

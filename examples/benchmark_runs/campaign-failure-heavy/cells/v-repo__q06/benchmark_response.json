@@ -1,0 +1,15 @@
+{
+  "agent_stack": "repo-governed",
+  "backend_kind": "mock",
+  "backend_model": "mock-model",
+  "benchmark_id": "bench.examples.campaign.failure_heavy.v1",
+  "created_at": "1970-01-01T00:00:00Z",
+  "duration_ms": 0,
+  "execution_mode": "repo_governed",
+  "id": "resp-v-repo-q06",
+  "prompt_id": "q06",
+  "prompt_text": "A batch job timed out after chunking doubled token count. What diagnostics would you request first, and what mitigations would you try before rerunning?",
+  "response_text": "[repo_governed][mock:mock-model] e07d1fc8811d7678",
+  "schema_version": 1,
+  "variant_id": "v-repo"
+}

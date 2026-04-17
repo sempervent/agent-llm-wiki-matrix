@@ -1,0 +1,40 @@
+# Failure-heavy campaign: strict rubric + failure/recovery prompts (q06–q10), two variants.
+# Intended to stress fault awareness and regression safety in scoring narratives.
+schema_version: 1
+id: bench.examples.campaign.failure_heavy.v1
+title: Example failure-heavy campaign (strict rubric, five prompts)
+rubric_ref: examples/dataset/rubrics/strict.v1.json
+prompts:
+  - id: q06
+    text: >-
+      A batch job timed out after chunking doubled token count. What diagnostics would you request
+      first, and what mitigations would you try before rerunning?
+  - id: q07
+    text: >-
+      The embedding index returns plausible but wrong citations under load. Describe a regression
+      harness to catch this class of failure before merge.
+  - id: q08
+    text: >-
+      OOM during model load on CI runners. Outline how you would shrink the reproducible Docker
+      image or split the benchmark without losing coverage.
+  - id: q09
+    text: >-
+      Users report non-deterministic scores across runs with the same prompt. Which configuration
+      fields and seeds would you freeze, and where would you record them?
+  - id: q10
+    text: >-
+      Browser automation flakes on the export button. Write a short incident-style note: suspected
+      causes, evidence to collect, and a temporary workaround.
+variants:
+  - id: v-cli
+    agent_stack: alwm-cli
+    execution_mode: cli
+    backend:
+      kind: mock
+      model: mock-model
+  - id: v-repo
+    agent_stack: repo-governed
+    execution_mode: repo_governed
+    backend:
+      kind: mock
+      model: mock-model

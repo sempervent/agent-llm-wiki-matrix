@@ -1,0 +1,25 @@
+{
+  "col_labels": [
+    "v-cli",
+    "v-browser"
+  ],
+  "created_at": "1970-01-01T00:00:00Z",
+  "id": "examples-campaign-success-heavy-pairwise",
+  "matrix_kind": "pairwise",
+  "metric": "mean_abs_total_score_delta",
+  "row_labels": [
+    "v-cli",
+    "v-browser"
+  ],
+  "scores": [
+    [
+      0.0,
+      0.3122076
+    ],
+    [
+      0.3122076,
+      0.0
+    ]
+  ],
+  "title": "Example success-heavy campaign (generous rubric, five prompts) (mean abs score delta across prompts)"
+}

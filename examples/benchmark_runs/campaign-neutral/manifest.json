@@ -1,0 +1,150 @@
+{
+  "benchmark_id": "bench.examples.campaign.neutral.v1",
+  "cells": [
+    {
+      "aggregate_response_relpath": "cells/v-browser__q01/benchmark_response.json",
+      "cell_id": "v-browser__q01",
+      "evaluation_relpath": "cells/v-browser__q01/evaluation.json",
+      "normalized_response_relpath": "cells/v-browser__q01/response.normalized.txt",
+      "raw_response_relpath": "cells/v-browser__q01/response.raw.txt",
+      "request_relpath": "cells/v-browser__q01/request.json"
+    },
+    {
+      "aggregate_response_relpath": "cells/v-browser__q02/benchmark_response.json",
+      "cell_id": "v-browser__q02",
+      "evaluation_relpath": "cells/v-browser__q02/evaluation.json",
+      "normalized_response_relpath": "cells/v-browser__q02/response.normalized.txt",
+      "raw_response_relpath": "cells/v-browser__q02/response.raw.txt",
+      "request_relpath": "cells/v-browser__q02/request.json"
+    },
+    {
+      "aggregate_response_relpath": "cells/v-browser__q03/benchmark_response.json",
+      "cell_id": "v-browser__q03",
+      "evaluation_relpath": "cells/v-browser__q03/evaluation.json",
+      "normalized_response_relpath": "cells/v-browser__q03/response.normalized.txt",
+      "raw_response_relpath": "cells/v-browser__q03/response.raw.txt",
+      "request_relpath": "cells/v-browser__q03/request.json"
+    },
+    {
+      "aggregate_response_relpath": "cells/v-browser__q04/benchmark_response.json",
+      "cell_id": "v-browser__q04",
+      "evaluation_relpath": "cells/v-browser__q04/evaluation.json",
+      "normalized_response_relpath": "cells/v-browser__q04/response.normalized.txt",
+      "raw_response_relpath": "cells/v-browser__q04/response.raw.txt",
+      "request_relpath": "cells/v-browser__q04/request.json"
+    },
+    {
+      "aggregate_response_relpath": "cells/v-browser__q05/benchmark_response.json",
+      "cell_id": "v-browser__q05",
+      "evaluation_relpath": "cells/v-browser__q05/evaluation.json",
+      "normalized_response_relpath": "cells/v-browser__q05/response.normalized.txt",
+      "raw_response_relpath": "cells/v-browser__q05/response.raw.txt",
+      "request_relpath": "cells/v-browser__q05/request.json"
+    },
+    {
+      "aggregate_response_relpath": "cells/v-cli__q01/benchmark_response.json",
+      "cell_id": "v-cli__q01",
+      "evaluation_relpath": "cells/v-cli__q01/evaluation.json",
+      "normalized_response_relpath": "cells/v-cli__q01/response.normalized.txt",
+      "raw_response_relpath": "cells/v-cli__q01/response.raw.txt",
+      "request_relpath": "cells/v-cli__q01/request.json"
+    },
+    {
+      "aggregate_response_relpath": "cells/v-cli__q02/benchmark_response.json",
+      "cell_id": "v-cli__q02",
+      "evaluation_relpath": "cells/v-cli__q02/evaluation.json",
+      "normalized_response_relpath": "cells/v-cli__q02/response.normalized.txt",
+      "raw_response_relpath": "cells/v-cli__q02/response.raw.txt",
+      "request_relpath": "cells/v-cli__q02/request.json"
+    },
+    {
+      "aggregate_response_relpath": "cells/v-cli__q03/benchmark_response.json",
+      "cell_id": "v-cli__q03",
+      "evaluation_relpath": "cells/v-cli__q03/evaluation.json",
+      "normalized_response_relpath": "cells/v-cli__q03/response.normalized.txt",
+      "raw_response_relpath": "cells/v-cli__q03/response.raw.txt",
+      "request_relpath": "cells/v-cli__q03/request.json"
+    },
+    {
+      "aggregate_response_relpath": "cells/v-cli__q04/benchmark_response.json",
+      "cell_id": "v-cli__q04",
+      "evaluation_relpath": "cells/v-cli__q04/evaluation.json",
+      "normalized_response_relpath": "cells/v-cli__q04/response.normalized.txt",
+      "raw_response_relpath": "cells/v-cli__q04/response.raw.txt",
+      "request_relpath": "cells/v-cli__q04/request.json"
+    },
+    {
+      "aggregate_response_relpath": "cells/v-cli__q05/benchmark_response.json",
+      "cell_id": "v-cli__q05",
+      "evaluation_relpath": "cells/v-cli__q05/evaluation.json",
+      "normalized_response_relpath": "cells/v-cli__q05/response.normalized.txt",
+      "raw_response_relpath": "cells/v-cli__q05/response.raw.txt",
+      "request_relpath": "cells/v-cli__q05/request.json"
+    },
+    {
+      "aggregate_response_relpath": "cells/v-repo__q01/benchmark_response.json",
+      "cell_id": "v-repo__q01",
+      "evaluation_relpath": "cells/v-repo__q01/evaluation.json",
+      "normalized_response_relpath": "cells/v-repo__q01/response.normalized.txt",
+      "raw_response_relpath": "cells/v-repo__q01/response.raw.txt",
+      "request_relpath": "cells/v-repo__q01/request.json"
+    },
+    {
+      "aggregate_response_relpath": "cells/v-repo__q02/benchmark_response.json",
+      "cell_id": "v-repo__q02",
+      "evaluation_relpath": "cells/v-repo__q02/evaluation.json",
+      "normalized_response_relpath": "cells/v-repo__q02/response.normalized.txt",
+      "raw_response_relpath": "cells/v-repo__q02/response.raw.txt",
+      "request_relpath": "cells/v-repo__q02/request.json"
+    },
+    {
+      "aggregate_response_relpath": "cells/v-repo__q03/benchmark_response.json",
+      "cell_id": "v-repo__q03",
+      "evaluation_relpath": "cells/v-repo__q03/evaluation.json",
+      "normalized_response_relpath": "cells/v-repo__q03/response.normalized.txt",
+      "raw_response_relpath": "cells/v-repo__q03/response.raw.txt",
+      "request_relpath": "cells/v-repo__q03/request.json"
+    },
+    {
+      "aggregate_response_relpath": "cells/v-repo__q04/benchmark_response.json",
+      "cell_id": "v-repo__q04",
+      "evaluation_relpath": "cells/v-repo__q04/evaluation.json",
+      "normalized_response_relpath": "cells/v-repo__q04/response.normalized.txt",
+      "raw_response_relpath": "cells/v-repo__q04/response.raw.txt",
+      "request_relpath": "cells/v-repo__q04/request.json"
+    },
+    {
+      "aggregate_response_relpath": "cells/v-repo__q05/benchmark_response.json",
+      "cell_id": "v-repo__q05",
+      "evaluation_relpath": "cells/v-repo__q05/evaluation.json",
+      "normalized_response_relpath": "cells/v-repo__q05/response.normalized.txt",
+      "raw_response_relpath": "cells/v-repo__q05/response.raw.txt",
+      "request_relpath": "cells/v-repo__q05/request.json"
+    }
+  ],
+  "created_at": "1970-01-01T00:00:00Z",
+  "matrix_grid_md_path": "markdown/matrix.grid.md",
+  "matrix_grid_path": "matrices/grid.json",
+  "matrix_grid_row_inputs_path": "matrices/grid.row_inputs.json",
+  "matrix_pairwise_md_path": "markdown/matrix.pairwise.md",
+  "matrix_pairwise_path": "matrices/pairwise.json",
+  "matrix_pairwise_row_inputs_path": "matrices/pairwise.row_inputs.json",
+  "prompt_ids": [
+    "q01",
+    "q02",
+    "q03",
+    "q04",
+    "q05"
+  ],
+  "report_json_path": "reports/report.json",
+  "report_md_path": "reports/report.md",
+  "rubric_ref": "examples/dataset/rubrics/balanced.v1.json",
+  "run_id": "examples-campaign-neutral",
+  "schema_version": 1,
+  "title": "Example neutral campaign (balanced rubric, five prompts)",
+  "variant_ids": [
+    "v-cli",
+    "v-browser",
+    "v-repo"
+  ]
+}

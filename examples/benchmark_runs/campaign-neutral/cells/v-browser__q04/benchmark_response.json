@@ -1,0 +1,15 @@
+{
+  "agent_stack": "browser-mock",
+  "backend_kind": "mock",
+  "backend_model": "mock-model",
+  "benchmark_id": "bench.examples.campaign.neutral.v1",
+  "created_at": "1970-01-01T00:00:00Z",
+  "duration_ms": 0,
+  "execution_mode": "browser_mock",
+  "id": "resp-v-browser-q04",
+  "prompt_id": "q04",
+  "prompt_text": "Explain why pairwise comparison matrices are easier to audit than ad-hoc prose when comparing more than two models.",
+  "response_text": "[browser_mock][mock:mock-model] a3e37d532a3bd729",
+  "schema_version": 1,
+  "variant_id": "v-browser"
+}

@@ -1,0 +1,15 @@
+{
+  "agent_stack": "alwm-cli",
+  "backend_kind": "mock",
+  "backend_model": "mock-model",
+  "benchmark_id": "bench.examples.campaign.success_heavy.v1",
+  "created_at": "1970-01-01T00:00:00Z",
+  "duration_ms": 0,
+  "execution_mode": "cli",
+  "id": "resp-v-cli-q14",
+  "prompt_id": "q14",
+  "prompt_text": "Explain how reproducible file naming under cells/ helps reviewers trust a benchmark campaign without re-running models.",
+  "response_text": "[mock:mock-model] 3ec1a749d82e78fe",
+  "schema_version": 1,
+  "variant_id": "v-cli"
+}

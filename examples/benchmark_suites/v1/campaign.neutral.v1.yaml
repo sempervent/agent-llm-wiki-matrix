@@ -1,0 +1,45 @@
+# Neutral campaign: balanced rubric, general prompts (q01–q05), three execution modes.
+schema_version: 1
+id: bench.examples.campaign.neutral.v1
+title: Example neutral campaign (balanced rubric, five prompts)
+rubric_ref: examples/dataset/rubrics/balanced.v1.json
+prompts:
+  - id: q01
+    text: >-
+      Summarize how you would structure a small RAG pipeline for Markdown notes in a git repo,
+      including where JSON Schema validation fits.
+  - id: q02
+    text: >-
+      List three trade-offs between dense retrieval and lexical search for agent tool-calling
+      documentation, in under 120 words.
+  - id: q03
+    text: >-
+      Propose a minimal experiment protocol to compare two local LLM backends on the same prompt set,
+      including what you would log per run.
+  - id: q04
+    text: >-
+      Explain why pairwise comparison matrices are easier to audit than ad-hoc prose when comparing
+      more than two models.
+  - id: q05
+    text: >-
+      Draft a short checklist for reviewing an agent-generated pull request that adds a new JSON
+      artifact schema.
+variants:
+  - id: v-cli
+    agent_stack: alwm-cli
+    execution_mode: cli
+    backend:
+      kind: mock
+      model: mock-model
+  - id: v-browser
+    agent_stack: browser-mock
+    execution_mode: browser_mock
+    backend:
+      kind: mock
+      model: mock-model
+  - id: v-repo
+    agent_stack: repo-governed
+    execution_mode: repo_governed
+    backend:
+      kind: mock
+      model: mock-model

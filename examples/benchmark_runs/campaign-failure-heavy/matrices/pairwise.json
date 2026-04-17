@@ -1,0 +1,25 @@
+{
+  "col_labels": [
+    "v-cli",
+    "v-repo"
+  ],
+  "created_at": "1970-01-01T00:00:00Z",
+  "id": "examples-campaign-failure-heavy-pairwise",
+  "matrix_kind": "pairwise",
+  "metric": "mean_abs_total_score_delta",
+  "row_labels": [
+    "v-cli",
+    "v-repo"
+  ],
+  "scores": [
+    [
+      0.0,
+      0.20785500000000004
+    ],
+    [
+      0.20785500000000004,
+      0.0
+    ]
+  ],
+  "title": "Example failure-heavy campaign (strict rubric, five prompts) (mean abs score delta across prompts)"
+}

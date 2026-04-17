@@ -1,0 +1,15 @@
+{
+  "agent_stack": "alwm-cli",
+  "backend_kind": "mock",
+  "backend_model": "mock-model",
+  "benchmark_id": "bench.examples.campaign.failure_heavy.v1",
+  "created_at": "1970-01-01T00:00:00Z",
+  "duration_ms": 0,
+  "execution_mode": "cli",
+  "id": "resp-v-cli-q10",
+  "prompt_id": "q10",
+  "prompt_text": "Browser automation flakes on the export button. Write a short incident-style note: suspected causes, evidence to collect, and a temporary workaround.",
+  "response_text": "[mock:mock-model] 509e5d9f8ab0183e",
+  "schema_version": 1,
+  "variant_id": "v-cli"
+}

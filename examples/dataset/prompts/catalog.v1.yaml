@@ -1,0 +1,72 @@
+# Canonical prompt set for example benchmark suites (15 prompts).
+# Suites reference subsets; ids are stable across rubrics and runs.
+
+schema_version: 1
+id: prompt.catalog.examples.v1
+title: Example wiki-matrix benchmark prompt catalog
+prompts:
+  # Neutral / general (q01–q05)
+  - id: q01
+    text: >-
+      Summarize how you would structure a small RAG pipeline for Markdown notes in a git repo,
+      including where JSON Schema validation fits.
+  - id: q02
+    text: >-
+      List three trade-offs between dense retrieval and lexical search for agent tool-calling
+      documentation, in under 120 words.
+  - id: q03
+    text: >-
+      Propose a minimal experiment protocol to compare two local LLM backends on the same prompt set,
+      including what you would log per run.
+  - id: q04
+    text: >-
+      Explain why pairwise comparison matrices are easier to audit than ad-hoc prose when comparing
+      more than two models.
+  - id: q05
+    text: >-
+      Draft a short checklist for reviewing an agent-generated pull request that adds a new JSON
+      artifact schema.
+
+  # Failure-heavy themes (q06–q10)
+  - id: q06
+    text: >-
+      A batch job timed out after chunking doubled token count. What diagnostics would you request
+      first, and what mitigations would you try before rerunning?
+  - id: q07
+    text: >-
+      The embedding index returns plausible but wrong citations under load. Describe a regression
+      harness to catch this class of failure before merge.
+  - id: q08
+    text: >-
+      OOM during model load on CI runners. Outline how you would shrink the reproducible Docker
+      image or split the benchmark without losing coverage.
+  - id: q09
+    text: >-
+      Users report non-deterministic scores across runs with the same prompt. Which configuration
+      fields and seeds would you freeze, and where would you record them?
+  - id: q10
+    text: >-
+      Browser automation flakes on the export button. Write a short incident-style note: suspected
+      causes, evidence to collect, and a temporary workaround.
+
+  # Success-heavy themes (q11–q15)
+  - id: q11
+    text: >-
+      Celebrate a green CI run: list what artifacts you would attach to the weekly report when
+      lint, typecheck, and offline benchmarks all pass.
+  - id: q12
+    text: >-
+      Describe a crisp “definition of done” for closing a benchmark ticket when matrices and
+      Markdown reports are already in examples/.
+  - id: q13
+    text: >-
+      Write a short success checklist for onboarding a new contributor who will run just ci and a
+      local offline benchmark suite.
+  - id: q14
+    text: >-
+      Explain how reproducible file naming under cells/ helps reviewers trust a benchmark campaign
+      without re-running models.
+  - id: q15
+    text: >-
+      Summarize why committing generated example outputs next to YAML suites improves onboarding
+      compared to screenshots alone.

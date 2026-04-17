@@ -1,28 +1,18 @@
-# Example dataset
+# Example dataset (prompts + rubrics)
 
-Small Markdown wiki pages used to exercise **ingest → evaluate → compare → report** without network access.
+This directory holds **canonical content** for documentation and larger benchmark examples:
 
-- `pages/` — source Markdown files.
-- Generated artifacts (JSON + Markdown) live under `../generated/` and are checked in as a reference matrix/report pair.
+| Path | Contents |
+| --- | --- |
+| `prompts/catalog.v1.yaml` | **15** stable prompts (`q01`–`q15`): neutral (q01–q05), failure/recovery themed (q06–q10), success/checklist themed (q11–q15). |
+| `rubrics/balanced.v1.json` | Three-criterion **balanced** rubric (`rubric.examples.balanced.v1`). |
+| `rubrics/strict.v1.json` | Four-criterion **strict** rubric for failure-heavy suites (`rubric.examples.strict.v1`). |
+| `rubrics/generous.v1.json` | Two-criterion **generous** rubric for success-heavy suites (`rubric.examples.generous.v1`). |
 
-Reproduce locally from the repository root:
+Benchmark suites that use these live under `examples/benchmark_suites/v1/`; generated mock runs are committed under `examples/benchmark_runs/`.
+
+Validate a rubric:
 
 ```bash
-alwm ingest examples/dataset/pages examples/dataset/thoughts --created-at 1970-01-01T00:00:00Z
-alwm evaluate --subject examples/dataset/pages/retrieval-basics.md \
-  --rubric examples/v1/rubric.json \
-  --out examples/dataset/evals/retrieval-basics.eval.json --id eval-retrieval-basics
-alwm evaluate --subject examples/dataset/pages/chunking-strategies.md \
-  --rubric examples/v1/rubric.json \
-  --out examples/dataset/evals/chunking-strategies.eval.json --id eval-chunking
-alwm compare examples/dataset/evals/retrieval-basics.eval.json \
-  examples/dataset/evals/chunking-strategies.eval.json \
-  --out examples/generated/wiki_matrix.json \
-  --out-md examples/generated/wiki_matrix.md \
-  --id wiki-matrix-001 \
-  --title "Wiki pages (example dataset)"
-alwm report --matrix examples/generated/wiki_matrix.json \
-  --out-json examples/generated/wiki_report.json \
-  --out-md examples/generated/wiki_report.md \
-  --id wiki-report-001
+alwm validate examples/dataset/rubrics/balanced.v1.json rubric
 ```

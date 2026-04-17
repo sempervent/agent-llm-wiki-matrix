@@ -1,0 +1,27 @@
+{
+  "id": "rubric.examples.strict.v1",
+  "title": "Strict fault-sensitive rubric (failure-heavy campaigns)",
+  "version": "1",
+  "criteria": [
+    {
+      "id": "clarity",
+      "weight": 0.2,
+      "description": "Readable under stress or partial context."
+    },
+    {
+      "id": "traceability",
+      "weight": 0.2,
+      "description": "Every claim tied to evidence or a named source."
+    },
+    {
+      "id": "failure_awareness",
+      "weight": 0.3,
+      "description": "Explicit handling of edge cases, errors, and rollback paths."
+    },
+    {
+      "id": "regression_safety",
+      "weight": 0.3,
+      "description": "Mitigations for flakiness, drift, and non-determinism."
+    }
+  ]
+}

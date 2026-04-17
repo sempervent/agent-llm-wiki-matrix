@@ -1,0 +1,12 @@
+{
+  "benchmark_id": "bench.examples.campaign.failure_heavy.v1",
+  "cell_id": "v-repo__q09",
+  "created_at": "1970-01-01T00:00:00Z",
+  "id": "req__examples-campaign-failure-heavy__v-repo__q09",
+  "model": "mock-model",
+  "prompt_id": "q09",
+  "prompt_text": "Users report non-deterministic scores across runs with the same prompt. Which configuration fields and seeds would you freeze, and where would you record them?",
+  "run_id": "examples-campaign-failure-heavy",
+  "schema_version": 1,
+  "variant_id": "v-repo"
+}

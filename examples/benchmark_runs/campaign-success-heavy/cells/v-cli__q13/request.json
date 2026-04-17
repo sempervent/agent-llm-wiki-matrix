@@ -1,0 +1,12 @@
+{
+  "benchmark_id": "bench.examples.campaign.success_heavy.v1",
+  "cell_id": "v-cli__q13",
+  "created_at": "1970-01-01T00:00:00Z",
+  "id": "req__examples-campaign-success-heavy__v-cli__q13",
+  "model": "mock-model",
+  "prompt_id": "q13",
+  "prompt_text": "Write a short success checklist for onboarding a new contributor who will run just ci and a local offline benchmark suite.",
+  "run_id": "examples-campaign-success-heavy",
+  "schema_version": 1,
+  "variant_id": "v-cli"
+}

@@ -1,0 +1,15 @@
+{
+  "agent_stack": "alwm-cli",
+  "backend_kind": "mock",
+  "backend_model": "mock-model",
+  "benchmark_id": "bench.examples.campaign.success_heavy.v1",
+  "created_at": "1970-01-01T00:00:00Z",
+  "duration_ms": 0,
+  "execution_mode": "cli",
+  "id": "resp-v-cli-q15",
+  "prompt_id": "q15",
+  "prompt_text": "Summarize why committing generated example outputs next to YAML suites improves onboarding compared to screenshots alone.",
+  "response_text": "[mock:mock-model] 661818004bd0fb89",
+  "schema_version": 1,
+  "variant_id": "v-cli"
+}

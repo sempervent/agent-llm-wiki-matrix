@@ -1,0 +1,21 @@
+{
+  "evaluated_at": "1970-01-01T00:00:00Z",
+  "evaluator": "pipeline",
+  "id": "eval-v-cli-q07",
+  "notes_markdown": "Benchmark cell evaluation (rubric hash on normalized response).",
+  "rubric_id": "rubric.examples.strict.v1",
+  "scores": {
+    "clarity": 0.533737,
+    "failure_awareness": 0.210555,
+    "regression_safety": 0.01585,
+    "traceability": 0.843827
+  },
+  "subject_ref": "cells/v-cli__q07/benchmark_response.json",
+  "total_weighted_score": 0.343434,
+  "weights": {
+    "clarity": 0.2,
+    "failure_awareness": 0.3,
+    "regression_safety": 0.3,
+    "traceability": 0.2
+  }
+}

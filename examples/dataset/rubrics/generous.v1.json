@@ -1,0 +1,17 @@
+{
+  "id": "rubric.examples.generous.v1",
+  "title": "Lightweight rubric (success-heavy campaigns)",
+  "version": "1",
+  "criteria": [
+    {
+      "id": "clarity",
+      "weight": 0.5,
+      "description": "Understandable summary of intent."
+    },
+    {
+      "id": "alignment",
+      "weight": 0.5,
+      "description": "Matches the stated goal or checklist."
+    }
+  ]
+}

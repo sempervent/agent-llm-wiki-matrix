@@ -1,0 +1,12 @@
+{
+  "benchmark_id": "bench.examples.campaign.failure_heavy.v1",
+  "cell_id": "v-repo__q08",
+  "created_at": "1970-01-01T00:00:00Z",
+  "id": "req__examples-campaign-failure-heavy__v-repo__q08",
+  "model": "mock-model",
+  "prompt_id": "q08",
+  "prompt_text": "OOM during model load on CI runners. Outline how you would shrink the reproducible Docker image or split the benchmark without losing coverage.",
+  "run_id": "examples-campaign-failure-heavy",
+  "schema_version": 1,
+  "variant_id": "v-repo"
+}

@@ -1,0 +1,12 @@
+{
+  "benchmark_id": "bench.examples.campaign.success_heavy.v1",
+  "cell_id": "v-cli__q12",
+  "created_at": "1970-01-01T00:00:00Z",
+  "id": "req__examples-campaign-success-heavy__v-cli__q12",
+  "model": "mock-model",
+  "prompt_id": "q12",
+  "prompt_text": "Describe a crisp \u201cdefinition of done\u201d for closing a benchmark ticket when matrices and Markdown reports are already in examples/.",
+  "run_id": "examples-campaign-success-heavy",
+  "schema_version": 1,
+  "variant_id": "v-cli"
+}

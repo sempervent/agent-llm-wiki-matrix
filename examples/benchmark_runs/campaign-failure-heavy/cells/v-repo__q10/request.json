@@ -1,0 +1,12 @@
+{
+  "benchmark_id": "bench.examples.campaign.failure_heavy.v1",
+  "cell_id": "v-repo__q10",
+  "created_at": "1970-01-01T00:00:00Z",
+  "id": "req__examples-campaign-failure-heavy__v-repo__q10",
+  "model": "mock-model",
+  "prompt_id": "q10",
+  "prompt_text": "Browser automation flakes on the export button. Write a short incident-style note: suspected causes, evidence to collect, and a temporary workaround.",
+  "run_id": "examples-campaign-failure-heavy",
+  "schema_version": 1,
+  "variant_id": "v-repo"
+}

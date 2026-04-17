@@ -1,0 +1,12 @@
+{
+  "benchmark_id": "bench.examples.campaign.success_heavy.v1",
+  "cell_id": "v-cli__q15",
+  "created_at": "1970-01-01T00:00:00Z",
+  "id": "req__examples-campaign-success-heavy__v-cli__q15",
+  "model": "mock-model",
+  "prompt_id": "q15",
+  "prompt_text": "Summarize why committing generated example outputs next to YAML suites improves onboarding compared to screenshots alone.",
+  "run_id": "examples-campaign-success-heavy",
+  "schema_version": 1,
+  "variant_id": "v-cli"
+}

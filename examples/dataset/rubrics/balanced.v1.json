@@ -1,0 +1,22 @@
+{
+  "id": "rubric.examples.balanced.v1",
+  "title": "Balanced wiki and agent output quality",
+  "version": "1",
+  "criteria": [
+    {
+      "id": "clarity",
+      "weight": 0.34,
+      "description": "Clear structure and plain language."
+    },
+    {
+      "id": "traceability",
+      "weight": 0.33,
+      "description": "Citations, links, or explicit provenance."
+    },
+    {
+      "id": "actionability",
+      "weight": 0.33,
+      "description": "Concrete next steps or measurable claims."
+    }
+  ]
+}

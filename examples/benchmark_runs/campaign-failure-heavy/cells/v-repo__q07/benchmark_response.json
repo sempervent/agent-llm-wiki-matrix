@@ -1,0 +1,15 @@
+{
+  "agent_stack": "repo-governed",
+  "backend_kind": "mock",
+  "backend_model": "mock-model",
+  "benchmark_id": "bench.examples.campaign.failure_heavy.v1",
+  "created_at": "1970-01-01T00:00:00Z",
+  "duration_ms": 0,
+  "execution_mode": "repo_governed",
+  "id": "resp-v-repo-q07",
+  "prompt_id": "q07",
+  "prompt_text": "The embedding index returns plausible but wrong citations under load. Describe a regression harness to catch this class of failure before merge.",
+  "response_text": "[repo_governed][mock:mock-model] 3f88d32e0fbda626",
+  "schema_version": 1,
+  "variant_id": "v-repo"
+}
