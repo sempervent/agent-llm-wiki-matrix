@@ -56,6 +56,7 @@ def test_offline_benchmark_pipeline_is_deterministic(
     manifest = json.loads((out / "manifest.json").read_text(encoding="utf-8"))
     assert manifest["benchmark_id"] == "bench.offline.v1"
     assert len(manifest["cells"]) == 6
+    load_artifact_file(out / "manifest.json", "benchmark_manifest")
 
     first = manifest["cells"][0]
     assert "request_relpath" in first

@@ -4,7 +4,7 @@ Markdown-first, git-native **LLM wiki + comparison matrix** system for capturing
 
 **Repository:** [github.com/sempervent/agent-llm-wiki-matrix](https://github.com/sempervent/agent-llm-wiki-matrix)
 
-Contributors and coding agents should follow **`AGENTS.md`** for the full operating manual (contribution loop, decision rules, prompt registry policy, verification expectations).
+Contributors and coding agents should follow **`AGENTS.md`** for the full operating manual (contribution loop, decision rules, prompt registry policy, verification expectations, **multi-agent parallel work**, capability labels). Parallel agents: see **`docs/workflows/multi-agent-parallel.md`**.
 
 ## Goals
 
@@ -28,6 +28,8 @@ Contributors and coding agents should follow **`AGENTS.md`** for the full operat
 python3.11 -m venv .venv
 source .venv/bin/activate
 pip install -e ".[dev]"
+# Optional — live browser capture via Playwright (not required for `just ci`):
+# pip install -e ".[browser]" && playwright install chromium
 alwm version
 alwm info
 alwm validate examples/v1/thought.json thought
@@ -147,6 +149,7 @@ Run `just` with no arguments to list recipes. Common tasks:
 | `alwm validate <file> <kind>` | Validate JSON against schema + Pydantic (includes `browser_evidence`) |
 | `alwm browser prompt-block <file>` | Load browser evidence JSON → stable prompt-sized text |
 | `alwm browser run-mock` | Run `MockBrowserRunner` (deterministic; no browser binary) |
+| `alwm browser run-playwright` | Run `PlaywrightBrowserRunner` (requires `pip install -e ".[browser]"` and `playwright install …`; not used in default CI) |
 | `alwm ingest <input_dir> <output_dir>` | Markdown pages → Thought JSON |
 | `alwm evaluate --subject … --rubric … --out …` | Deterministic rubric scoring |
 | `alwm compare <eval.json>… --out … [--out-md …]` | Evaluations → matrix JSON (+ optional matrix Markdown) |

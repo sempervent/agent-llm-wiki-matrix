@@ -1,0 +1,19 @@
+{
+  "agent_stack": "alwm-cli",
+  "backend_kind": "mock",
+  "backend_model": "mock-model",
+  "benchmark_id": "bench.examples.suite.registry.four_modes.v1",
+  "created_at": "1970-01-01T00:00:00Z",
+  "duration_ms": 0,
+  "execution_mode": "cli",
+  "id": "resp-v-cli-p-matrix",
+  "prompt_id": "p-matrix",
+  "prompt_registry_id": "bench.task.matrix_reasoning.v1",
+  "prompt_source": "registry",
+  "prompt_source_relpath": "prompts/versions/bench.task.matrix_reasoning.v1.txt",
+  "prompt_text": "Comparison-matrix task: you are comparing three mock LLM variants on the same fixed prompt set using a single rubric. Describe how you would build a grid matrix (variants \u00d7 prompts) and a pairwise matrix derived from per-cell total_weighted_score, and what you would look for when auditing matrix Markdown exports.\n",
+  "registry_document_version": "0.2.0",
+  "response_text": "[mock:mock-model] 767a5b8da38f2889",
+  "schema_version": 1,
+  "variant_id": "v-cli"
+}

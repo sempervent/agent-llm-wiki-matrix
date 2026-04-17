@@ -1,0 +1,25 @@
+{
+  "col_labels": [
+    "v-cli",
+    "v-repo"
+  ],
+  "created_at": "1970-01-01T00:00:00Z",
+  "id": "examples-registry-strict-duo-pairwise",
+  "matrix_kind": "pairwise",
+  "metric": "mean_abs_total_score_delta",
+  "row_labels": [
+    "v-cli",
+    "v-repo"
+  ],
+  "scores": [
+    [
+      0.0,
+      0.19492199999999996
+    ],
+    [
+      0.19492199999999996,
+      0.0
+    ]
+  ],
+  "title": "Strict rubric \u2014 repo governance + matrix reasoning (dual modes) (mean abs score delta across prompts)"
+}

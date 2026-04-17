@@ -2,6 +2,14 @@
 
 Chronological record of repository work. Latest entries first.
 
+## 2026-04-17 — Post-merge stabilization (parallel tracks)
+
+**Delivered:** Single coherent tree on `main`: lazy `run_benchmark` in `benchmark/__init__.py` to avoid `artifacts` ↔ `pipelines` import cycles after manifest consolidation; audit docs refreshed (`mission-gap-audit.md`, **`current-capability-status.md`**) with **85 passed, 1 skipped** from `just ci`; staged governance and benchmark expansion artifacts (registry suites, example runs, `test_benchmark_expansion`).
+
+## 2026-04-17 — Benchmark manifest: JSON Schema + `benchmark_manifest` artifact kind
+
+**Delivered:** `schemas/v1/manifest.schema.json` (Draft 2020-12); `BenchmarkRunManifest` / `BenchmarkCellArtifactPaths` moved to **`models.py`** (re-exported from `benchmark/manifest.py`) to avoid import cycles with `artifacts.py`. Registered `benchmark_manifest` in `artifacts.py`; `write_benchmark_manifest` in `benchmark/persistence.py` validates against JSON Schema before writing; `run_benchmark` uses it. CLI: `alwm validate … benchmark_manifest`. Fixture `fixtures/v1/manifest.json`; tests `tests/test_manifest.py` + `test_domain` / `test_benchmark` hooks. Docs: `data-model.md`, `benchmarking.md`, `examples/v1/README.md`. Committed example runs under `examples/benchmark_runs/` unchanged (backward compatible: optional provenance keys omitted).
+
 ## 2026-04-17 — Benchmark expansion: registry suites, comparison rubric, manifest provenance
 
 **Delivered:** Four versioned prompts under `prompts/versions/` (`bench.task.repo_governed.v1`, `markdown_synthesis`, `matrix_reasoning`, `browser_evidence`) registered in `prompts/registry.yaml` (**0.2.0**). New rubric `examples/dataset/rubrics/comparison.v1.json` (structure / task_fit / grounding / brevity). Three example suites: `suite.registry.four_modes.v1.yaml`, `suite.registry.strict_duo.v1.yaml`, `suite.registry.generous_duo.v1.yaml`; fixture mirror `fixtures/benchmarks/suite_four_modes.v1.yaml`. Committed offline runs under `examples/benchmark_runs/registry-four-modes`, `registry-strict-duo`, `registry-generous-duo`. `BenchmarkRunManifest` + `run_benchmark(..., definition_source_relpath=...)` + CLI wiring for optional manifest fields. Tests: `tests/test_benchmark_expansion.py`. Docs: `data-model.md`, `evaluation-pipeline.md`, `benchmarking.md`, `examples/benchmark_suites/v1/README.md`.

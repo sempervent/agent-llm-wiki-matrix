@@ -1,0 +1,16 @@
+{
+  "benchmark_id": "bench.examples.suite.registry.generous_duo.v1",
+  "cell_id": "v-browser__p-md",
+  "created_at": "1970-01-01T00:00:00Z",
+  "id": "req__examples-registry-generous-duo__v-browser__p-md",
+  "model": "mock-model",
+  "prompt_id": "p-md",
+  "prompt_registry_id": "bench.task.markdown_synthesis.v1",
+  "prompt_source": "registry",
+  "prompt_source_relpath": "prompts/versions/bench.task.markdown_synthesis.v1.txt",
+  "prompt_text": "Markdown synthesis task: in under 180 words, explain how raw Markdown pages under examples/dataset/pages/ relate to the ingest pipeline that emits Thought JSON. Mention at least one schema or validation concept used elsewhere in this repository.\n",
+  "registry_document_version": "0.2.0",
+  "run_id": "examples-registry-generous-duo",
+  "schema_version": 1,
+  "variant_id": "v-browser"
+}

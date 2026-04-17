@@ -1,0 +1,1 @@
+Comparison-matrix task: you are comparing three mock LLM variants on the same fixed prompt set using a single rubric. Describe how you would build a grid matrix (variants × prompts) and a pairwise matrix derived from per-cell total_weighted_score, and what you would look for when auditing matrix Markdown exports.

@@ -1,0 +1,54 @@
+{
+  "benchmark_id": "bench.examples.suite.registry.strict_duo.v1",
+  "created_at": "1970-01-01T00:00:00Z",
+  "entries": [
+    {
+      "col_label": "v-cli",
+      "mean_abs_score_delta": 0.0,
+      "prompt_ids": [
+        "p-repo",
+        "p-matrix"
+      ],
+      "row_label": "v-cli",
+      "variant_i": "v-cli",
+      "variant_j": "v-cli"
+    },
+    {
+      "col_label": "v-repo",
+      "mean_abs_score_delta": 0.19492199999999996,
+      "prompt_ids": [
+        "p-repo",
+        "p-matrix"
+      ],
+      "row_label": "v-cli",
+      "variant_i": "v-cli",
+      "variant_j": "v-repo"
+    },
+    {
+      "col_label": "v-cli",
+      "mean_abs_score_delta": 0.19492199999999996,
+      "prompt_ids": [
+        "p-repo",
+        "p-matrix"
+      ],
+      "row_label": "v-repo",
+      "variant_i": "v-repo",
+      "variant_j": "v-cli"
+    },
+    {
+      "col_label": "v-repo",
+      "mean_abs_score_delta": 0.0,
+      "prompt_ids": [
+        "p-repo",
+        "p-matrix"
+      ],
+      "row_label": "v-repo",
+      "variant_i": "v-repo",
+      "variant_j": "v-repo"
+    }
+  ],
+  "matrix_id": "examples-registry-strict-duo-pairwise",
+  "metric": "mean_abs_total_score_delta",
+  "run_id": "examples-registry-strict-duo",
+  "schema_version": 1
+}

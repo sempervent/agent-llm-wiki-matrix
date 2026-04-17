@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import json
 import os
 import re
 from collections.abc import Mapping
@@ -10,21 +9,26 @@ from pathlib import Path
 from typing import Literal, cast
 
 from agent_llm_wiki_matrix.benchmark.definitions import BenchmarkDefinitionV1
-from agent_llm_wiki_matrix.benchmark.manifest import (
-    BenchmarkCellArtifactPaths,
-    BenchmarkRunManifest,
-)
 from agent_llm_wiki_matrix.benchmark.matrices import (
     grid_inputs_from_scores,
     grid_matrix_from_scores,
     pairwise_inputs_from_scores,
     pairwise_mean_delta_matrix,
 )
-from agent_llm_wiki_matrix.benchmark.persistence import write_pydantic_json, write_utf8_text
-from agent_llm_wiki_matrix.benchmark.prompt_resolution import resolve_benchmark_prompts
+from agent_llm_wiki_matrix.benchmark.persistence import (
+    write_benchmark_manifest,
+    write_pydantic_json,
+    write_utf8_text,
+)
+from agent_llm_wiki_matrix.benchmark.prompt_resolution import (
+    resolve_benchmark_prompts,
+    resolve_registry_yaml_path,
+)
 from agent_llm_wiki_matrix.models import (
+    BenchmarkCellArtifactPaths,
     BenchmarkRequestRecord,
     BenchmarkResponse,
+    BenchmarkRunManifest,
     MatrixGridInputs,
     MatrixPairwiseInputs,
 )
@@ -63,6 +67,7 @@ def run_benchmark(
     environ: Mapping[str, str] | None = None,
     fixture_mode_force_mock: bool = True,
     prompt_registry_path: Path | None = None,
+    definition_source_relpath: str | None = None,
 ) -> BenchmarkRunManifest:
     """Run all variant × prompt cells, write artifacts under ``output_dir``."""
     env: Mapping[str, str] = os.environ if environ is None else environ
@@ -77,6 +82,18 @@ def run_benchmark(
         definition,
         prompt_registry_path=prompt_registry_path,
     )
+
+    prompt_registry_effective_ref: str | None = None
+    if any(p.prompt_ref is not None for p in definition.prompts):
+        reg_abs = resolve_registry_yaml_path(
+            repo_root=repo_root,
+            definition=definition,
+            prompt_registry_path=prompt_registry_path,
+        )
+        try:
+            prompt_registry_effective_ref = str(reg_abs.relative_to(repo_root))
+        except ValueError:
+            prompt_registry_effective_ref = str(reg_abs)
 
     cells_root = output_dir / "cells"
     matrices_dir = output_dir / "matrices"
@@ -274,6 +291,8 @@ def run_benchmark(
         created_at=created_at,
         variant_ids=variant_ids,
         prompt_ids=prompt_ids,
+        definition_source_relpath=definition_source_relpath,
+        prompt_registry_effective_ref=prompt_registry_effective_ref,
         cells=cell_manifest_rows,
         matrix_grid_path="matrices/grid.json",
         matrix_pairwise_path="matrices/pairwise.json",
@@ -284,8 +303,5 @@ def run_benchmark(
         matrix_grid_md_path="markdown/matrix.grid.md",
         matrix_pairwise_md_path="markdown/matrix.pairwise.md",
     )
-    (output_dir / "manifest.json").write_text(
-        json.dumps(manifest.model_dump(), indent=2, sort_keys=True) + "\n",
-        encoding="utf-8",
-    )
+    write_benchmark_manifest(output_dir / "manifest.json", manifest)
     return manifest

@@ -1,7 +1,7 @@
 # Versioned prompt registry (Phase 1 skeleton).
 # Phase 2+ will add strict schema validation and semver-style IDs.
 
-version: "0.1.0"
+version: "0.2.0"
 updated_at: "2026-04-17T00:00:00Z"
 prompts:
   - id: scaffold.echo.v1
@@ -12,3 +12,19 @@ prompts:
     description: "Sample prompt for registry-backed benchmark examples."
     path: prompts/versions/bench.sample.prompt.v1.txt
     tags: [benchmark, example]
+  - id: bench.task.repo_governed.v1
+    description: "Repo-governed design task (paths, PR review framing)."
+    path: prompts/versions/bench.task.repo_governed.v1.txt
+    tags: [benchmark, repo, governance]
+  - id: bench.task.markdown_synthesis.v1
+    description: "Markdown synthesis about dataset pages and ingest pipeline."
+    path: prompts/versions/bench.task.markdown_synthesis.v1.txt
+    tags: [benchmark, markdown, synthesis]
+  - id: bench.task.matrix_reasoning.v1
+    description: "Comparison matrix reasoning (variants × prompts, pairwise)."
+    path: prompts/versions/bench.task.matrix_reasoning.v1.txt
+    tags: [benchmark, matrix, comparison]
+  - id: bench.task.browser_evidence.v1
+    description: "Interpret file-backed browser trace (fixture path in prompt)."
+    path: prompts/versions/bench.task.browser_evidence.v1.txt
+    tags: [benchmark, browser, evidence, fixture]

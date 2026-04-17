@@ -1,0 +1,60 @@
+{
+  "benchmark_id": "bench.examples.suite.registry.generous_duo.v1",
+  "cells": [
+    {
+      "aggregate_response_relpath": "cells/v-browser__p-browser/benchmark_response.json",
+      "cell_id": "v-browser__p-browser",
+      "evaluation_relpath": "cells/v-browser__p-browser/evaluation.json",
+      "normalized_response_relpath": "cells/v-browser__p-browser/response.normalized.txt",
+      "raw_response_relpath": "cells/v-browser__p-browser/response.raw.txt",
+      "request_relpath": "cells/v-browser__p-browser/request.json"
+    },
+    {
+      "aggregate_response_relpath": "cells/v-browser__p-md/benchmark_response.json",
+      "cell_id": "v-browser__p-md",
+      "evaluation_relpath": "cells/v-browser__p-md/evaluation.json",
+      "normalized_response_relpath": "cells/v-browser__p-md/response.normalized.txt",
+      "raw_response_relpath": "cells/v-browser__p-md/response.raw.txt",
+      "request_relpath": "cells/v-browser__p-md/request.json"
+    },
+    {
+      "aggregate_response_relpath": "cells/v-cli__p-browser/benchmark_response.json",
+      "cell_id": "v-cli__p-browser",
+      "evaluation_relpath": "cells/v-cli__p-browser/evaluation.json",
+      "normalized_response_relpath": "cells/v-cli__p-browser/response.normalized.txt",
+      "raw_response_relpath": "cells/v-cli__p-browser/response.raw.txt",
+      "request_relpath": "cells/v-cli__p-browser/request.json"
+    },
+    {
+      "aggregate_response_relpath": "cells/v-cli__p-md/benchmark_response.json",
+      "cell_id": "v-cli__p-md",
+      "evaluation_relpath": "cells/v-cli__p-md/evaluation.json",
+      "normalized_response_relpath": "cells/v-cli__p-md/response.normalized.txt",
+      "raw_response_relpath": "cells/v-cli__p-md/response.raw.txt",
+      "request_relpath": "cells/v-cli__p-md/request.json"
+    }
+  ],
+  "created_at": "1970-01-01T00:00:00Z",
+  "definition_source_relpath": "examples/benchmark_suites/v1/suite.registry.generous_duo.v1.yaml",
+  "matrix_grid_md_path": "markdown/matrix.grid.md",
+  "matrix_grid_path": "matrices/grid.json",
+  "matrix_grid_row_inputs_path": "matrices/grid.row_inputs.json",
+  "matrix_pairwise_md_path": "markdown/matrix.pairwise.md",
+  "matrix_pairwise_path": "matrices/pairwise.json",
+  "matrix_pairwise_row_inputs_path": "matrices/pairwise.row_inputs.json",
+  "prompt_ids": [
+    "p-md",
+    "p-browser"
+  ],
+  "prompt_registry_effective_ref": "prompts/registry.yaml",
+  "report_json_path": "reports/report.json",
+  "report_md_path": "reports/report.md",
+  "rubric_ref": "examples/dataset/rubrics/generous.v1.json",
+  "run_id": "examples-registry-generous-duo",
+  "schema_version": 1,
+  "title": "Generous rubric \u2014 Markdown synthesis + browser evidence (dual modes)",
+  "variant_ids": [
+    "v-cli",
+    "v-browser"
+  ]
+}

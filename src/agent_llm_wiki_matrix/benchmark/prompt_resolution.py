@@ -31,12 +31,13 @@ class ResolvedBenchmarkPrompt:
 DEFAULT_REGISTRY_RELPATH = "prompts/registry.yaml"
 
 
-def _registry_yaml_path(
+def resolve_registry_yaml_path(
     *,
     repo_root: Path,
     definition: BenchmarkDefinitionV1,
     prompt_registry_path: Path | None,
 ) -> Path:
+    """Absolute path to the prompt registry YAML used for ``prompt_ref`` resolution."""
     if prompt_registry_path is not None:
         return prompt_registry_path.resolve()
     ref = definition.prompt_registry_ref or DEFAULT_REGISTRY_RELPATH
@@ -59,7 +60,7 @@ def resolve_benchmark_prompts(
     registry_path: Path | None = None
 
     if needs_registry:
-        registry_path = _registry_yaml_path(
+        registry_path = resolve_registry_yaml_path(
             repo_root=repo_root,
             definition=definition,
             prompt_registry_path=prompt_registry_path,

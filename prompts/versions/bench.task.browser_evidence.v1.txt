@@ -1,0 +1,1 @@
+Browser-evidence interpretation (fixture-only; no live browser). The deterministic trace JSON is committed at fixtures/browser_evidence/v1/export_flow.json. Summarize the navigation sequence, list what you would capture in a BrowserEvidence-shaped summary for auditors, and note one limitation of file-backed evidence versus live Playwright traces.

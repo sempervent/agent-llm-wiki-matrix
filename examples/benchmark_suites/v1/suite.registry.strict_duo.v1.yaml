@@ -1,0 +1,23 @@
+# Strict rubric × two registry prompts × two execution modes (cli vs repo_governed).
+schema_version: 1
+id: bench.examples.suite.registry.strict_duo.v1
+title: Strict rubric — repo governance + matrix reasoning (dual modes)
+rubric_ref: examples/dataset/rubrics/strict.v1.json
+prompts:
+  - id: p-repo
+    prompt_ref: bench.task.repo_governed.v1
+  - id: p-matrix
+    prompt_ref: bench.task.matrix_reasoning.v1
+variants:
+  - id: v-cli
+    agent_stack: alwm-cli
+    execution_mode: cli
+    backend:
+      kind: mock
+      model: mock-model
+  - id: v-repo
+    agent_stack: repo-governed
+    execution_mode: repo_governed
+    backend:
+      kind: mock
+      model: mock-model

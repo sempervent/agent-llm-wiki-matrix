@@ -1,0 +1,42 @@
+{
+  "benchmark_id": "bench.examples.suite.registry.four_modes.v1",
+  "created_at": "1970-01-01T00:00:00Z",
+  "entries": [
+    {
+      "col_label": "p-repo",
+      "evaluation_relpath": "cells/v-cli__p-repo/evaluation.json",
+      "prompt_id": "p-repo",
+      "row_label": "v-cli",
+      "total_weighted_score": 0.781362,
+      "variant_id": "v-cli"
+    },
+    {
+      "col_label": "p-md",
+      "evaluation_relpath": "cells/v-cli__p-md/evaluation.json",
+      "prompt_id": "p-md",
+      "row_label": "v-cli",
+      "total_weighted_score": 0.394505,
+      "variant_id": "v-cli"
+    },
+    {
+      "col_label": "p-matrix",
+      "evaluation_relpath": "cells/v-cli__p-matrix/evaluation.json",
+      "prompt_id": "p-matrix",
+      "row_label": "v-cli",
+      "total_weighted_score": 0.189147,
+      "variant_id": "v-cli"
+    },
+    {
+      "col_label": "p-browser",
+      "evaluation_relpath": "cells/v-cli__p-browser/evaluation.json",
+      "prompt_id": "p-browser",
+      "row_label": "v-cli",
+      "total_weighted_score": 0.43673,
+      "variant_id": "v-cli"
+    }
+  ],
+  "matrix_id": "examples-registry-four-modes-grid",
+  "metric": "total_weighted_rubric_score",
+  "run_id": "examples-registry-four-modes",
+  "schema_version": 1
+}

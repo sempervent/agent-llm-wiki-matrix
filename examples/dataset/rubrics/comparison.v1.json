@@ -1,0 +1,27 @@
+{
+  "id": "rubric.examples.comparison.v1",
+  "title": "Benchmark cell comparison (structure, fit, grounding, brevity)",
+  "version": "1",
+  "criteria": [
+    {
+      "id": "structure",
+      "weight": 0.25,
+      "description": "Clear sections, bullets, or numbered steps suitable for audit."
+    },
+    {
+      "id": "task_fit",
+      "weight": 0.25,
+      "description": "Directly addresses the stated task and constraints."
+    },
+    {
+      "id": "grounding",
+      "weight": 0.25,
+      "description": "References repo paths, fixtures, schemas, or explicit assumptions."
+    },
+    {
+      "id": "brevity",
+      "weight": 0.25,
+      "description": "Stays focused; avoids unnecessary repetition."
+    }
+  ]
+}

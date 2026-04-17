@@ -1,0 +1,17 @@
+{
+  "evaluated_at": "1970-01-01T00:00:00Z",
+  "evaluator": "pipeline",
+  "id": "eval-v-cli-p-browser",
+  "notes_markdown": "Benchmark cell evaluation (rubric hash on normalized response).",
+  "rubric_id": "rubric.examples.generous.v1",
+  "scores": {
+    "alignment": 0.273394,
+    "clarity": 0.047549
+  },
+  "subject_ref": "cells/v-cli__p-browser/benchmark_response.json",
+  "total_weighted_score": 0.160472,
+  "weights": {
+    "alignment": 0.5,
+    "clarity": 0.5
+  }
+}

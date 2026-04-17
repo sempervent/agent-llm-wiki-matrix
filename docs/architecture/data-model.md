@@ -1,6 +1,6 @@
 # Data model
 
-_Last updated: 2026-04-17 (benchmark prompt registry)._
+_Last updated: 2026-04-17 (benchmark run manifest schema)._
 
 ## Principles
 
@@ -24,6 +24,7 @@ _Last updated: 2026-04-17 (benchmark prompt registry)._
 | `schemas/v1/prompt_registry.schema.json` | `PromptRegistryDocument` | `prompts/registry.yaml`: ids, paths to prompt bodies, document `version` |
 | `schemas/v1/benchmark_request.schema.json` | `BenchmarkRequestRecord` | Per-cell provider request; includes `prompt_source`, optional `prompt_registry_id`, `registry_document_version`, `prompt_source_relpath` |
 | `schemas/v1/benchmark_response.schema.json` | `BenchmarkResponse` | Same prompt provenance fields as request for traceability |
+| `schemas/v1/manifest.schema.json` | `BenchmarkRunManifest` | Run index (`manifest.json`): `cells[]`, matrix/report paths; optional **`definition_source_relpath`**, **`prompt_registry_effective_ref`** (omit or null when unknown) |
 
 ## Validation
 

@@ -40,7 +40,7 @@ Artifacts (under `--output-dir`; lexicographic cell order in `manifest.json`):
 - `matrices/grid.row_inputs.json`, `matrices/pairwise.row_inputs.json` — **matrix_grid_inputs** / **matrix_pairwise_inputs** (row inputs and evaluation refs).
 - `markdown/matrix.grid.md`, `markdown/matrix.pairwise.md` — rendered matrix tables.
 - `reports/report.json`, `reports/report.md` — **report** JSON + generated Markdown.
-- `manifest.json` — run summary with **cells[]** path index; may include **`definition_source_relpath`** and **`prompt_registry_effective_ref`** for reproducibility when the definition path and registry-backed prompts are known.
+- `manifest.json` — run summary with **cells[]** path index; may include **`definition_source_relpath`** and **`prompt_registry_effective_ref`** for reproducibility when the definition path and registry-backed prompts are known. Validate with **`alwm validate <path> benchmark_manifest`** (JSON Schema `schemas/v1/manifest.schema.json` + Pydantic `BenchmarkRunManifest`). The harness writes manifests that pass this check; older committed runs may omit optional provenance keys entirely (still valid).
 
 ## Docker Compose
 

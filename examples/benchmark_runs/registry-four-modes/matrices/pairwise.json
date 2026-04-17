@@ -1,0 +1,18 @@
+{
+  "col_labels": [
+    "v-cli"
+  ],
+  "created_at": "1970-01-01T00:00:00Z",
+  "id": "examples-registry-four-modes-pairwise",
+  "matrix_kind": "pairwise",
+  "metric": "mean_abs_total_score_delta",
+  "row_labels": [
+    "v-cli"
+  ],
+  "scores": [
+    [
+      0.0
+    ]
+  ],
+  "title": "Registry four task modes (repo, markdown, matrix, browser fixture) (mean abs score delta across prompts)"
+}

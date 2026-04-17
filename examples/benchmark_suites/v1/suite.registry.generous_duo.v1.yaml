@@ -1,0 +1,23 @@
+# Generous rubric × Markdown + browser-evidence prompts × cli vs browser_mock tagging.
+schema_version: 1
+id: bench.examples.suite.registry.generous_duo.v1
+title: Generous rubric — Markdown synthesis + browser evidence (dual modes)
+rubric_ref: examples/dataset/rubrics/generous.v1.json
+prompts:
+  - id: p-md
+    prompt_ref: bench.task.markdown_synthesis.v1
+  - id: p-browser
+    prompt_ref: bench.task.browser_evidence.v1
+variants:
+  - id: v-cli
+    agent_stack: alwm-cli
+    execution_mode: cli
+    backend:
+      kind: mock
+      model: mock-model
+  - id: v-browser
+    agent_stack: browser-mock
+    execution_mode: browser_mock
+    backend:
+      kind: mock
+      model: mock-model

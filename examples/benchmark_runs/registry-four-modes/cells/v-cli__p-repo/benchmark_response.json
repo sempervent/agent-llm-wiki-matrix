@@ -1,0 +1,19 @@
+{
+  "agent_stack": "alwm-cli",
+  "backend_kind": "mock",
+  "backend_model": "mock-model",
+  "benchmark_id": "bench.examples.suite.registry.four_modes.v1",
+  "created_at": "1970-01-01T00:00:00Z",
+  "duration_ms": 0,
+  "execution_mode": "cli",
+  "id": "resp-v-cli-p-repo",
+  "prompt_id": "p-repo",
+  "prompt_registry_id": "bench.task.repo_governed.v1",
+  "prompt_source": "registry",
+  "prompt_source_relpath": "prompts/versions/bench.task.repo_governed.v1.txt",
+  "prompt_text": "Repo-governed task: answer as if your output will be reviewed in a git PR against agent-llm-wiki-matrix.\n\nName concrete repo paths (e.g. schemas/v1/, docs/architecture/, prompts/registry.yaml) and the artifact types you would add or change. Task: outline the steps to register a new versioned prompt and wire it into a benchmark definition using prompt_ref (no code\u2014design only).\n",
+  "registry_document_version": "0.2.0",
+  "response_text": "[mock:mock-model] 1a8525dd93aaabfd",
+  "schema_version": 1,
+  "variant_id": "v-cli"
+}

@@ -1,0 +1,41 @@
+{
+  "benchmark_id": "bench.examples.registry.mixed.v1",
+  "cells": [
+    {
+      "aggregate_response_relpath": "cells/v-cli__p-inline/benchmark_response.json",
+      "cell_id": "v-cli__p-inline",
+      "evaluation_relpath": "cells/v-cli__p-inline/evaluation.json",
+      "normalized_response_relpath": "cells/v-cli__p-inline/response.normalized.txt",
+      "raw_response_relpath": "cells/v-cli__p-inline/response.raw.txt",
+      "request_relpath": "cells/v-cli__p-inline/request.json"
+    },
+    {
+      "aggregate_response_relpath": "cells/v-cli__p-reg/benchmark_response.json",
+      "cell_id": "v-cli__p-reg",
+      "evaluation_relpath": "cells/v-cli__p-reg/evaluation.json",
+      "normalized_response_relpath": "cells/v-cli__p-reg/response.normalized.txt",
+      "raw_response_relpath": "cells/v-cli__p-reg/response.raw.txt",
+      "request_relpath": "cells/v-cli__p-reg/request.json"
+    }
+  ],
+  "created_at": "1970-01-01T00:00:00Z",
+  "matrix_grid_md_path": "markdown/matrix.grid.md",
+  "matrix_grid_path": "matrices/grid.json",
+  "matrix_grid_row_inputs_path": "matrices/grid.row_inputs.json",
+  "matrix_pairwise_md_path": "markdown/matrix.pairwise.md",
+  "matrix_pairwise_path": "matrices/pairwise.json",
+  "matrix_pairwise_row_inputs_path": "matrices/pairwise.row_inputs.json",
+  "prompt_ids": [
+    "p-inline",
+    "p-reg"
+  ],
+  "report_json_path": "reports/report.json",
+  "report_md_path": "reports/report.md",
+  "rubric_ref": "examples/dataset/rubrics/balanced.v1.json",
+  "run_id": "examples-registry-mixed",
+  "schema_version": 1,
+  "title": "Example mixed inline + registry prompts",
+  "variant_ids": [
+    "v-cli"
+  ]
+}

@@ -1,0 +1,22 @@
+# CI/tests: same prompt set as examples/benchmark_suites/v1/suite.registry.four_modes.v1.yaml
+# with the smoke rubric so benchmark runs stay self-contained under fixtures/.
+schema_version: 1
+id: bench.fixtures.suite.four_modes.v1
+title: Fixture four registry prompts (smoke rubric)
+rubric_ref: fixtures/v1/rubric.json
+prompts:
+  - id: p-repo
+    prompt_ref: bench.task.repo_governed.v1
+  - id: p-md
+    prompt_ref: bench.task.markdown_synthesis.v1
+  - id: p-matrix
+    prompt_ref: bench.task.matrix_reasoning.v1
+  - id: p-browser
+    prompt_ref: bench.task.browser_evidence.v1
+variants:
+  - id: v-cli
+    agent_stack: alwm-cli
+    execution_mode: cli
+    backend:
+      kind: mock
+      model: mock-model

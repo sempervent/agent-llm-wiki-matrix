@@ -1,0 +1,1 @@
+Markdown synthesis task: in under 180 words, explain how raw Markdown pages under examples/dataset/pages/ relate to the ingest pipeline that emits Thought JSON. Mention at least one schema or validation concept used elsewhere in this repository.

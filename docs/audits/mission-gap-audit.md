@@ -1,7 +1,9 @@
 # Mission gap audit (code-verified)
 
-**Date:** 2026-04-17  
-**Method:** Inspect `src/agent_llm_wiki_matrix/`, run `just compose-help`, `pytest`, representative `alwm` commands, and `docker buildx bake --print`. Claims below are backed by command output unless marked *static review*.
+**Last verified:** 2026-04-17 (stabilization refresh)  
+**Method:** Inspect `src/agent_llm_wiki_matrix/`, run `just ci`, `just compose-help`, `just verify-live-providers`, `just verify-playwright-local`, representative `alwm` commands, and `docker buildx bake --print`. Claims below are backed by command output unless marked *static review*.
+
+**Related:** `docs/audits/current-capability-status.md` (summary table), `docs/audits/capability-classification.md` (labeling rules).
 
 ## Classification key
 
@@ -23,47 +25,35 @@
 | --- | --- |
 | **Evidence** | `src/agent_llm_wiki_matrix/cli.py` (`cmd_validate`); `artifacts.py` registers kinds. |
 | **Tests** | `tests/test_domain.py`, `tests/test_browser.py` (browser_evidence), etc. |
-| **Run** | `alwm validate examples/v1/thought.json thought` → `ok: … (thought)`; `alwm validate examples/v1/rubric.json rubric` → ok. |
+| **Run** | `alwm validate examples/v1/thought.json thought` → `ok: … (thought)`. |
 | **Gap** | Only JSON files with registered kinds; use `alwm prompts check` for `prompts/registry.yaml`. |
 
-### `alwm ingest`
+### `alwm ingest` / `evaluate` / `compare` / `report`
 
 | Status | **complete** |
 | --- | --- |
-| **Evidence** | `cli.py` → `ingest_markdown_pages` (`pipelines/ingest.py`). |
-| **Run** | Ingest to `/tmp/alwm-audit-out/thoughts` wrote two `*.thought.json` files. |
-
-### `alwm evaluate`
-
-| Status | **complete** |
-| --- | --- |
-| **Evidence** | `cli.py` → `evaluate_subject` (deterministic pipeline evaluator). |
-| **Run** | Wrote `/tmp/alwm-audit-out/evals/retrieval.eval.json`. |
-
-### `alwm compare`
-
-| Status | **complete** |
-| **Evidence** | `cli.py` → `evaluations_to_matrix`. |
-| **Run** | Wrote `matrix.json` and `matrix.md`. |
-
-### `alwm report`
-
-| Status | **complete** |
-| **Evidence** | `cli.py` → `build_report_from_matrix` + Markdown render. |
-| **Run** | Wrote `report.json` and `report.md`. |
+| **Evidence** | `cli.py` → pipeline modules under `pipelines/`. |
+| **Tests** | `tests/test_pipelines.py`, integration-style checks via fixtures. |
 
 ### `alwm benchmark run`
 
+| Status | **complete** (offline default) |
+| --- | --- |
+| **Evidence** | `benchmark/runner.py`; inline `text` and/or `prompt_ref`; `manifest.json` includes optional `definition_source_relpath`, `prompt_registry_effective_ref` when recorded. |
+| **Tests** | `tests/test_benchmark.py`, `tests/test_benchmark_prompt_registry.py`, `tests/test_benchmark_expansion.py`. |
+| **Run** | `ALWM_FIXTURE_MODE=1 alwm benchmark run --definition fixtures/benchmarks/offline.v1.yaml --output-dir /tmp/…` → success; manifest shows `definition_source_relpath` when run via CLI from within repo. |
+
+### `alwm benchmark probe` / `alwm providers show`
+
 | Status | **complete** |
 | --- | --- |
-| **Evidence** | `benchmark/runner.py` full pipeline; `tests/test_benchmark.py` deterministic offline run. |
-| **Run** | `ALWM_FIXTURE_MODE=1 alwm benchmark run --definition fixtures/benchmarks/offline.v1.yaml --output-dir /tmp/alwm-audit-bench …` → success. |
+| **Evidence** | `benchmark/live_probe.py`; CLI wiring; `tests/test_live_probe.py`. |
 
-### `alwm providers show`
+### `alwm prompts` (`check` / `list` / `show`)
 
 | Status | **complete** |
 | --- | --- |
-| **Run** | Prints JSON with default `kind: mock` and Ollama/OpenAI-compatible sections. |
+| **Evidence** | `prompt_registry.py`; `tests/test_prompt_registry.py`. |
 
 ---
 
@@ -71,10 +61,9 @@
 
 | Status | **partial** |
 | --- | --- |
-| **What works** | `ProviderConfig.kind` ∈ `{mock, ollama, openai_compatible}` (`providers/config.py`). `create_provider` dispatches (`providers/factory.py`). Benchmark merges variant `backend.kind` + model via `load_provider_config_for_benchmark_variant` (`providers/benchmark_config.py`). `ALWM_FIXTURE_MODE=1` forces mock when `fixture_mode_force_mock` is true (default CLI). |
-| **Tests** | `tests/test_providers.py`: mock deterministic; Ollama and OpenAI-compatible use **httpx.MockTransport** (no live network). |
-| **Not verified here** | Live calls to Ollama or llama-server: require running services; *correct by design* but not part of CI. |
-| **Compose** | `benchmark-ollama` and `benchmark-llamacpp` profiles point at `benchmarks/v1/ollama.v1.yaml` and `llamacpp.v1.yaml` with `--no-fixture-mock`. *Static review:* `docker compose --profile benchmark-offline config` validated via `just compose-help`; full `docker compose run` not executed in this audit (needs Docker daemon + optionally models). |
+| **What works** | `ProviderConfig.kind` ∈ `{mock, ollama, openai_compatible}`; `create_provider`; benchmark per-variant merge; `ALWM_FIXTURE_MODE=1` forces mock unless `--no-fixture-mock`. |
+| **Tests** | `tests/test_providers.py` uses **httpx.MockTransport** (no live network). |
+| **Live path** | **opt-in:** `tests/integration/test_live_benchmark_providers.py`, `just verify-live-providers`, Compose `benchmark-ollama` / `benchmark-llamacpp`. |
 
 ---
 
@@ -82,9 +71,9 @@
 
 | Status | **partial** |
 | --- | --- |
-| **Complete path** | `BrowserEvidence` schema + `alwm validate … browser_evidence`; `load_browser_evidence`, `evidence_to_prompt_block`; `MockBrowserRunner`; `FileBrowserRunner` (`tests/test_browser.py`). |
-| **Run** | `alwm browser prompt-block examples/browser_evidence/v1/export_flow.json` printed structured markdown. |
-| **Stub** | `PlaywrightBrowserRunner`, `MCPBrowserRunner` raise `NotImplementedError` (`browser/stubs.py`). |
+| **Offline** | **complete:** `MockBrowserRunner`, `FileBrowserRunner`, `BrowserEvidence` validation (`tests/test_browser.py`). |
+| **Playwright** | **partial (optional):** `browser/playwright_runner.py`, `[browser]` extra; `tests/integration/test_playwright_browser.py` with `ALWM_PLAYWRIGHT_SMOKE=1`; `just verify-playwright-local`; Compose **`browser-verify`**. |
+| **Stub** | `MCPBrowserRunner` → `NotImplementedError` (`browser/stubs.py`). |
 
 ---
 
@@ -92,8 +81,8 @@
 
 | Status | **complete** |
 | --- | --- |
-| **Evidence** | `docker-compose.yml` defines `dev`, `test`, `benchmark`, `benchmark-offline`, `ollama`+`benchmark-ollama`, `benchmark-llamacpp`. |
-| **Run** | `just compose-help` exited 0 and listed services: `orchestrator`, `tests`, `benchmark`, `benchmark-offline`, `ollama`, `benchmark-ollama`, `benchmark-llamacpp`. |
+| **Evidence** | `docker-compose.yml` — `dev`, `test`, `benchmark`, `benchmark-offline`, `ollama` + `benchmark-ollama`, `benchmark-probe`, `benchmark-llamacpp`, `browser-verify`. |
+| **Run** | `just compose-help` exited 0 and listed services (including `ollama` twice as dependency of multiple profiles): `orchestrator`, `tests`, `benchmark`, `benchmark-offline`, `ollama`, `benchmark-ollama`, `benchmark-probe`, `benchmark-llamacpp`, `browser-verify`. |
 
 ---
 
@@ -101,81 +90,77 @@
 
 | Status | **complete** |
 | --- | --- |
-| **Evidence** | `docker-bake.hcl`: `orchestrator`, `orchestrator-amd64`, `orchestrator-arm64`; `justfile` recipes `docker-bake`, `docker-build`. |
-| **Run** | `docker buildx bake --print` returned resolved JSON for `orchestrator` (platforms `linux/amd64`, `linux/arm64`). Full image build not required to prove HCL validity. |
+| **Evidence** | `docker-bake.hcl`: `orchestrator` (default group), `orchestrator-amd64`, `orchestrator-arm64`, optional `browser-test` (linux/amd64). |
+| **Run** | `docker buildx bake --print` returned resolved JSON for default `orchestrator` (platforms `linux/amd64`, `linux/arm64`). |
 
 ---
 
 ## 6. Prompt registry (`prompts/registry.yaml`)
 
-| Status | **partial** (discovery + validation; benchmark defs still inline prompts) |
+| Status | **partial** |
 | --- | --- |
-| **Shipped in this remediation** | `schemas/v1/prompt_registry.schema.json`, `prompt_registry.load_prompt_registry_yaml`, CLI `alwm prompts check|list|show`, `tests/test_prompt_registry.py`. |
-| **Remaining gap** | Benchmark YAML and other pipelines do not yet reference registry ids instead of inline `text:` (optional future work). |
+| **Done** | Schema + `load_prompt_registry_yaml`; CLI `alwm prompts check|list|show`; benchmarks support **`prompt_ref`** + optional **`registry_version`**; `resolve_registry_yaml_path` exported; example suites under `examples/benchmark_suites/v1/suite.registry.*.v1.yaml`; tests in `test_prompt_registry.py`, `test_benchmark_prompt_registry.py`, `test_benchmark_expansion.py`. |
+| **Remaining gap** | Non-benchmark pipelines (e.g. wiki ingest) do not require registry ids; inline prompt text in some YAML remains valid for one-offs. |
 
 ---
 
-## 7. Test suite summary
+## 7. Test suite summary (default CI)
 
-| Command | Result |
+| Command | Result (stabilization refresh) |
 | --- | --- |
-| `pytest tests/ -q` | **53 passed** (after prompt-registry tests; session on 2026-04-17) |
-| `ruff check src tests` | All checks passed |
-| `mypy` | Success: 37 source files |
+| `just ci` (ruff + mypy + `pytest tests/ --ignore=tests/integration`) | **85 passed, 1 skipped** |
+| `mypy src` | Success: **42** source files |
 
-Test modules: `test_benchmark`, `test_benchmark_cases`, `test_browser`, `test_domain`, `test_example_campaigns`, `test_pipelines`, `test_prompt_registry`, `test_providers`, `test_smoke`.
+Test modules include: `test_benchmark`, `test_benchmark_cases`, `test_benchmark_expansion`, `test_benchmark_prompt_registry`, `test_browser`, `test_domain`, `test_example_campaigns`, `test_live_probe`, `test_pipelines`, `test_prompt_registry`, `test_providers`, `test_smoke`, and others under `tests/`.
 
 ---
 
 ## 8. Documentation drift (vs source of truth)
 
-| Document | Drift |
+| Document | Notes |
 | --- | --- |
-| **`docs/implementation-log.md`** | Phase 1 block still lists “Known gaps” (e.g. Phase 6 placeholder) that are **obsolete** relative to current code (Ollama profile exists; pipelines exist). Latest “Next” lines are more accurate than older embedded gap lists. |
-| **`AGENTS.md` / `README.md`** | Largely aligned with `just ci`, `justfile`, and CLI. Both claim a prompt **registry** under `prompts/`; until registry wiring shipped, that was aspirational. |
-| **Cursor / workspace rules** | If any external rule still references `Makefile` or `make ci`, that is **stale** (repo uses `justfile`; no `Makefile` in tree). |
+| **`docs/implementation-log.md`** | Older “Known gaps” blocks in early phases are **historical**; prefer latest dated entries and `docs/audits/current-capability-status.md`. |
+| **`AGENTS.md` / `README.md`** | Must match `just ci`, `justfile`, and CLI; capability labels per `capability-classification.md`. |
+| **External Cursor rules** | If any still reference `Makefile` / `make ci`, treat as **stale** (repo uses `justfile`). |
 
 ---
 
-## 9. Prioritized remediation
+## 9. Prioritized remediation (rolling)
 
-1. **P0 — Prompt registry wiring** (explicit “Next” in implementation log): schema + loader + CLI so the registry is validated and addressable from `alwm`, with tests. *Done (same change set as this audit).*
-2. **P1 — Live provider smoke (optional CI job)** Document or script a manual/scheduled check for Ollama + OpenAI-compatible endpoints; keep default CI offline-only per `AGENTS.md`.
-3. **P2 — Implementation log hygiene** Replace or clearly mark historical “Known gaps” in Phase 1 so they are not mistaken for current state.
-4. **P3 — Browser automation** Implement `PlaywrightBrowserRunner` or MCP behind the same `BrowserRunner` ABC when scope allows (currently intentional stubs).
-
----
-
-## 10. Single most important next phase (product mission)
-
-**Prompt registry integration (P0)** — The mission emphasizes git-native prompts and reproducibility; a registry file that nothing loads undermines trust and duplicates benchmark inline prompts. Wiring validation + discovery is the smallest step that connects documentation to code.
-
-After that, **optional LLM-assisted rubric scoring** and **real browser runners** remain the larger capability jumps recorded in `docs/implementation-log.md`.
+1. **Live provider scheduling** — Optional scheduled/manual `just verify-live-providers` against real Ollama/llama-server; keep default CI offline (`AGENTS.md`).
+2. **Implementation log hygiene** — Mark or archive obsolete Phase-1 “Known gaps” bullets so they are not read as current.
+3. **MCP browser runner** — Implement `MCPBrowserRunner` with tests and docs, or keep explicit stub only.
 
 ---
 
-## Appendix: exact commands run (audit)
+## 10. Product follow-ups
+
+High-value optional work remains: **LLM-assisted rubric scoring**, **MCP-based browser evidence**, and continued **benchmark/example** expansion using `prompt_ref` (see `docs/implementation-log.md`).
+
+---
+
+## Appendix: exact commands run (stabilization refresh)
 
 ```text
-.venv/bin/python -m pytest tests/ -q
-# 48 passed
-
-.venv/bin/alwm validate examples/v1/thought.json thought
-.venv/bin/alwm validate examples/v1/rubric.json rubric
-
-.venv/bin/alwm ingest examples/dataset/pages /tmp/alwm-audit-out/thoughts --created-at 1970-01-01T00:00:00Z
-.venv/bin/alwm evaluate --subject examples/dataset/pages/retrieval-basics.md --rubric examples/v1/rubric.json --out /tmp/alwm-audit-out/evals/retrieval.eval.json
-.venv/bin/alwm compare /tmp/alwm-audit-out/evals/retrieval.eval.json examples/dataset/evals/chunking-strategies.eval.json --out /tmp/alwm-audit-out/matrix.json --id audit-matrix --title "Audit" --out-md /tmp/alwm-audit-out/matrix.md
-.venv/bin/alwm report --matrix /tmp/alwm-audit-out/matrix.json --out-json /tmp/alwm-audit-out/report.json --out-md /tmp/alwm-audit-out/report.md --id audit-report
-
-ALWM_FIXTURE_MODE=1 .venv/bin/alwm benchmark run --definition fixtures/benchmarks/offline.v1.yaml --output-dir /tmp/alwm-audit-bench --created-at 1970-01-01T00:00:00Z --run-id audit-bench
-
-.venv/bin/alwm providers show
-.venv/bin/alwm browser prompt-block examples/browser_evidence/v1/export_flow.json
+just ci
+# 85 passed, 1 skipped; ruff + mypy clean
 
 just compose-help
-docker buildx bake --print
+# services: orchestrator, tests, benchmark, benchmark-offline, ollama, benchmark-ollama,
+#           benchmark-probe, benchmark-llamacpp, browser-verify
 
-.venv/bin/alwm prompts check
-.venv/bin/alwm prompts show scaffold.echo.v1
+just verify-live-providers
+# 2 skipped (no ALWM_LIVE_BENCHMARK_* / live services)
+
+just verify-playwright-local
+# 2 passed (with Playwright + ALWM_PLAYWRIGHT_SMOKE=1 in this environment)
+
+docker buildx bake --print
+# default target orchestrator, platforms linux/amd64 + linux/arm64
+
+alwm validate examples/v1/thought.json thought
+ALWM_FIXTURE_MODE=1 alwm benchmark run --definition fixtures/benchmarks/offline.v1.yaml --output-dir /tmp/alwm-stab/bench …
+# manifest.json includes definition_source_relpath; prompt_registry_effective_ref null for inline-only defs
+
+alwm prompts check
 ```

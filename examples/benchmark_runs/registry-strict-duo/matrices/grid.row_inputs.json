@@ -1,0 +1,42 @@
+{
+  "benchmark_id": "bench.examples.suite.registry.strict_duo.v1",
+  "created_at": "1970-01-01T00:00:00Z",
+  "entries": [
+    {
+      "col_label": "p-repo",
+      "evaluation_relpath": "cells/v-cli__p-repo/evaluation.json",
+      "prompt_id": "p-repo",
+      "row_label": "v-cli",
+      "total_weighted_score": 0.798455,
+      "variant_id": "v-cli"
+    },
+    {
+      "col_label": "p-matrix",
+      "evaluation_relpath": "cells/v-cli__p-matrix/evaluation.json",
+      "prompt_id": "p-matrix",
+      "row_label": "v-cli",
+      "total_weighted_score": 0.371169,
+      "variant_id": "v-cli"
+    },
+    {
+      "col_label": "p-repo",
+      "evaluation_relpath": "cells/v-repo__p-repo/evaluation.json",
+      "prompt_id": "p-repo",
+      "row_label": "v-repo",
+      "total_weighted_score": 0.695389,
+      "variant_id": "v-repo"
+    },
+    {
+      "col_label": "p-matrix",
+      "evaluation_relpath": "cells/v-repo__p-matrix/evaluation.json",
+      "prompt_id": "p-matrix",
+      "row_label": "v-repo",
+      "total_weighted_score": 0.657947,
+      "variant_id": "v-repo"
+    }
+  ],
+  "matrix_id": "examples-registry-strict-duo-grid",
+  "metric": "total_weighted_rubric_score",
+  "run_id": "examples-registry-strict-duo",
+  "schema_version": 1
+}

@@ -1,0 +1,90 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/sempervent/agent-llm-wiki-matrix/schemas/v1/manifest.schema.json",
+  "title": "BenchmarkRunManifest",
+  "description": "Index of a benchmark run output directory (manifest.json). Optional provenance fields may be omitted or null for backward compatibility.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "run_id",
+    "benchmark_id",
+    "title",
+    "rubric_ref",
+    "created_at",
+    "variant_ids",
+    "prompt_ids",
+    "cells",
+    "matrix_grid_path",
+    "matrix_pairwise_path",
+    "matrix_grid_row_inputs_path",
+    "matrix_pairwise_row_inputs_path",
+    "report_json_path",
+    "report_md_path",
+    "matrix_grid_md_path",
+    "matrix_pairwise_md_path"
+  ],
+  "properties": {
+    "schema_version": { "type": "integer", "const": 1 },
+    "run_id": { "type": "string", "minLength": 1 },
+    "benchmark_id": { "type": "string", "minLength": 1 },
+    "title": { "type": "string" },
+    "rubric_ref": { "type": "string", "minLength": 1 },
+    "created_at": {
+      "type": "string",
+      "description": "RFC 3339 date-time or date string used for the run"
+    },
+    "variant_ids": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "prompt_ids": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "definition_source_relpath": {
+      "description": "Benchmark definition path when recorded (CLI); omit or null when unknown",
+      "type": ["string", "null"]
+    },
+    "prompt_registry_effective_ref": {
+      "description": "Effective prompt registry YAML when any prompt used prompt_ref; omit or null otherwise",
+      "type": ["string", "null"]
+    },
+    "cells": {
+      "type": "array",
+      "description": "Per-cell artifact paths; typically sorted lexicographically by cell_id",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "cell_id",
+          "request_relpath",
+          "raw_response_relpath",
+          "normalized_response_relpath",
+          "aggregate_response_relpath",
+          "evaluation_relpath"
+        ],
+        "properties": {
+          "cell_id": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Stable slug: safe(variant)__safe(prompt)"
+          },
+          "request_relpath": { "type": "string", "minLength": 1 },
+          "raw_response_relpath": { "type": "string", "minLength": 1 },
+          "normalized_response_relpath": { "type": "string", "minLength": 1 },
+          "aggregate_response_relpath": { "type": "string", "minLength": 1 },
+          "evaluation_relpath": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "matrix_grid_path": { "type": "string", "minLength": 1 },
+    "matrix_pairwise_path": { "type": "string", "minLength": 1 },
+    "matrix_grid_row_inputs_path": { "type": "string", "minLength": 1 },
+    "matrix_pairwise_row_inputs_path": { "type": "string", "minLength": 1 },
+    "report_json_path": { "type": "string", "minLength": 1 },
+    "report_md_path": { "type": "string", "minLength": 1 },
+    "matrix_grid_md_path": { "type": "string", "minLength": 1 },
+    "matrix_pairwise_md_path": { "type": "string", "minLength": 1 }
+  }
+}

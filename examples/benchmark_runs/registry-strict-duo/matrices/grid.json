@@ -1,0 +1,25 @@
+{
+  "col_labels": [
+    "p-repo",
+    "p-matrix"
+  ],
+  "created_at": "1970-01-01T00:00:00Z",
+  "id": "examples-registry-strict-duo-grid",
+  "matrix_kind": "grid",
+  "metric": "total_weighted_rubric_score",
+  "row_labels": [
+    "v-cli",
+    "v-repo"
+  ],
+  "scores": [
+    [
+      0.798455,
+      0.371169
+    ],
+    [
+      0.695389,
+      0.657947
+    ]
+  ],
+  "title": "Strict rubric \u2014 repo governance + matrix reasoning (dual modes) (per-prompt scores)"
+}

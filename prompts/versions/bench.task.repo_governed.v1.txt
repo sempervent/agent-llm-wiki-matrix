@@ -1,0 +1,3 @@
+Repo-governed task: answer as if your output will be reviewed in a git PR against agent-llm-wiki-matrix.
+
+Name concrete repo paths (e.g. schemas/v1/, docs/architecture/, prompts/registry.yaml) and the artifact types you would add or change. Task: outline the steps to register a new versioned prompt and wire it into a benchmark definition using prompt_ref (no code—design only).

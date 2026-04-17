@@ -490,6 +490,10 @@ def cmd_benchmark_run(
     dfn = load_benchmark_definition(definition_path)
     rid = run_id or dfn.id
     output_dir.mkdir(parents=True, exist_ok=True)
+    try:
+        def_rel = str(definition_path.resolve().relative_to(repo))
+    except ValueError:
+        def_rel = str(definition_path.resolve())
     run_benchmark(
         dfn,
         repo_root=repo,
@@ -500,6 +504,7 @@ def cmd_benchmark_run(
         environ=os.environ,
         fixture_mode_force_mock=not no_fixture_mock,
         prompt_registry_path=prompt_registry_path,
+        definition_source_relpath=def_rel,
     )
     click.echo(f"wrote benchmark run under {output_dir}")
 

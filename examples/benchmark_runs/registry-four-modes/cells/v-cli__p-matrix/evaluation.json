@@ -1,0 +1,21 @@
+{
+  "evaluated_at": "1970-01-01T00:00:00Z",
+  "evaluator": "pipeline",
+  "id": "eval-v-cli-p-matrix",
+  "notes_markdown": "Benchmark cell evaluation (rubric hash on normalized response).",
+  "rubric_id": "rubric.examples.comparison.v1",
+  "scores": {
+    "brevity": 0.209673,
+    "grounding": 0.29804,
+    "structure": 0.066248,
+    "task_fit": 0.182627
+  },
+  "subject_ref": "cells/v-cli__p-matrix/benchmark_response.json",
+  "total_weighted_score": 0.189147,
+  "weights": {
+    "brevity": 0.25,
+    "grounding": 0.25,
+    "structure": 0.25,
+    "task_fit": 0.25
+  }
+}
