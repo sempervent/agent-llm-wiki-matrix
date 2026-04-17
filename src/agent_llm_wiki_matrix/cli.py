@@ -9,6 +9,7 @@ from pathlib import Path
 import click
 
 from agent_llm_wiki_matrix import __version__
+from agent_llm_wiki_matrix.artifacts import list_artifact_kinds, load_artifact_file
 from agent_llm_wiki_matrix.logging_config import configure_logging, get_logger
 
 
@@ -35,6 +36,18 @@ def main(ctx: click.Context, log_level: str) -> None:
 def cmd_version() -> None:
     """Print version string."""
     click.echo(__version__)
+
+
+@main.command("validate")
+@click.argument(
+    "path",
+    type=click.Path(path_type=Path, exists=True, dir_okay=False, readable=True),
+)
+@click.argument("kind", type=click.Choice(list_artifact_kinds()))
+def cmd_validate(path: Path, kind: str) -> None:
+    """Validate a JSON artifact file against schema + domain model."""
+    load_artifact_file(path, kind)
+    click.echo(f"ok: {path} ({kind})")
 
 
 @main.command("info")

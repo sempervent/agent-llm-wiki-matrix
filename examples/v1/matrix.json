@@ -1,0 +1,13 @@
+{
+  "id": "fixture-matrix-001",
+  "title": "Model A vs Model B (smoke)",
+  "matrix_kind": "grid",
+  "row_labels": ["model_a", "model_b"],
+  "col_labels": ["latency", "quality"],
+  "scores": [
+    [120.0, 0.82],
+    [95.0, 0.88]
+  ],
+  "metric": "latency_ms_vs_quality_0_1",
+  "created_at": "2026-04-17T12:00:00Z"
+}

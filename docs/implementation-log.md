@@ -2,6 +2,20 @@
 
 Chronological record of repository work. Latest entries first.
 
+## 2026-04-17 — Phase 2 complete (domain models + schemas)
+
+**Delivered:**
+
+- JSON Schemas under `schemas/v1/` for `thought`, `event`, `experiment`, `evaluation`, `matrix`, `report` (plus existing `note`).
+- Pydantic models in `src/agent_llm_wiki_matrix/models.py` with extra validation for matrix score shapes.
+- `src/agent_llm_wiki_matrix/artifacts.py` for dual JSON Schema + Pydantic validation.
+- CLI: `alwm validate <path> <kind>`.
+- Fixtures: `fixtures/v1/*.json`; examples mirrored under `examples/v1/`.
+- Markdown templates: `templates/thought.md`, `event.md`, `experiment.md`, `evaluation.md`, `matrix.md`, `report.md` (plus weekly stub).
+- Tests: `tests/test_domain.py`, `tests/conftest.py` (repo root + cwd for deterministic schema resolution).
+
+**Next:** Phase 3 — provider abstraction (`BaseProvider`, Ollama, OpenAI-compatible HTTP, mock) with YAML/env configuration.
+
 ## 2026-04-17 — Phase 1 complete (scaffold)
 
 **Audit:** Initial repository contained only `LICENSE`. No prior scaffold to migrate.

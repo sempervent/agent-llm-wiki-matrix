@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/sempervent/agent-llm-wiki-matrix/schemas/v1/thought.schema.json",
+  "title": "Thought",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "title", "body_markdown", "created_at"],
+  "properties": {
+    "id": { "type": "string", "minLength": 1 },
+    "title": { "type": "string" },
+    "body_markdown": { "type": "string" },
+    "created_at": { "type": "string", "description": "RFC 3339 date-time" },
+    "status": { "type": "string", "enum": ["draft", "published"], "default": "draft" },
+    "tags": { "type": "array", "items": { "type": "string" }, "default": [] },
+    "links": { "type": "array", "items": { "type": "string", "minLength": 1 }, "default": [] }
+  }
+}

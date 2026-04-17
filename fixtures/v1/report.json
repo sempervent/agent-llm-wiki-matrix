@@ -1,0 +1,9 @@
+{
+  "id": "fixture-report-001",
+  "title": "Week 2026-W16 — smoke",
+  "kind": "weekly",
+  "period_start": "2026-04-14",
+  "period_end": "2026-04-17",
+  "body_markdown": "Fixture weekly report body.",
+  "source_refs": ["fixtures/v1/matrix.json"]
+}

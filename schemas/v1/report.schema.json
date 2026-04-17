@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/sempervent/agent-llm-wiki-matrix/schemas/v1/report.schema.json",
+  "title": "Report",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "title", "kind", "period_start", "period_end", "body_markdown"],
+  "properties": {
+    "id": { "type": "string", "minLength": 1 },
+    "title": { "type": "string" },
+    "kind": {
+      "type": "string",
+      "enum": ["weekly", "model_comparison", "agent_stack", "browser_evidence"]
+    },
+    "period_start": { "type": "string", "description": "RFC 3339 date or date-time" },
+    "period_end": { "type": "string", "description": "RFC 3339 date or date-time" },
+    "body_markdown": { "type": "string" },
+    "source_refs": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "default": []
+    }
+  }
+}

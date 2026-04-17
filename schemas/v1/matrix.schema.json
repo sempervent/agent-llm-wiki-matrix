@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/sempervent/agent-llm-wiki-matrix/schemas/v1/matrix.schema.json",
+  "title": "ComparisonMatrix",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "title",
+    "matrix_kind",
+    "row_labels",
+    "col_labels",
+    "scores",
+    "metric",
+    "created_at"
+  ],
+  "properties": {
+    "id": { "type": "string", "minLength": 1 },
+    "title": { "type": "string" },
+    "matrix_kind": { "type": "string", "enum": ["pairwise", "grid"] },
+    "row_labels": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "col_labels": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "scores": {
+      "type": "array",
+      "items": {
+        "type": "array",
+        "items": { "type": "number" }
+      }
+    },
+    "metric": { "type": "string", "minLength": 1 },
+    "created_at": { "type": "string", "description": "RFC 3339 date-time" }
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/sempervent/agent-llm-wiki-matrix/schemas/v1/event.schema.json",
+  "title": "Event",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "kind", "title", "occurred_at", "summary_markdown"],
+  "properties": {
+    "id": { "type": "string", "minLength": 1 },
+    "kind": {
+      "type": "string",
+      "enum": ["run", "incident", "observation", "other"]
+    },
+    "title": { "type": "string" },
+    "occurred_at": { "type": "string", "description": "RFC 3339 date-time" },
+    "summary_markdown": { "type": "string" },
+    "refs": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "default": []
+    }
+  }
+}

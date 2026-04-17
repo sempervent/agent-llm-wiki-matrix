@@ -27,7 +27,7 @@ Conventions for humans and coding agents working on **agent-llm-wiki-matrix**.
 
 - Install: `pip install -e ".[dev]"` (Python 3.11+ recommended; matches `Dockerfile`).
 - CI parity: `make ci` (ruff, mypy, pytest).
-- CLI entrypoint: `alwm` (`alwm version`, `alwm info`).
+- CLI entrypoint: `alwm` (`alwm version`, `alwm info`, `alwm validate <path> <kind>`).
 - Images: `make docker-build` or `make docker-bake` (multi-arch; see `docker-bake.hcl`).
 
 ## Implementation phases

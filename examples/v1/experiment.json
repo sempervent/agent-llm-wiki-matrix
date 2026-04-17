@@ -1,0 +1,13 @@
+{
+  "id": "fixture-experiment-001",
+  "title": "Compare two prompt variants",
+  "hypothesis": "Shorter prompts reduce latency without hurting rubric scores.",
+  "protocol_markdown": "1. Fix seed. 2. Run A/B. 3. Score with rubric `rubric.smoke.v1`.",
+  "parameters": {
+    "temperature": 0.2,
+    "seed": 42
+  },
+  "status": "planned",
+  "started_at": "2026-04-17T12:00:00Z",
+  "tags": ["benchmark"]
+}

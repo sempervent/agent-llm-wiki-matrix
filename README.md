@@ -27,6 +27,7 @@ source .venv/bin/activate
 pip install -e ".[dev]"
 alwm version
 alwm info
+alwm validate examples/v1/thought.json thought
 make ci
 ```
 
@@ -81,6 +82,7 @@ Detailed diagrams and data flow: `docs/architecture/runtime.md`, `docs/architect
 | `make docker-build` | Build local image |
 | `make docker-bake` | Multi-arch bake via `docker-bake.hcl` |
 | `make compose-help` | Validate Compose file and list services |
+| `alwm validate <file> <kind>` | Validate JSON against schema + Pydantic (`thought`, `event`, …) |
 
 ## Repository layout
 

@@ -1,23 +1,23 @@
 # Current architecture
 
-_Last updated: 2026-04-17 (Phase 1)._
+_Last updated: 2026-04-17 (Phase 2)._
 
 ## Summary
 
-The repository is a **docs-first** workspace for an LLM wiki and comparison matrix, with a small Python orchestration package and Docker-based build/run tooling. Phase 1 established layout, CLI, schema validation, multi-arch bake targets, and Compose profiles without implementing full evaluation or provider stacks.
+The repository is a **docs-first** workspace for an LLM wiki and comparison matrix, with a Python orchestration package and Docker-based build/run tooling. Phase 2 added **domain models** and **JSON Schemas** for core entities, **fixtures**, **examples**, **markdown templates**, and a **`validate`** CLI command.
 
 ## Components
 
 | Component | Status | Notes |
 | --- | --- | --- |
-| CLI (`alwm`) | Implemented | `version`, `info`; structured logging via structlog |
-| JSON Schema validation | Implemented | Draft 2020-12; load by repo-relative path; cache keyed by absolute schema path |
-| Prompt registry | Skeleton | `prompts/registry.yaml` + versioned text files |
-| Markdown templates | Skeleton | `templates/report-weekly.md` |
-| Provider layer | Not implemented | Planned: mock, Ollama, OpenAI-compatible HTTP (Phase 3) |
-| Ingest / evaluate / matrix | Not implemented | Phases 4–5 |
-| Browser evidence layer | Not implemented | Mock + file fixtures planned |
-| Ollama / model Compose services | Commented placeholder | Phase 6 |
+| CLI (`alwm`) | Implemented | `version`, `info`, `validate` |
+| JSON Schema + Pydantic | Implemented | Thought, Event, Experiment, Evaluation, Matrix, Report |
+| Wiki `WikiNote` schema | Implemented | `note.schema.json`; examples still JSON-only |
+| Prompt registry | Skeleton | `prompts/registry.yaml` |
+| Markdown templates | Skeleton | `templates/*.md` plus weekly report stub |
+| Provider layer | Not implemented | Phase 3 |
+| Pipelines (ingest/evaluate) | Not implemented | Phases 4–5 |
+| Browser evidence layer | Not implemented | Planned: mock + fixtures |
 
 ## Runtime
 
@@ -30,20 +30,19 @@ The repository is a **docs-first** workspace for an LLM wiki and comparison matr
 ```mermaid
 flowchart LR
   subgraph repo [Git repository]
-    MD[Markdown notes]
     SCH[JSON Schemas]
-    EX[Examples / fixtures]
+    FIX[fixtures/v1 JSON]
+    EX[examples/v1 JSON]
   end
-  CLI[alwm CLI]
-  VAL[jsonschema validation]
-  MD --> CLI
+  VAL[jsonschema + Pydantic]
+  CLI[alwm validate]
   SCH --> VAL
-  EX --> VAL
+  FIX --> VAL
+  EX --> CLI
+  CLI --> VAL
 ```
-
-Full ingest → evaluate → compare → summarize pipelines are not yet wired.
 
 ## Testing
 
-- Pytest smoke tests for CLI and schema validation.
-- No live network tests by default; use `ALWM_FIXTURE_MODE` for future deterministic modes (Phase 6+).
+- Pytest covers smoke tests, all v1 fixtures, matrix dimension validation, and CLI `validate`.
+- No live network tests by default.

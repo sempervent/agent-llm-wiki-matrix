@@ -1,0 +1,17 @@
+{
+  "id": "fixture-evaluation-001",
+  "subject_ref": "fixtures/v1/thought.json",
+  "rubric_id": "rubric.smoke.v1",
+  "scores": {
+    "clarity": 0.8,
+    "traceability": 0.9
+  },
+  "weights": {
+    "clarity": 0.5,
+    "traceability": 0.5
+  },
+  "total_weighted_score": 0.85,
+  "evaluated_at": "2026-04-17T12:00:00Z",
+  "evaluator": "pipeline",
+  "notes_markdown": "Fixture example; no LLM calls."
+}
