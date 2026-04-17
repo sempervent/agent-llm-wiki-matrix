@@ -36,4 +36,4 @@ See `.env.example`. Notable keys:
 
 ## CI-friendly commands
 
-`make ci` runs Ruff, Mypy, and pytest without Docker. `make benchmark-offline` runs the full harness in a container (mock-only, deterministic).
+`just ci` runs Ruff, Mypy, and pytest without Docker. `just benchmark-offline` runs the full harness in a container (mock-only, deterministic).

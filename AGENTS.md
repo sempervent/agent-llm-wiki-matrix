@@ -22,13 +22,14 @@ Conventions for humans and coding agents working on **agent-llm-wiki-matrix**.
 | `fixtures/` | Deterministic inputs for offline tests |
 | `src/agent_llm_wiki_matrix/` | Python package (CLI, pipelines) |
 | `tests/` | Pytest suite |
+| `justfile` | [just](https://github.com/casey/just) task runner (replaces Make) |
 
 ## Commands
 
 - Install: `pip install -e ".[dev]"` (Python 3.11+ recommended; matches `Dockerfile`).
-- CI parity: `make ci` (ruff, mypy, pytest).
+- CI parity: `just ci` (ruff, mypy, pytest).
 - CLI entrypoint: `alwm` (`alwm version`, `alwm info`, `alwm validate …`, `alwm ingest|evaluate|compare|report`, `alwm benchmark run`, `alwm providers show`).
-- Images: `make docker-build` or `make docker-bake` (multi-arch; see `docker-bake.hcl`).
+- Images: `just docker-build` or `just docker-bake` (multi-arch; see `docker-bake.hcl`).
 
 ## Implementation phases
 

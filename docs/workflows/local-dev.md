@@ -5,7 +5,7 @@
 1. Use Python **3.11+** (matches Docker). On macOS with Homebrew: `/opt/homebrew/bin/python3.11`.
 2. Create a venv: `python3.11 -m venv .venv && source .venv/bin/activate`.
 3. Install: `pip install -e ".[dev]"`.
-4. Run checks: `make ci`.
+4. Run checks: `just ci` (install [just](https://github.com/casey/just) if needed).
 5. CLI: `alwm version`, `alwm info`, `alwm validate …`, pipeline commands (`ingest`, `evaluate`, `compare`, `report`), `alwm providers show`.
 
 ## Docker
@@ -36,7 +36,7 @@ docker compose --profile benchmark run --rm benchmark
 docker compose --profile benchmark-offline run --rm benchmark-offline
 ```
 
-`make compose-help` validates the Compose file for each profile and prints service names. Shortcut targets: `make benchmark-offline`, `make benchmark-ollama`, `make benchmark-llamacpp`.
+`just compose-help` validates the Compose file for each profile and prints service names. Shortcut recipes: `just benchmark-offline`, `just benchmark-ollama`, `just benchmark-llamacpp`.
 
 ## Buildx Bake
 

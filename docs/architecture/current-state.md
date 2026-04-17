@@ -21,7 +21,7 @@ The repository is a **docs-first** workspace for an LLM wiki and comparison matr
 
 ## Runtime
 
-- **Local:** Python 3.11+ (`pyproject.toml`); `make ci` for lint, typecheck, tests.
+- **Local:** Python 3.11+ (`pyproject.toml`); `just ci` for lint, typecheck, tests.
 - **Container:** `Dockerfile` `runtime` target: non-root `alwm` image; `test` target: editable install + pytest for the Compose **test** profile.
 - **Compose:** `dev` (`orchestrator`), `test` (`tests`), `benchmark` (`benchmark` → `alwm info` smoke).
 - **Build:** `docker buildx bake` defaults to `linux/amd64` and `linux/arm64`; `orchestrator-amd64` / `orchestrator-arm64` for single-arch builds.

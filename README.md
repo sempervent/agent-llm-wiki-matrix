@@ -16,6 +16,7 @@ Markdown-first, git-native **LLM wiki + comparison matrix** system for capturing
 
 ### Prerequisites
 
+- [just](https://github.com/casey/just) for project tasks (`brew install just` or see upstream install options)
 - Docker with Buildx, Docker Compose v2
 - Python **3.11+** recommended (matches the `Dockerfile`; use `pyenv`/`brew` if your system Python is older)
 
@@ -30,7 +31,7 @@ alwm info
 alwm validate examples/v1/thought.json thought
 alwm validate examples/v1/rubric.json rubric
 alwm providers show
-make ci
+just ci
 ```
 
 ### End-to-end pipeline (offline scoring)
@@ -70,9 +71,9 @@ alwm validate out/benchmark-offline/responses/v-cli__p-one.response.json benchma
 Compose shortcuts (writes under `out/` in the mounted repo):
 
 ```bash
-make benchmark-offline
-make benchmark-ollama    # pull a model into the ollama service first
-make benchmark-llamacpp    # start llama-server on the host (default :8080/v1)
+just benchmark-offline
+just benchmark-ollama    # pull a model into the ollama service first
+just benchmark-llamacpp    # start llama-server on the host (default :8080/v1)
 ```
 
 ### Docker
@@ -99,7 +100,7 @@ docker compose --profile dev run --rm orchestrator version
 docker compose --profile test run --rm tests
 docker compose --profile benchmark run --rm benchmark
 docker compose --profile benchmark-offline run --rm benchmark-offline
-make compose-help
+just compose-help
 ```
 
 See `docs/workflows/local-dev.md` for profile details (`dev`, `test`, `benchmark`, `benchmark-offline`, `benchmark-ollama`, `benchmark-llamacpp`).
@@ -118,23 +119,25 @@ See `docs/workflows/local-dev.md` for profile details (`dev`, `test`, `benchmark
 
 Detailed diagrams and data flow: `docs/architecture/runtime.md`, `docs/architecture/data-model.md`, `docs/architecture/evaluation-pipeline.md`.
 
-## Commands (Makefile and CLI)
+## Commands (just and CLI)
+
+Run `just` with no arguments to list recipes. Common tasks:
 
 | Command | Description |
 | --- | --- |
-| `make install-dev` | Editable install with dev dependencies |
-| `make test` | Run pytest |
-| `make smoke` | Smoke tests only |
-| `make lint` | Ruff check |
-| `make fmt` | Ruff format |
-| `make typecheck` | Mypy |
-| `make ci` | Lint + typecheck + tests |
-| `make docker-build` | Build local image (`runtime` target) |
-| `make docker-bake` | Multi-arch bake via `docker-bake.hcl` |
-| `make compose-help` | Validate Compose for dev/test/benchmark + benchmark-offline/ollama/llamacpp |
-| `make benchmark-offline` | Run mock benchmark via Compose → `out/benchmark-offline` |
-| `make benchmark-ollama` | Ollama service + smoke benchmark → `out/benchmark-ollama` |
-| `make benchmark-llamacpp` | OpenAI-compatible endpoint on host → `out/benchmark-llamacpp` |
+| `just install-dev` | Editable install with dev dependencies |
+| `just test` | Run pytest |
+| `just smoke` | Smoke tests only |
+| `just lint` | Ruff check |
+| `just fmt` | Ruff format |
+| `just typecheck` | Mypy |
+| `just ci` | Lint + typecheck + tests |
+| `just docker-build` | Build local image (`runtime` target) |
+| `just docker-bake` | Multi-arch bake via `docker-bake.hcl` |
+| `just compose-help` | Validate Compose for dev/test/benchmark + benchmark-offline/ollama/llamacpp |
+| `just benchmark-offline` | Run mock benchmark via Compose → `out/benchmark-offline` |
+| `just benchmark-ollama` | Ollama service + smoke benchmark → `out/benchmark-ollama` |
+| `just benchmark-llamacpp` | OpenAI-compatible endpoint on host → `out/benchmark-llamacpp` |
 | `alwm validate <file> <kind>` | Validate JSON against schema + Pydantic |
 | `alwm ingest <input_dir> <output_dir>` | Markdown pages → Thought JSON |
 | `alwm evaluate --subject … --rubric … --out …` | Deterministic rubric scoring |
@@ -150,7 +153,7 @@ Detailed diagrams and data flow: `docs/architecture/runtime.md`, `docs/architect
 ├── docker-compose.yml
 ├── docker-bake.hcl
 ├── Dockerfile
-├── Makefile
+├── justfile               # just task runner (https://github.com/casey/just)
 ├── pyproject.toml
 ├── schemas/               # JSON Schemas (v1)
 ├── templates/             # Markdown report templates

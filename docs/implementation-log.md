@@ -2,6 +2,10 @@
 
 Chronological record of repository work. Latest entries first.
 
+## 2026-04-17 — Replace Makefile with justfile
+
+**Delivered:** [just](https://github.com/casey/just) `justfile` with the same recipes as the former Makefile (`ci`, lint, compose-help, benchmark profiles, etc.); removed `Makefile`; documentation and `AGENTS.md` now reference `just …`.
+
 ## 2026-04-17 — Benchmark case schema (v1) + task examples
 
 **Delivered:**
@@ -21,7 +25,7 @@ Chronological record of repository work. Latest entries first.
 - **Artifacts:** `schemas/v1/benchmark_response.schema.json`, `BenchmarkResponse` model, `alwm validate … benchmark_response`.
 - **Pipeline:** `benchmark/runner.py` stores raw responses, rubric-evaluates each cell, builds **grid** and **pairwise** `ComparisonMatrix` JSON + Markdown, `report.json` / `report.md`, and `manifest.json`.
 - **CLI:** `alwm benchmark run --definition … --output-dir …`.
-- **Compose / Make:** profiles **`benchmark-offline`**, **`benchmark-ollama`** (+ `ollama` service), **`benchmark-llamacpp`**; targets `make benchmark-offline`, `benchmark-ollama`, `benchmark-llamacpp`.
+- **Compose / just:** profiles **`benchmark-offline`**, **`benchmark-ollama`** (+ `ollama` service), **`benchmark-llamacpp`**; recipes `just benchmark-offline`, `just benchmark-ollama`, `just benchmark-llamacpp`.
 - **Tests:** `tests/test_benchmark.py` asserts deterministic offline matrix output and validates artifacts.
 
 **Next:** Richer prompt registry wiring; optional LLM rubric; real browser trace ingestion.
@@ -33,7 +37,7 @@ Chronological record of repository work. Latest entries first.
 - **Rubric** JSON Schema (`schemas/v1/rubric.schema.json`) + Pydantic models; `alwm validate … rubric`.
 - **Pipelines:** `ingest_markdown_pages`, deterministic `evaluate_subject`, `evaluations_to_matrix`, `build_report_from_matrix` + Markdown renderers for `templates/matrix.md` and `templates/report.md`.
 - **CLI:** `alwm ingest`, `evaluate`, `compare` (optional `--out-md`), `report`.
-- **Docker:** `Dockerfile` `test` stage (editable `.[dev]` + pytest); Compose services `orchestrator` (dev), `tests` (test), `benchmark` (benchmark); `make compose-help` validates all profiles.
+- **Docker:** `Dockerfile` `test` stage (editable `.[dev]` + pytest); Compose services `orchestrator` (dev), `tests` (test), `benchmark` (benchmark); `just compose-help` validates all profiles.
 - **Examples:** `examples/dataset/` wiki pages, evaluations, thoughts, and `examples/generated/` matrix + report pair; tests validate checked-in generated JSON.
 - **Docs:** Updated `docs/workflows/*`, `docs/architecture/current-state.md`, `docs/architecture/evaluation-pipeline.md`, `docs/architecture/runtime.md`, and `README.md` with exact commands.
 
@@ -74,7 +78,7 @@ Chronological record of repository work. Latest entries first.
 **Delivered:**
 
 - Repository layout: `src/agent_llm_wiki_matrix/`, `tests/`, `docs/`, `schemas/`, `templates/`, `prompts/`, `examples/`, `fixtures/`.
-- Top-level: `README.md`, `AGENTS.md`, `pyproject.toml`, `Makefile`, `.gitignore`, `.env.example`, `Dockerfile`, `docker-compose.yml`, `docker-bake.hcl`.
+- Top-level: `README.md`, `AGENTS.md`, `pyproject.toml`, `justfile`, `.gitignore`, `.env.example`, `Dockerfile`, `docker-compose.yml`, `docker-bake.hcl`.
 - Python package: Click CLI (`alwm`), structlog-based logging, JSON Schema helpers (`schema.py`) with path-aware caching.
 - Schemas: `schemas/v1/note.schema.json`; example `examples/sample-note.json`.
 - Prompt registry skeleton: `prompts/registry.yaml` + `prompts/versions/scaffold.echo.v1.txt`.
