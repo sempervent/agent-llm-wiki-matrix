@@ -6,7 +6,7 @@
 2. Create a venv: `python3.11 -m venv .venv && source .venv/bin/activate`.
 3. Install: `pip install -e ".[dev]"`.
 4. Run checks: `make ci`.
-5. CLI: `alwm version`, `alwm info`.
+5. CLI: `alwm version`, `alwm info`, `alwm validate …`, pipeline commands (`ingest`, `evaluate`, `compare`, `report`), `alwm providers show`.
 
 ## Docker
 
@@ -18,19 +18,21 @@ docker run --rm agent-llm-wiki-matrix:local version
 
 ## Docker Compose profiles
 
-The `orchestrator` service is assigned to profiles so a bare `docker compose up` does not surprise-run workloads.
+| Profile | Service | Intended use |
+| --- | --- | --- |
+| `dev` | `orchestrator` | Interactive `alwm` against the mounted repo (`command` defaults to `--help`; override when running) |
+| `test` | `tests` | `python -m pytest` in the `Dockerfile` `test` stage (dev dependencies installed) |
+| `benchmark` | `benchmark` | Smoke `alwm info` with repo mounted at `/workspace` |
 
-| Profile | Intended use |
-| --- | --- |
-| `dev` | Interactive CLI against mounted repo |
-| `test` | Future: run test suite in container |
-| `benchmark` | Future: benchmark harness entrypoints |
-
-Example:
+Examples:
 
 ```bash
 docker compose --profile dev run --rm orchestrator version
+docker compose --profile test run --rm tests
+docker compose --profile benchmark run --rm benchmark
 ```
+
+`make compose-help` validates the Compose file for each profile and prints service names.
 
 ## Buildx Bake
 

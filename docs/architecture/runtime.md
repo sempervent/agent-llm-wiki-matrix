@@ -15,7 +15,7 @@ See `.env.example`. Notable keys:
 | --- | --- |
 | `ALWM_LOG_LEVEL` | Logging verbosity |
 | `ALWM_REPO_ROOT` | Repository root for schema paths and future pipelines (Compose sets `/workspace`) |
-| `ALWM_FIXTURE_MODE` | Future: force fixture-only behavior (no network) |
+| `ALWM_FIXTURE_MODE` | Convention: prefer fixtures / no live endpoints when set to `1` |
 | `ALWM_PROVIDER` | `mock`, `ollama`, or `openai_compatible` |
 | `ALWM_PROVIDER_CONFIG` | Optional path to YAML (see `config/providers.example.yaml`) |
 | `OLLAMA_HOST`, `OLLAMA_MODEL` | Ollama endpoint overrides |
@@ -23,8 +23,8 @@ See `.env.example`. Notable keys:
 
 ## Docker
 
-- **Image:** `Dockerfile` `runtime` target; non-root user `alwm` (uid 1000); workdir `/workspace`.
-- **Compose:** Service `orchestrator` is gated by profiles `dev`, `test`, `benchmark`; bind-mounts the project to `/workspace`.
+- **Image:** `Dockerfile` `runtime` target (CLI); `test` target installs `.[dev]` for pytest. Non-root user `alwm` (uid 1000); workdir `/workspace`.
+- **Compose:** `orchestrator` (**dev**), `tests` (**test**, pytest), `benchmark` (**benchmark**, `alwm info` smoke); bind-mounts the project to `/workspace`.
 - **Bake:** `docker-bake.hcl` — variable `PLATFORM` (comma-separated) defaults to `linux/amd64,linux/arm64`; targets `orchestrator`, `orchestrator-amd64`, `orchestrator-arm64`.
 
 ## CI-friendly commands

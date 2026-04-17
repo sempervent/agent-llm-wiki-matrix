@@ -2,6 +2,19 @@
 
 Chronological record of repository work. Latest entries first.
 
+## 2026-04-17 — Phase 4 complete (pipelines + Compose test image)
+
+**Delivered:**
+
+- **Rubric** JSON Schema (`schemas/v1/rubric.schema.json`) + Pydantic models; `alwm validate … rubric`.
+- **Pipelines:** `ingest_markdown_pages`, deterministic `evaluate_subject`, `evaluations_to_matrix`, `build_report_from_matrix` + Markdown renderers for `templates/matrix.md` and `templates/report.md`.
+- **CLI:** `alwm ingest`, `evaluate`, `compare` (optional `--out-md`), `report`.
+- **Docker:** `Dockerfile` `test` stage (editable `.[dev]` + pytest); Compose services `orchestrator` (dev), `tests` (test), `benchmark` (benchmark); `make compose-help` validates all profiles.
+- **Examples:** `examples/dataset/` wiki pages, evaluations, thoughts, and `examples/generated/` matrix + report pair; tests validate checked-in generated JSON.
+- **Docs:** Updated `docs/workflows/*`, `docs/architecture/current-state.md`, `docs/architecture/evaluation-pipeline.md`, `docs/architecture/runtime.md`, and `README.md` with exact commands.
+
+**Next:** Optional LLM-assisted scoring behind providers; richer ingest extraction; browser evidence fixtures.
+
 ## 2026-04-17 — Phase 3 complete (provider abstraction)
 
 **Delivered:**
