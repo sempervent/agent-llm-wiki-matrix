@@ -83,9 +83,20 @@ def test_playwright_runner_missing_package_raises_runtime_error() -> None:
         pytest.skip("playwright is installed; install-path not exercised")
 
 
-def test_mcp_stub_raises() -> None:
-    with pytest.raises(NotImplementedError):
-        MCPBrowserRunner().run(BrowserRunRequest())
+def test_mcp_runner_without_fixture_raises() -> None:
+    with pytest.raises(RuntimeError, match="remote MCP"):
+        MCPBrowserRunner(_REPO).run(BrowserRunRequest())
+
+
+def test_mcp_runner_fixture_bridge() -> None:
+    runner = MCPBrowserRunner(_REPO)
+    result = runner.run(
+        BrowserRunRequest(fixture_relpath="fixtures/browser_evidence/v1/export_flow.json")
+    )
+    assert result.runner == "mcp"
+    assert result.evidence.id == "evidence.export_flow.v1"
+    assert result.evidence.notes is not None
+    assert "fixture-backed bridge" in result.evidence.notes
 
 
 def test_cli_prompt_block() -> None:

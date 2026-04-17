@@ -1,0 +1,31 @@
+# Taxonomy: matrix reasoning — compare variants on pairwise/grid mental model.
+schema_version: 1
+id: bench.examples.taxonomy.matrix_reasoning.v1
+title: Taxonomy — matrix reasoning (multi-variant)
+rubric_ref: examples/dataset/rubrics/comparison.v1.json
+taxonomy:
+  taxonomy_version: 1
+  task_family: matrix_reasoning
+  difficulty: high
+  determinism: deterministic_scoring
+  tool_requirements: [multi_variant, registry, cli, repo_context]
+time_budget_seconds: 200
+token_budget: 3000
+tags: [taxonomy, matrix, pairwise]
+expected_artifact_kinds: [benchmark_response, evaluation, matrix, matrix_grid_inputs]
+prompts:
+  - id: p-matrix
+    prompt_ref: bench.task.matrix_reasoning.v1
+variants:
+  - id: v-cli
+    agent_stack: alwm-cli
+    execution_mode: cli
+    backend:
+      kind: mock
+      model: mock-model
+  - id: v-repo
+    agent_stack: repo-governed
+    execution_mode: repo_governed
+    backend:
+      kind: mock
+      model: mock-model

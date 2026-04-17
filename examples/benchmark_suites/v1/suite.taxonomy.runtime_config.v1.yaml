@@ -1,0 +1,25 @@
+# Taxonomy: runtime — Docker, Compose, Bake, ALWM_* fixture semantics.
+schema_version: 1
+id: bench.examples.taxonomy.runtime_config.v1
+title: Taxonomy — runtime & packaging (Compose / Bake / just)
+rubric_ref: examples/dataset/rubrics/comparison.v1.json
+taxonomy:
+  taxonomy_version: 1
+  task_family: runtime_config
+  difficulty: low
+  determinism: deterministic_fixture
+  tool_requirements: [cli, registry, compose]
+time_budget_seconds: 90
+token_budget: 1800
+tags: [taxonomy, runtime, docker]
+expected_artifact_kinds: [benchmark_request, benchmark_response, evaluation]
+prompts:
+  - id: p-runtime
+    prompt_ref: bench.task.runtime_config.v1
+variants:
+  - id: v-cli
+    agent_stack: alwm-cli
+    execution_mode: cli
+    backend:
+      kind: mock
+      model: mock-model

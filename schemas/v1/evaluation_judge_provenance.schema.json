@@ -1,0 +1,82 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/sempervent/agent-llm-wiki-matrix/schemas/v1/evaluation_judge_provenance.schema.json",
+  "title": "EvaluationJudgeProvenance",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "evaluation_id",
+    "evaluation_ref",
+    "subject_ref",
+    "rubric_id",
+    "scoring_backend",
+    "judge_system_prompt",
+    "judge_user_prompt",
+    "provider",
+    "raw_response_text",
+    "parsed_criterion_scores",
+    "parse_ok"
+  ],
+  "properties": {
+    "schema_version": { "type": "integer", "const": 1 },
+    "evaluation_id": { "type": "string", "minLength": 1 },
+    "evaluation_ref": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Path to evaluation.json relative to benchmark run root"
+    },
+    "subject_ref": { "type": "string", "minLength": 1 },
+    "rubric_id": { "type": "string", "minLength": 1 },
+    "scoring_backend": {
+      "type": "string",
+      "enum": ["semantic_judge", "hybrid"]
+    },
+    "judge_system_prompt": { "type": "string" },
+    "judge_user_prompt": { "type": "string" },
+    "provider": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "model"],
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": ["mock", "ollama", "openai_compatible"]
+        },
+        "model": { "type": "string", "minLength": 1 }
+      }
+    },
+    "raw_response_text": { "type": "string" },
+    "parsed_criterion_scores": {
+      "type": "object",
+      "additionalProperties": { "type": "number" }
+    },
+    "parse_ok": { "type": "boolean" },
+    "parse_error": { "type": ["string", "null"] },
+    "hybrid_aggregation": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "required": [
+        "deterministic_weight",
+        "semantic_weight",
+        "deterministic_scores",
+        "semantic_scores",
+        "blend_method"
+      ],
+      "properties": {
+        "deterministic_weight": { "type": "number", "minimum": 0, "maximum": 1 },
+        "semantic_weight": { "type": "number", "minimum": 0, "maximum": 1 },
+        "deterministic_scores": {
+          "type": "object",
+          "additionalProperties": { "type": "number" }
+        },
+        "semantic_scores": {
+          "type": "object",
+          "additionalProperties": { "type": "number" }
+        },
+        "blend_method": { "type": "string", "const": "weighted_per_criterion" }
+      }
+    },
+    "aggregation_notes": { "type": ["string", "null"] }
+  }
+}

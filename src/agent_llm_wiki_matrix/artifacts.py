@@ -16,6 +16,7 @@ from agent_llm_wiki_matrix.models import (
     BenchmarkRunManifest,
     ComparisonMatrix,
     Evaluation,
+    EvaluationJudgeProvenance,
     Event,
     Experiment,
     MatrixGridInputs,
@@ -31,6 +32,10 @@ _ARTIFACTS: dict[str, tuple[type[BaseModel], str]] = {
     "event": (Event, "schemas/v1/event.schema.json"),
     "experiment": (Experiment, "schemas/v1/experiment.schema.json"),
     "evaluation": (Evaluation, "schemas/v1/evaluation.schema.json"),
+    "evaluation_judge_provenance": (
+        EvaluationJudgeProvenance,
+        "schemas/v1/evaluation_judge_provenance.schema.json",
+    ),
     "matrix": (ComparisonMatrix, "schemas/v1/matrix.schema.json"),
     "report": (Report, "schemas/v1/report.schema.json"),
     "rubric": (Rubric, "schemas/v1/rubric.schema.json"),

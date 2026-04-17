@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/sempervent/agent-llm-wiki-matrix/schemas/v1/benchmark_taxonomy.schema.json",
+  "title": "BenchmarkTaxonomyV1",
+  "description": "Versioned taxonomy for grouping benchmark suites (task family, difficulty, determinism, tools).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["taxonomy_version", "task_family", "difficulty", "determinism"],
+  "properties": {
+    "taxonomy_version": { "type": "integer", "const": 1 },
+    "task_family": {
+      "type": "string",
+      "enum": [
+        "repo_governance",
+        "runtime_config",
+        "documentation",
+        "browser_evidence",
+        "matrix_reasoning",
+        "multi_agent_coordination",
+        "campaign",
+        "scaffolding",
+        "integration",
+        "other"
+      ]
+    },
+    "difficulty": {
+      "type": "string",
+      "enum": ["trivial", "low", "medium", "high", "stress"]
+    },
+    "determinism": {
+      "type": "string",
+      "enum": ["deterministic_fixture", "deterministic_scoring", "stochastic_live"]
+    },
+    "tool_requirements": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "none",
+          "cli",
+          "registry",
+          "browser_mock",
+          "repo_context",
+          "live_llm",
+          "playwright",
+          "compose",
+          "multi_variant"
+        ]
+      }
+    }
+  }
+}

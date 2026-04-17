@@ -29,6 +29,15 @@
     "total_weighted_score": { "type": "number" },
     "evaluated_at": { "type": "string", "description": "RFC 3339 date-time" },
     "evaluator": { "type": "string", "enum": ["human", "agent", "pipeline"] },
-    "notes_markdown": { "type": "string" }
+    "notes_markdown": { "type": "string" },
+    "scoring_backend": {
+      "type": "string",
+      "enum": ["deterministic", "semantic_judge", "hybrid"],
+      "description": "deterministic=byte-hash; semantic_judge=LLM; hybrid=blend"
+    },
+    "judge_provenance_relpath": {
+      "type": ["string", "null"],
+      "description": "Path to evaluation_judge_provenance.json when semantic or hybrid"
+    }
   }
 }

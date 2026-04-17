@@ -48,6 +48,14 @@
     "prompt_source_relpath": {
       "type": ["string", "null"],
       "description": "Repo-relative path to the prompt body file when prompt_source is registry"
+    },
+    "browser_runner": {
+      "type": ["string", "null"],
+      "description": "Browser runner id when browser evidence augmented the prompt"
+    },
+    "browser_evidence_relpath": {
+      "type": ["string", "null"],
+      "description": "Cell-relative path to browser_evidence.json when present"
     }
   }
 }

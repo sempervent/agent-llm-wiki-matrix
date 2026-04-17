@@ -1,0 +1,19 @@
+{
+  "agent_stack": "alwm-cli",
+  "backend_kind": "mock",
+  "backend_model": "mock-model",
+  "benchmark_id": "bench.examples.taxonomy.runtime_config.v1",
+  "created_at": "1970-01-01T00:00:00Z",
+  "duration_ms": 0,
+  "execution_mode": "cli",
+  "id": "resp-v-cli-p-runtime",
+  "prompt_id": "p-runtime",
+  "prompt_registry_id": "bench.task.runtime_config.v1",
+  "prompt_source": "registry",
+  "prompt_source_relpath": "prompts/versions/bench.task.runtime_config.v1.txt",
+  "prompt_text": "Runtime and packaging task: explain how `justfile` recipes, Docker Compose profiles, and `docker buildx bake` targets work together in agent-llm-wiki-matrix. Name at least three Compose profiles from `docker-compose.yml` and what they are for. Mention why `ALWM_FIXTURE_MODE=1` affects benchmark backends. Answer in under 220 words as if for a new contributor.\n",
+  "registry_document_version": "0.3.0",
+  "response_text": "[mock:mock-model] 84245f6fa771e19c",
+  "schema_version": 1,
+  "variant_id": "v-cli"
+}

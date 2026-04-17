@@ -10,6 +10,23 @@
 | `suite.registry.strict_duo.v1.yaml` | Strict | `bench.task.repo_governed.v1` + `bench.task.matrix_reasoning.v1` | 2 (`cli`, `repo_governed`) | Cross-mode deltas under strict scoring |
 | `suite.registry.generous_duo.v1.yaml` | Generous | `bench.task.markdown_synthesis.v1` + `bench.task.browser_evidence.v1` | 2 (`cli`, `browser_mock`) | Markdown + browser-tagged outputs |
 
+### Taxonomy-tagged suites (task family + budgets + tags)
+
+Each file below sets `taxonomy` (`task_family`, `difficulty`, `determinism`, `tool_requirements`) and usually `tags`, `expected_artifact_kinds`, and optional time/token/retry metadata. See `docs/workflows/benchmarking.md`.
+
+| File | Task family | Notes |
+| --- | --- | --- |
+| `suite.taxonomy.repo_governance.v1.yaml` | `repo_governance` | Registry: `bench.task.repo_governed.v1` |
+| `suite.taxonomy.runtime_config.v1.yaml` | `runtime_config` | Registry: `bench.task.runtime_config.v1` (Docker/Compose/Bake) |
+| `suite.taxonomy.documentation.v1.yaml` | `documentation` | Registry: `bench.task.markdown_synthesis.v1` |
+| `suite.taxonomy.browser_evidence.v1.yaml` | `browser_evidence` | `browser_mock` variant + registry browser task |
+| `suite.taxonomy.matrix_reasoning.v1.yaml` | `matrix_reasoning` | Two variants (`cli`, `repo_governed`) |
+| `suite.taxonomy.multi_agent_coordination.v1.yaml` | `multi_agent_coordination` | Registry: `bench.task.multi_agent_coord.v1` |
+| `suite.taxonomy.campaign_coordination.v1.yaml` | `campaign` | Inline prompts × three execution modes |
+| `suite.taxonomy.integration_stress.v1.yaml` | `integration` | Stress budgets; `stochastic_live` metadata for optional live runs |
+
+Committed example runs: `examples/benchmark_runs/taxonomy-repo-governance/`, `examples/benchmark_runs/taxonomy-runtime-config/`.
+
 After a run, validate the output index: `alwm validate examples/benchmark_runs/<id>/manifest.json benchmark_manifest`.
 
 Run offline (mock) and write `examples/benchmark_runs/<id>/`:

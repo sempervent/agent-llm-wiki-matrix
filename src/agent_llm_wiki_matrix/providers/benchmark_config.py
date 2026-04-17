@@ -40,3 +40,16 @@ def load_provider_config_for_benchmark_variant(
         kind = "mock"
         model = backend_model or "mock-model"
     return apply_backend_override(cfg, kind=kind, model=model)
+
+
+def load_judge_provider_config(
+    *,
+    yaml_path: Path | None,
+    environ: Mapping[str, str],
+    judge_live: bool,
+) -> ProviderConfig:
+    """Provider for semantic judge: in fixture mode, force mock unless ``judge_live`` (opt-in)."""
+    cfg = load_provider_config(yaml_path=yaml_path, environ=environ)
+    if environ.get("ALWM_FIXTURE_MODE") == "1" and not judge_live:
+        return apply_backend_override(cfg, kind="mock", model="mock-model")
+    return cfg

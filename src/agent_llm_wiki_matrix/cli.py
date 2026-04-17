@@ -6,18 +6,20 @@ import json
 import os
 import sys
 from pathlib import Path
-from typing import Literal, cast
+from typing import Any, Literal, cast
 
 import click
 
 from agent_llm_wiki_matrix import __version__
 from agent_llm_wiki_matrix.artifacts import list_artifact_kinds, load_artifact_file
 from agent_llm_wiki_matrix.benchmark import load_benchmark_definition, run_benchmark
+from agent_llm_wiki_matrix.benchmark.definitions import EvalHybridWeights
 from agent_llm_wiki_matrix.benchmark.live_probe import (
     ollama_model_available,
     probe_ollama_api,
     probe_openai_compatible_api,
 )
+from agent_llm_wiki_matrix.benchmark.persistence import write_pydantic_json
 from agent_llm_wiki_matrix.browser import (
     MockBrowserRunner,
     PlaywrightBrowserRunner,
@@ -28,7 +30,15 @@ from agent_llm_wiki_matrix.browser.models import BrowserRunRequest
 from agent_llm_wiki_matrix.logging_config import configure_logging, get_logger
 from agent_llm_wiki_matrix.models import ComparisonMatrix
 from agent_llm_wiki_matrix.pipelines.compare import evaluations_to_matrix
-from agent_llm_wiki_matrix.pipelines.evaluate import evaluate_subject, evaluation_to_json
+from agent_llm_wiki_matrix.pipelines.evaluate import (
+    evaluate_subject,
+    evaluation_to_json,
+    load_evaluation_subject,
+)
+from agent_llm_wiki_matrix.pipelines.evaluation_backends import (
+    evaluate_with_scoring_backend,
+    judge_live_enabled,
+)
 from agent_llm_wiki_matrix.pipelines.ingest import ingest_markdown_pages
 from agent_llm_wiki_matrix.pipelines.reporting import (
     build_report_from_matrix,
@@ -40,6 +50,7 @@ from agent_llm_wiki_matrix.prompt_registry import (
     load_prompt_registry_yaml,
     resolve_prompt_text,
 )
+from agent_llm_wiki_matrix.providers.benchmark_config import load_judge_provider_config
 from agent_llm_wiki_matrix.providers.config import load_provider_config
 
 
@@ -316,24 +327,105 @@ def cmd_ingest(input_dir: Path, output_dir: Path, created_at: str, status: str) 
     help="Evaluation id (default: derived from subject and rubric paths).",
 )
 @click.option("--evaluated-at", default="1970-01-01T00:00:00Z", show_default=True)
+@click.option(
+    "--scoring-backend",
+    type=click.Choice(["deterministic", "semantic_judge", "hybrid"]),
+    default="deterministic",
+    show_default=True,
+    help=(
+        "deterministic=byte-hash (default); semantic_judge/hybrid use LLM judge "
+        "(mock in fixture mode unless --judge-live)."
+    ),
+)
+@click.option(
+    "--judge-provider-config",
+    type=click.Path(path_type=Path, exists=True, dir_okay=False, readable=True),
+    default=None,
+    help="Providers YAML for the judge (defaults env / built-in when omitted).",
+)
+@click.option(
+    "--judge-live",
+    is_flag=True,
+    help=(
+        "Opt-in live judge: use real provider even when ALWM_FIXTURE_MODE=1 "
+        "(local experimentation)."
+    ),
+)
+@click.option(
+    "--hybrid-deterministic-weight",
+    default=0.5,
+    show_default=True,
+    type=float,
+    help="For hybrid: weight on deterministic scores (semantic gets 1 minus this).",
+)
 def cmd_evaluate(
     subject_path: Path,
     rubric_path: Path,
     out_path: Path,
     evaluation_id: str | None,
     evaluated_at: str,
+    scoring_backend: str,
+    judge_provider_config: Path | None,
+    judge_live: bool,
+    hybrid_deterministic_weight: float,
 ) -> None:
-    """Run deterministic rubric scoring (pipeline evaluator; no network)."""
+    """Run rubric scoring (deterministic default; optional semantic or hybrid judge)."""
+    repo = Path(os.environ.get("ALWM_REPO_ROOT", ".")).resolve()
+    rubric_abs = rubric_path if rubric_path.is_absolute() else (repo / rubric_path).resolve()
     eid = evaluation_id or f"eval-{subject_path.stem}-{rubric_path.stem}"
-    ev = evaluate_subject(
-        subject_path,
-        rubric_path,
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    try:
+        eval_ref = str(out_path.resolve().relative_to(repo).as_posix())
+    except ValueError:
+        eval_ref = str(out_path.resolve())
+
+    if scoring_backend == "deterministic":
+        ev = evaluate_subject(
+            subject_path,
+            rubric_path,
+            evaluation_id=eid,
+            evaluated_at=evaluated_at,
+        )
+        out_path.write_text(evaluation_to_json(ev), encoding="utf-8")
+        click.echo(f"wrote {out_path}")
+        return
+
+    subject_ref, text = load_evaluation_subject(subject_path)
+    jl = judge_live or judge_live_enabled(os.environ)
+    jcfg = load_judge_provider_config(
+        yaml_path=judge_provider_config,
+        environ=os.environ,
+        judge_live=jl,
+    )
+    hw = None
+    if scoring_backend == "hybrid":
+        hw = EvalHybridWeights(
+            deterministic_weight=hybrid_deterministic_weight,
+            semantic_weight=1.0 - hybrid_deterministic_weight,
+        )
+    sb = cast(Any, scoring_backend)
+    ev, prov = evaluate_with_scoring_backend(
+        subject_ref=subject_ref,
+        text=text,
+        rubric_path=rubric_abs,
         evaluation_id=eid,
         evaluated_at=evaluated_at,
+        scoring_backend=sb,
+        hybrid_weights=hw,
+        judge_provider_cfg=jcfg,
+        judge_live=jl,
+        evaluation_json_relpath=eval_ref,
     )
-    out_path.parent.mkdir(parents=True, exist_ok=True)
+    prov_path = out_path.parent / f"{out_path.stem}_judge_provenance.json"
+    try:
+        jp_rel = str(prov_path.resolve().relative_to(repo).as_posix())
+    except ValueError:
+        jp_rel = str(prov_path.resolve())
+    ev = ev.model_copy(update={"judge_provenance_relpath": jp_rel})
     out_path.write_text(evaluation_to_json(ev), encoding="utf-8")
+    write_pydantic_json(prov_path, prov)
     click.echo(f"wrote {out_path}")
+    click.echo(f"wrote {prov_path}")
 
 
 @main.command("compare")
@@ -476,6 +568,23 @@ def benchmark_cmd() -> None:
         "or prompts/registry.yaml when prompts use prompt_ref)."
     ),
 )
+@click.option(
+    "--eval-scoring-backend",
+    "eval_scoring_backend",
+    type=click.Choice(["deterministic", "semantic_judge", "hybrid"]),
+    default=None,
+    help="Override benchmark eval_scoring.backend (default: definition or deterministic).",
+)
+@click.option(
+    "--judge-provider-config",
+    "judge_provider_config",
+    type=click.Path(path_type=Path, exists=True, dir_okay=False, readable=True),
+    default=None,
+    help=(
+        "Providers YAML for semantic/hybrid judge "
+        "(defaults to --provider-config or eval_scoring.judge_provider_ref)."
+    ),
+)
 def cmd_benchmark_run(
     definition_path: Path,
     output_dir: Path,
@@ -484,8 +593,16 @@ def cmd_benchmark_run(
     provider_config: Path | None,
     no_fixture_mock: bool,
     prompt_registry_path: Path | None,
+    eval_scoring_backend: str | None,
+    judge_provider_config: Path | None,
 ) -> None:
-    """Execute a benchmark definition: responses, evaluations, matrices, report."""
+    """Execute a benchmark definition: responses, evaluations, matrices, report.
+
+    Browser-backed variants (``execution_mode: browser_mock``) run the configured
+    browser runner, write ``cells/.../browser_evidence.json``, and prepend evidence
+    to the provider prompt. For ``browser.runner: playwright``, set
+    ``ALWM_BENCHMARK_PLAYWRIGHT=1`` and install the optional ``[browser]`` extra.
+    """
     repo = Path(os.environ.get("ALWM_REPO_ROOT", ".")).resolve()
     dfn = load_benchmark_definition(definition_path)
     rid = run_id or dfn.id
@@ -505,6 +622,9 @@ def cmd_benchmark_run(
         fixture_mode_force_mock=not no_fixture_mock,
         prompt_registry_path=prompt_registry_path,
         definition_source_relpath=def_rel,
+        eval_scoring_backend=eval_scoring_backend,
+        judge_provider_yaml=judge_provider_config,
+        judge_live=None,
     )
     click.echo(f"wrote benchmark run under {output_dir}")
 

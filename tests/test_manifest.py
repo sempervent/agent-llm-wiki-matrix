@@ -26,6 +26,17 @@ def test_example_manifests_with_optional_provenance_validate() -> None:
     )
 
 
+def test_taxonomy_example_run_manifest_validates() -> None:
+    load_artifact_file(
+        _REPO / "examples" / "benchmark_runs" / "taxonomy-repo-governance" / "manifest.json",
+        "benchmark_manifest",
+    )
+    load_artifact_file(
+        _REPO / "examples" / "benchmark_runs" / "taxonomy-runtime-config" / "manifest.json",
+        "benchmark_manifest",
+    )
+
+
 def test_manifest_optional_null_provenance_round_trip() -> None:
     path = _REPO / "fixtures" / "v1" / "manifest.json"
     raw = json.loads(path.read_text(encoding="utf-8"))

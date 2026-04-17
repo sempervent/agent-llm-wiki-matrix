@@ -1,0 +1,19 @@
+# Requires ALWM_BENCHMARK_PLAYWRIGHT=1 and Playwright browsers — used for opt-in tests only.
+schema_version: 1
+id: bench.fixtures.browser.playwright.v1
+title: Browser playwright benchmark (opt-in)
+rubric_ref: fixtures/v1/rubric.json
+prompts:
+  - id: p-one
+    text: "Reply OK."
+variants:
+  - id: v-pw
+    agent_stack: browser-pw
+    execution_mode: browser_mock
+    backend:
+      kind: mock
+      model: mock-model
+    browser:
+      runner: playwright
+      start_url: "https://example.com/"
+      steps: []

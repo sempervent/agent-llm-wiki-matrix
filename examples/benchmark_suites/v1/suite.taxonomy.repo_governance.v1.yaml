@@ -1,0 +1,28 @@
+# Taxonomy: repo governance — design review framing against the real tree.
+schema_version: 1
+id: bench.examples.taxonomy.repo_governance.v1
+title: Taxonomy — repo governance (registry prompt)
+rubric_ref: examples/dataset/rubrics/comparison.v1.json
+taxonomy:
+  taxonomy_version: 1
+  task_family: repo_governance
+  difficulty: medium
+  determinism: deterministic_fixture
+  tool_requirements: [cli, registry, repo_context]
+time_budget_seconds: 120
+token_budget: 2048
+retry_policy:
+  max_attempts: 2
+  backoff_seconds: 1.5
+tags: [taxonomy, repo_governance, v1]
+expected_artifact_kinds: [benchmark_request, benchmark_response, evaluation, matrix, report]
+prompts:
+  - id: p-repo
+    prompt_ref: bench.task.repo_governed.v1
+variants:
+  - id: v-cli
+    agent_stack: alwm-cli
+    execution_mode: cli
+    backend:
+      kind: mock
+      model: mock-model

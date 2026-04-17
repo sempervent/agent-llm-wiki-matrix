@@ -1,0 +1,34 @@
+# Taxonomy: multi-agent coordination — parallel agents, merge gates, artifact kinds.
+schema_version: 1
+id: bench.examples.taxonomy.multi_agent_coordination.v1
+title: Taxonomy — multi-agent coordination (handoffs & audits)
+rubric_ref: examples/dataset/rubrics/comparison.v1.json
+taxonomy:
+  taxonomy_version: 1
+  task_family: multi_agent_coordination
+  difficulty: high
+  determinism: deterministic_scoring
+  tool_requirements: [multi_variant, registry, repo_context, cli]
+time_budget_seconds: 240
+token_budget: 3500
+retry_policy:
+  max_attempts: 3
+  backoff_seconds: 2.0
+tags: [taxonomy, multi_agent, coordination]
+expected_artifact_kinds: [benchmark_request, benchmark_response, evaluation, report]
+prompts:
+  - id: p-coord
+    prompt_ref: bench.task.multi_agent_coord.v1
+variants:
+  - id: v-cli
+    agent_stack: alwm-cli
+    execution_mode: cli
+    backend:
+      kind: mock
+      model: mock-model
+  - id: v-repo
+    agent_stack: repo-governed
+    execution_mode: repo_governed
+    backend:
+      kind: mock
+      model: mock-model

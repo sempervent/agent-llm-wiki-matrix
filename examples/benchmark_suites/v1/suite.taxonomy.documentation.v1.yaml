@@ -1,0 +1,28 @@
+# Taxonomy: documentation — Markdown synthesis tied to dataset pages.
+schema_version: 1
+id: bench.examples.taxonomy.documentation.v1
+title: Taxonomy — documentation synthesis (ingest-aligned)
+rubric_ref: examples/dataset/rubrics/comparison.v1.json
+taxonomy:
+  taxonomy_version: 1
+  task_family: documentation
+  difficulty: medium
+  determinism: deterministic_scoring
+  tool_requirements: [cli, registry]
+time_budget_seconds: 150
+token_budget: 2500
+retry_policy:
+  max_attempts: 1
+  backoff_seconds: 0
+tags: [taxonomy, docs, markdown]
+expected_artifact_kinds: [benchmark_response, evaluation, report]
+prompts:
+  - id: p-md
+    prompt_ref: bench.task.markdown_synthesis.v1
+variants:
+  - id: v-cli
+    agent_stack: alwm-cli
+    execution_mode: cli
+    backend:
+      kind: mock
+      model: mock-model

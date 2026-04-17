@@ -74,7 +74,15 @@
           "raw_response_relpath": { "type": "string", "minLength": 1 },
           "normalized_response_relpath": { "type": "string", "minLength": 1 },
           "aggregate_response_relpath": { "type": "string", "minLength": 1 },
-          "evaluation_relpath": { "type": "string", "minLength": 1 }
+          "evaluation_relpath": { "type": "string", "minLength": 1 },
+          "browser_evidence_relpath": {
+            "type": ["string", "null"],
+            "description": "Cell-relative path to browser_evidence.json for browser_mock cells"
+          },
+          "judge_provenance_relpath": {
+            "type": ["string", "null"],
+            "description": "Cell-relative path to evaluation_judge_provenance.json for semantic/hybrid scoring"
+          }
         }
       }
     },
@@ -85,6 +93,95 @@
     "report_json_path": { "type": "string", "minLength": 1 },
     "report_md_path": { "type": "string", "minLength": 1 },
     "matrix_grid_md_path": { "type": "string", "minLength": 1 },
-    "matrix_pairwise_md_path": { "type": "string", "minLength": 1 }
+    "matrix_pairwise_md_path": { "type": "string", "minLength": 1 },
+    "taxonomy": {
+      "description": "Optional taxonomy copied from the benchmark definition",
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["taxonomy_version", "task_family", "difficulty", "determinism"],
+          "properties": {
+            "taxonomy_version": { "type": "integer", "const": 1 },
+            "task_family": {
+              "type": "string",
+              "enum": [
+                "repo_governance",
+                "runtime_config",
+                "documentation",
+                "browser_evidence",
+                "matrix_reasoning",
+                "multi_agent_coordination",
+                "campaign",
+                "scaffolding",
+                "integration",
+                "other"
+              ]
+            },
+            "difficulty": {
+              "type": "string",
+              "enum": ["trivial", "low", "medium", "high", "stress"]
+            },
+            "determinism": {
+              "type": "string",
+              "enum": ["deterministic_fixture", "deterministic_scoring", "stochastic_live"]
+            },
+            "tool_requirements": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "none",
+                  "cli",
+                  "registry",
+                  "browser_mock",
+                  "repo_context",
+                  "live_llm",
+                  "playwright",
+                  "compose",
+                  "multi_variant"
+                ]
+              }
+            }
+          }
+        },
+        { "type": "null" }
+      ]
+    },
+    "time_budget_seconds": {
+      "description": "Optional wall-clock budget hint (seconds)",
+      "type": ["number", "null"],
+      "exclusiveMinimum": 0
+    },
+    "token_budget": {
+      "description": "Optional token budget hint",
+      "type": ["integer", "null"],
+      "minimum": 1
+    },
+    "retry_policy": {
+      "description": "Optional retry metadata for agent runners",
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["max_attempts", "backoff_seconds"],
+          "properties": {
+            "max_attempts": { "type": "integer", "minimum": 1, "maximum": 64 },
+            "backoff_seconds": { "type": "number", "minimum": 0 }
+          }
+        },
+        { "type": "null" }
+      ]
+    },
+    "tags": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Free-form labels"
+    },
+    "expected_artifact_kinds": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "description": "Expected alwm artifact kind names for cell outputs (metadata)"
+    }
   }
 }

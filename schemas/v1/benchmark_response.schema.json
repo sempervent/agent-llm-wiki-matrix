@@ -44,6 +44,14 @@
     },
     "prompt_registry_id": { "type": ["string", "null"] },
     "registry_document_version": { "type": ["string", "null"] },
-    "prompt_source_relpath": { "type": ["string", "null"] }
+    "prompt_source_relpath": { "type": ["string", "null"] },
+    "browser_runner": {
+      "type": ["string", "null"],
+      "description": "Browser runner id when a browser evidence phase ran"
+    },
+    "browser_evidence_relpath": {
+      "type": ["string", "null"],
+      "description": "Cell-relative path to browser_evidence.json when present"
+    }
   }
 }

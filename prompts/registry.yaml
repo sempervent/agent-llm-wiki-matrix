@@ -1,7 +1,7 @@
 # Versioned prompt registry (Phase 1 skeleton).
 # Phase 2+ will add strict schema validation and semver-style IDs.
 
-version: "0.2.0"
+version: "0.3.0"
 updated_at: "2026-04-17T00:00:00Z"
 prompts:
   - id: scaffold.echo.v1
@@ -28,3 +28,11 @@ prompts:
     description: "Interpret file-backed browser trace (fixture path in prompt)."
     path: prompts/versions/bench.task.browser_evidence.v1.txt
     tags: [benchmark, browser, evidence, fixture]
+  - id: bench.task.runtime_config.v1
+    description: "Runtime, Compose, Bake, and fixture-mode explanation task."
+    path: prompts/versions/bench.task.runtime_config.v1.txt
+    tags: [benchmark, runtime, docker, compose]
+  - id: bench.task.multi_agent_coord.v1
+    description: "Parallel agents, ownership zones, merge coordination."
+    path: prompts/versions/bench.task.multi_agent_coord.v1.txt
+    tags: [benchmark, multi_agent, coordination, governance]

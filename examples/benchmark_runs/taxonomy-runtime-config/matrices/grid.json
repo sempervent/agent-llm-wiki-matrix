@@ -1,0 +1,18 @@
+{
+  "col_labels": [
+    "p-runtime"
+  ],
+  "created_at": "1970-01-01T00:00:00Z",
+  "id": "taxonomy-runtime-example-grid",
+  "matrix_kind": "grid",
+  "metric": "total_weighted_rubric_score",
+  "row_labels": [
+    "v-cli"
+  ],
+  "scores": [
+    [
+      0.765143
+    ]
+  ],
+  "title": "Taxonomy \u2014 runtime & packaging (Compose / Bake / just) (per-prompt scores)"
+}

@@ -1,0 +1,1 @@
+Runtime and packaging task: explain how `justfile` recipes, Docker Compose profiles, and `docker buildx bake` targets work together in agent-llm-wiki-matrix. Name at least three Compose profiles from `docker-compose.yml` and what they are for. Mention why `ALWM_FIXTURE_MODE=1` affects benchmark backends. Answer in under 220 words as if for a new contributor.

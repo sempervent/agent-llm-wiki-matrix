@@ -1,0 +1,25 @@
+# Taxonomy: browser evidence — fixture-backed trace interpretation.
+schema_version: 1
+id: bench.examples.taxonomy.browser_evidence.v1
+title: Taxonomy — browser evidence (browser_mock execution)
+rubric_ref: examples/dataset/rubrics/comparison.v1.json
+taxonomy:
+  taxonomy_version: 1
+  task_family: browser_evidence
+  difficulty: medium
+  determinism: deterministic_fixture
+  tool_requirements: [browser_mock, registry, cli]
+time_budget_seconds: 180
+token_budget: 2200
+tags: [taxonomy, browser, evidence]
+expected_artifact_kinds: [benchmark_request, benchmark_response, evaluation, browser_evidence]
+prompts:
+  - id: p-browser
+    prompt_ref: bench.task.browser_evidence.v1
+variants:
+  - id: v-browser
+    agent_stack: browser-mock
+    execution_mode: browser_mock
+    backend:
+      kind: mock
+      model: mock-model

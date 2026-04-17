@@ -1,0 +1,18 @@
+# Deterministic: file-backed browser evidence (export_flow fixture).
+schema_version: 1
+id: bench.fixtures.browser.file.v1
+title: Browser file-runner benchmark (fixture evidence)
+rubric_ref: fixtures/v1/rubric.json
+prompts:
+  - id: p-one
+    text: "Reply with the single word OK."
+variants:
+  - id: v-file
+    agent_stack: browser-file
+    execution_mode: browser_mock
+    backend:
+      kind: mock
+      model: mock-model
+    browser:
+      runner: file
+      fixture_relpath: fixtures/browser_evidence/v1/export_flow.json

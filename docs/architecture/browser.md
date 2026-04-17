@@ -28,4 +28,8 @@ Capture **browser evidence** (navigation, console messages, optional DOM snapsho
 
 Verification: `docs/workflows/live-verification.md`.
 
+## Benchmark harness
+
+For variants with **`execution_mode: browser_mock`**, `run_benchmark` (`benchmark/runner.py`) calls **`run_benchmark_browser_phase`** (`benchmark/browser_execution.py`), persists **`BrowserEvidence`** to `cells/<cell>/browser_evidence.json`, and augments the provider prompt before scoring. Configure runners via **`variant.browser`** on the benchmark definition (see `schemas/v1/benchmark_definition.schema.json`). Opt-in Playwright for benchmarks: **`ALWM_BENCHMARK_PLAYWRIGHT=1`** (in addition to the `[browser]` install).
+
 Labeling guidance: `docs/audits/capability-classification.md`.

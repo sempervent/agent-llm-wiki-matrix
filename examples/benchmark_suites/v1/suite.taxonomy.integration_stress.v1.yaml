@@ -1,0 +1,36 @@
+# Taxonomy: integration stress — large budgets; live backends optional (metadata).
+schema_version: 1
+id: bench.examples.taxonomy.integration_stress.v1
+title: Taxonomy — integration stress (matrix + runtime prompts, dual variants)
+rubric_ref: examples/dataset/rubrics/comparison.v1.json
+taxonomy:
+  taxonomy_version: 1
+  task_family: integration
+  difficulty: stress
+  determinism: stochastic_live
+  tool_requirements: [multi_variant, live_llm, registry, cli, compose]
+time_budget_seconds: 3600
+token_budget: 32000
+retry_policy:
+  max_attempts: 5
+  backoff_seconds: 5.0
+tags: [taxonomy, integration, stress, live_optional]
+expected_artifact_kinds: [benchmark_request, benchmark_response, evaluation, matrix, report]
+prompts:
+  - id: p-matrix
+    prompt_ref: bench.task.matrix_reasoning.v1
+  - id: p-runtime
+    prompt_ref: bench.task.runtime_config.v1
+variants:
+  - id: v-cli
+    agent_stack: alwm-cli
+    execution_mode: cli
+    backend:
+      kind: mock
+      model: mock-model
+  - id: v-repo
+    agent_stack: repo-governed
+    execution_mode: repo_governed
+    backend:
+      kind: mock
+      model: mock-model

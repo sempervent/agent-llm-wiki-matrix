@@ -8,7 +8,11 @@ from collections.abc import Mapping
 from pathlib import Path
 from typing import Literal, cast
 
-from agent_llm_wiki_matrix.benchmark.definitions import BenchmarkDefinitionV1
+from agent_llm_wiki_matrix.benchmark.browser_execution import (
+    augment_prompt_with_browser_evidence,
+    run_benchmark_browser_phase,
+)
+from agent_llm_wiki_matrix.benchmark.definitions import BenchmarkDefinitionV1, EvalHybridWeights
 from agent_llm_wiki_matrix.benchmark.matrices import (
     grid_inputs_from_scores,
     grid_matrix_from_scores,
@@ -33,6 +37,11 @@ from agent_llm_wiki_matrix.models import (
     MatrixPairwiseInputs,
 )
 from agent_llm_wiki_matrix.pipelines.evaluate import evaluate_text, evaluation_to_json
+from agent_llm_wiki_matrix.pipelines.evaluation_backends import (
+    ScoringBackendName,
+    evaluate_with_scoring_backend,
+    judge_live_enabled,
+)
 from agent_llm_wiki_matrix.pipelines.reporting import (
     build_report_from_matrix,
     render_matrix_markdown,
@@ -40,6 +49,7 @@ from agent_llm_wiki_matrix.pipelines.reporting import (
 )
 from agent_llm_wiki_matrix.providers.base import CompletionRequest
 from agent_llm_wiki_matrix.providers.benchmark_config import (
+    load_judge_provider_config,
     load_provider_config_for_benchmark_variant,
 )
 from agent_llm_wiki_matrix.providers.execution import run_prompt_with_execution_mode
@@ -68,6 +78,9 @@ def run_benchmark(
     fixture_mode_force_mock: bool = True,
     prompt_registry_path: Path | None = None,
     definition_source_relpath: str | None = None,
+    eval_scoring_backend: str | None = None,
+    judge_provider_yaml: Path | None = None,
+    judge_live: bool | None = None,
 ) -> BenchmarkRunManifest:
     """Run all variant × prompt cells, write artifacts under ``output_dir``."""
     env: Mapping[str, str] = os.environ if environ is None else environ
@@ -103,6 +116,31 @@ def run_benchmark(
     markdown_dir.mkdir(parents=True, exist_ok=True)
     reports_dir.mkdir(parents=True, exist_ok=True)
 
+    scoring_backend = "deterministic"
+    hybrid_weights: EvalHybridWeights | None = None
+    judge_ref_path: Path | None = None
+    if definition.eval_scoring is not None:
+        scoring_backend = definition.eval_scoring.backend
+        hybrid_weights = definition.eval_scoring.hybrid
+        if definition.eval_scoring.judge_provider_ref:
+            judge_ref_path = (repo_root / definition.eval_scoring.judge_provider_ref).resolve()
+    if eval_scoring_backend is not None:
+        scoring_backend = eval_scoring_backend
+    if scoring_backend == "hybrid" and hybrid_weights is None:
+        hybrid_weights = EvalHybridWeights(deterministic_weight=0.5, semantic_weight=0.5)
+
+    jl = judge_live_enabled(env) if judge_live is None else judge_live
+    judge_yaml_effective = (
+        judge_provider_yaml if judge_provider_yaml is not None else judge_ref_path
+    )
+    judge_cfg = None
+    if scoring_backend in ("semantic_judge", "hybrid"):
+        judge_cfg = load_judge_provider_config(
+            yaml_path=judge_yaml_effective or provider_yaml,
+            environ=env,
+            judge_live=jl,
+        )
+
     scores: dict[tuple[str, str], float] = {}
     evaluation_relpaths: dict[tuple[str, str], str] = {}
     cell_manifest_rows: list[BenchmarkCellArtifactPaths] = []
@@ -123,9 +161,29 @@ def run_benchmark(
             base = f"{_safe_segment(variant.id)}__{_safe_segment(prompt.id)}"
             cell_dir = cells_root / base
             cell_dir.mkdir(parents=True, exist_ok=True)
+            rel_cell = Path("cells") / base
+
+            effective_prompt = resolved.rendered_text
+            browser_runner_name: str | None = None
+            browser_evidence_relpath: str | None = None
+            if variant.execution_mode == "browser_mock":
+                br_result, block = run_benchmark_browser_phase(
+                    repo_root=repo_root,
+                    variant=variant,
+                    prompt_id=prompt.id,
+                    environ=env,
+                )
+                effective_prompt = augment_prompt_with_browser_evidence(
+                    resolved.rendered_text,
+                    runner_name=br_result.runner,
+                    block=block,
+                )
+                browser_runner_name = br_result.runner
+                write_pydantic_json(cell_dir / "browser_evidence.json", br_result.evidence)
+                browser_evidence_relpath = str((rel_cell / "browser_evidence.json").as_posix())
 
             req = CompletionRequest(
-                prompt=resolved.rendered_text,
+                prompt=effective_prompt,
                 model=variant.backend.model,
                 temperature=None,
             )
@@ -143,7 +201,7 @@ def run_benchmark(
                 benchmark_id=definition.id,
                 variant_id=variant.id,
                 prompt_id=prompt.id,
-                prompt_text=resolved.rendered_text,
+                prompt_text=effective_prompt,
                 model=variant.backend.model,
                 temperature=req.temperature,
                 created_at=created_at,
@@ -151,6 +209,8 @@ def run_benchmark(
                 prompt_registry_id=resolved.prompt_registry_id,
                 registry_document_version=resolved.registry_document_version,
                 prompt_source_relpath=resolved.prompt_source_relpath,
+                browser_runner=browser_runner_name,
+                browser_evidence_relpath=browser_evidence_relpath,
             )
             write_pydantic_json(cell_dir / "request.json", req_rec)
             write_utf8_text(cell_dir / "response.raw.txt", raw_text)
@@ -167,7 +227,7 @@ def run_benchmark(
                 execution_mode=variant.execution_mode,
                 backend_kind=cast(BackendKind, cfg.kind),
                 backend_model=variant.backend.model,
-                prompt_text=resolved.rendered_text,
+                prompt_text=effective_prompt,
                 response_text=normalized_text,
                 duration_ms=duration_ms,
                 created_at=created_at,
@@ -175,23 +235,55 @@ def run_benchmark(
                 prompt_registry_id=resolved.prompt_registry_id,
                 registry_document_version=resolved.registry_document_version,
                 prompt_source_relpath=resolved.prompt_source_relpath,
+                browser_runner=browser_runner_name,
+                browser_evidence_relpath=browser_evidence_relpath,
             )
             aggregate_path = cell_dir / "benchmark_response.json"
             write_pydantic_json(aggregate_path, br)
 
-            rel_cell = Path("cells") / base
-            norm_txt = rel_cell / "response.normalized.txt"
             aggregate_relpath = str((rel_cell / "benchmark_response.json").as_posix())
+            norm_txt = rel_cell / "response.normalized.txt"
             eval_id = f"eval-{_safe_segment(variant.id)}-{_safe_segment(prompt.id)}"
-            ev = evaluate_text(
-                subject_ref=aggregate_relpath,
-                text=normalized_text,
-                rubric_path=rubric_path,
-                evaluation_id=eval_id,
-                evaluated_at=created_at,
-                notes_markdown="Benchmark cell evaluation (rubric hash on normalized response).",
-            )
             rel_eval = rel_cell / "evaluation.json"
+            evaluation_json_relpath = str(rel_eval.as_posix())
+            judge_provenance_cell_relpath: str | None = None
+
+            if scoring_backend == "deterministic":
+                ev = evaluate_text(
+                    subject_ref=aggregate_relpath,
+                    text=normalized_text,
+                    rubric_path=rubric_path,
+                    evaluation_id=eval_id,
+                    evaluated_at=created_at,
+                    notes_markdown=(
+                        "Benchmark cell evaluation (rubric hash on normalized response)."
+                    ),
+                )
+            else:
+                ev, prov = evaluate_with_scoring_backend(
+                    subject_ref=aggregate_relpath,
+                    text=normalized_text,
+                    rubric_path=rubric_path,
+                    evaluation_id=eval_id,
+                    evaluated_at=created_at,
+                    scoring_backend=cast(ScoringBackendName, scoring_backend),
+                    hybrid_weights=hybrid_weights,
+                    judge_provider_cfg=judge_cfg,
+                    judge_live=jl,
+                    evaluation_json_relpath=evaluation_json_relpath,
+                )
+                jp = rel_cell / "evaluation_judge_provenance.json"
+                judge_provenance_cell_relpath = str(jp.as_posix())
+                write_pydantic_json(output_dir / jp, prov)
+                ev = ev.model_copy(
+                    update={
+                        "notes_markdown": (
+                            "Benchmark cell evaluation (see evaluation_judge_provenance.json)."
+                        ),
+                        "judge_provenance_relpath": judge_provenance_cell_relpath,
+                    },
+                )
+
             eval_path = output_dir / rel_eval
             eval_path.write_text(evaluation_to_json(ev), encoding="utf-8")
             scores[(variant.id, prompt.id)] = ev.total_weighted_score
@@ -205,6 +297,8 @@ def run_benchmark(
                     normalized_response_relpath=str(norm_txt.as_posix()),
                     aggregate_response_relpath=aggregate_relpath,
                     evaluation_relpath=str(rel_eval.as_posix()),
+                    browser_evidence_relpath=browser_evidence_relpath,
+                    judge_provenance_relpath=judge_provenance_cell_relpath,
                 )
             )
 
@@ -302,6 +396,12 @@ def run_benchmark(
         report_md_path="reports/report.md",
         matrix_grid_md_path="markdown/matrix.grid.md",
         matrix_pairwise_md_path="markdown/matrix.pairwise.md",
+        taxonomy=definition.taxonomy,
+        time_budget_seconds=definition.time_budget_seconds,
+        token_budget=definition.token_budget,
+        retry_policy=definition.retry_policy,
+        tags=definition.tags,
+        expected_artifact_kinds=definition.expected_artifact_kinds,
     )
     write_benchmark_manifest(output_dir / "manifest.json", manifest)
     return manifest

@@ -4,6 +4,7 @@ from typing import Any
 
 from agent_llm_wiki_matrix.benchmark.definitions import (
     BenchmarkDefinitionV1,
+    BrowserBenchConfig,
     load_benchmark_definition,
 )
 from agent_llm_wiki_matrix.benchmark.errors import BenchmarkPromptResolutionError
@@ -12,10 +13,14 @@ from agent_llm_wiki_matrix.benchmark.prompt_resolution import (
     resolve_benchmark_prompts,
     resolve_registry_yaml_path,
 )
+from agent_llm_wiki_matrix.models import BenchmarkRetryPolicy, BenchmarkTaxonomyV1
 
 __all__ = [
     "BenchmarkDefinitionV1",
+    "BrowserBenchConfig",
     "BenchmarkPromptResolutionError",
+    "BenchmarkRetryPolicy",
+    "BenchmarkTaxonomyV1",
     "ResolvedBenchmarkPrompt",
     "load_benchmark_definition",
     "resolve_benchmark_prompts",

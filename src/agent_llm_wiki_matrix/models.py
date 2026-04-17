@@ -64,6 +64,62 @@ class Evaluation(BaseModel):
     evaluated_at: str = Field(description="RFC 3339 date-time")
     evaluator: Literal["human", "agent", "pipeline"]
     notes_markdown: str | None = None
+    scoring_backend: Literal["deterministic", "semantic_judge", "hybrid"] = Field(
+        default="deterministic",
+        description="deterministic=byte-hash; semantic_judge=LLM; hybrid=blend of both",
+    )
+    judge_provenance_relpath: str | None = Field(
+        default=None,
+        description=(
+            "Repo-relative path to evaluation_judge_provenance.json when semantic or hybrid."
+        ),
+    )
+
+
+class JudgeProviderInfo(BaseModel):
+    """Provider used for a semantic judge call."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    kind: Literal["mock", "ollama", "openai_compatible"]
+    model: str
+
+
+class JudgeHybridAggregation(BaseModel):
+    """How hybrid scores combined deterministic and semantic criterion scores."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    deterministic_weight: float = Field(ge=0.0, le=1.0)
+    semantic_weight: float = Field(ge=0.0, le=1.0)
+    deterministic_scores: dict[str, float]
+    semantic_scores: dict[str, float]
+    blend_method: Literal["weighted_per_criterion"] = "weighted_per_criterion"
+
+
+class EvaluationJudgeProvenance(BaseModel):
+    """Full audit trail for semantic or hybrid rubric scoring."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    schema_version: Literal[1] = 1
+    evaluation_id: str = Field(min_length=1)
+    evaluation_ref: str = Field(description="Path to evaluation.json relative to run root")
+    subject_ref: str
+    rubric_id: str
+    scoring_backend: Literal["semantic_judge", "hybrid"]
+    judge_system_prompt: str
+    judge_user_prompt: str
+    provider: JudgeProviderInfo
+    raw_response_text: str
+    parsed_criterion_scores: dict[str, float]
+    parse_ok: bool
+    parse_error: str | None = None
+    hybrid_aggregation: JudgeHybridAggregation | None = None
+    aggregation_notes: str | None = Field(
+        default=None,
+        description="Short summary of how total_weighted_score was derived",
+    )
 
 
 class ComparisonMatrix(BaseModel):
@@ -155,6 +211,14 @@ class BenchmarkResponse(BaseModel):
         default=None,
         description="Repo-relative path to prompt body file when prompt_source is registry",
     )
+    browser_runner: str | None = Field(
+        default=None,
+        description="Browser abstraction runner id when a browser evidence phase ran",
+    )
+    browser_evidence_relpath: str | None = Field(
+        default=None,
+        description="Cell-relative path to browser_evidence.json when written",
+    )
 
 
 class BenchmarkRequestRecord(BaseModel):
@@ -179,6 +243,14 @@ class BenchmarkRequestRecord(BaseModel):
     prompt_source_relpath: str | None = Field(
         default=None,
         description="Repo-relative path to prompt body file when prompt_source is registry",
+    )
+    browser_runner: str | None = Field(
+        default=None,
+        description="Browser runner id when execution_mode injected browser evidence",
+    )
+    browser_evidence_relpath: str | None = Field(
+        default=None,
+        description="Cell-relative path to browser_evidence.json when present",
     )
 
 
@@ -282,6 +354,64 @@ class BenchmarkCase(BaseModel):
         return self
 
 
+BenchmarkTaskFamily = Literal[
+    "repo_governance",
+    "runtime_config",
+    "documentation",
+    "browser_evidence",
+    "matrix_reasoning",
+    "multi_agent_coordination",
+    "campaign",
+    "scaffolding",
+    "integration",
+    "other",
+]
+
+BenchmarkDifficulty = Literal["trivial", "low", "medium", "high", "stress"]
+
+BenchmarkDeterminism = Literal[
+    "deterministic_fixture",
+    "deterministic_scoring",
+    "stochastic_live",
+]
+
+BenchmarkToolRequirement = Literal[
+    "none",
+    "cli",
+    "registry",
+    "browser_mock",
+    "repo_context",
+    "live_llm",
+    "playwright",
+    "compose",
+    "multi_variant",
+]
+
+
+class BenchmarkTaxonomyV1(BaseModel):
+    """Versioned grouping metadata for benchmark definitions and run manifests."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    taxonomy_version: Literal[1] = 1
+    task_family: BenchmarkTaskFamily
+    difficulty: BenchmarkDifficulty
+    determinism: BenchmarkDeterminism
+    tool_requirements: list[BenchmarkToolRequirement] = Field(
+        default_factory=list,
+        description=("Tools or harness features this suite expects (not enforced by mock runs)."),
+    )
+
+
+class BenchmarkRetryPolicy(BaseModel):
+    """Retry hints for benchmark cells (metadata only; harness does not loop yet)."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    max_attempts: int = Field(default=1, ge=1, le=64)
+    backoff_seconds: float = Field(default=0.0, ge=0.0)
+
+
 class BenchmarkCellArtifactPaths(BaseModel):
     """Relative paths for one variant × prompt cell (sorted by cell_id in the manifest)."""
 
@@ -293,6 +423,14 @@ class BenchmarkCellArtifactPaths(BaseModel):
     normalized_response_relpath: str
     aggregate_response_relpath: str
     evaluation_relpath: str
+    browser_evidence_relpath: str | None = Field(
+        default=None,
+        description="Present when execution_mode browser_mock wrote browser evidence JSON",
+    )
+    judge_provenance_relpath: str | None = Field(
+        default=None,
+        description="evaluation_judge_provenance.json when semantic_judge or hybrid scoring",
+    )
 
 
 class BenchmarkRunManifest(BaseModel):
@@ -327,3 +465,40 @@ class BenchmarkRunManifest(BaseModel):
     report_md_path: str
     matrix_grid_md_path: str
     matrix_pairwise_md_path: str
+    taxonomy: BenchmarkTaxonomyV1 | None = Field(
+        default=None,
+        description="Optional taxonomy copied from the benchmark definition at run time.",
+    )
+    time_budget_seconds: float | None = Field(
+        default=None,
+        description="Optional wall-clock budget hint for agents (not enforced by the harness).",
+    )
+    token_budget: int | None = Field(
+        default=None,
+        description="Optional token budget hint for providers (not enforced by the harness).",
+    )
+    retry_policy: BenchmarkRetryPolicy | None = Field(
+        default=None,
+        description="Optional retry policy metadata (future: harness may consume).",
+    )
+    tags: list[str] = Field(
+        default_factory=list,
+        description="Free-form labels for dashboards and suite filters.",
+    )
+    expected_artifact_kinds: list[str] = Field(
+        default_factory=list,
+        description="Expected alwm artifact kinds produced when reviewing cells (metadata).",
+    )
+
+    @model_validator(mode="after")
+    def manifest_expected_kinds_registered(self) -> Self:
+        if not self.expected_artifact_kinds:
+            return self
+        from agent_llm_wiki_matrix.artifacts import list_artifact_kinds
+
+        allowed = frozenset(list_artifact_kinds())
+        for k in self.expected_artifact_kinds:
+            if k not in allowed:
+                msg = f"Unknown expected artifact kind: {k!r} (not in {sorted(allowed)})"
+                raise ValueError(msg)
+        return self

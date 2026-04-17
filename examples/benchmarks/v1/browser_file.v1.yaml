@@ -1,0 +1,18 @@
+# Example: deterministic browser evidence via `browser.runner: file` (see fixtures mirror).
+schema_version: 1
+id: bench.examples.browser.file.v1
+title: Example — file-backed browser evidence in benchmarks
+rubric_ref: fixtures/v1/rubric.json
+prompts:
+  - id: p-one
+    text: "Reply with the single word OK."
+variants:
+  - id: v-file
+    agent_stack: browser-file
+    execution_mode: browser_mock
+    backend:
+      kind: mock
+      model: mock-model
+    browser:
+      runner: file
+      fixture_relpath: fixtures/browser_evidence/v1/export_flow.json

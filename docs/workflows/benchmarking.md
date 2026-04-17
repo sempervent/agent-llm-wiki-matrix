@@ -14,9 +14,33 @@ Versioned files live in `benchmarks/v1/` (see `benchmarks/v1/README.md`). Each f
 | Field | Meaning |
 | --- | --- |
 | `prompts[]` | Stable prompt ids and text (the shared prompt set). |
-| `variants[]` | **agent_stack** (label), **execution_mode** (`cli` \| `browser_mock` \| `repo_governed`), **backend** (`kind` + `model`). |
+| `variants[]` | **agent_stack** (label), **execution_mode** (`cli` \| `browser_mock` \| `repo_governed`), **backend** (`kind` + `model`), optional **`browser`** (only with `browser_mock`). |
 
-The same prompt text is executed for every variant; execution mode prefixes model output deterministically so rubric hashes differ by mode without a real browser.
+For **`cli`** and **`repo_governed`**, the same resolved prompt text is sent to the provider (with execution-mode tagging on the normalized response). For **`browser_mock`**, the harness runs a **browser evidence phase** first (`MockBrowserRunner` by default, or **`browser.runner`**: `file`, `playwright`, `mcp`), writes **`cells/.../browser_evidence.json`**, and **appends** a markdown evidence block to the prompt before calling the provider. Request/response records store the **effective** prompt (including browser context).
+
+| `browser.runner` | When to use | CI / notes |
+| --- | --- | --- |
+| `mock` (default) | Synthetic trace from `MockBrowserRunner` | Deterministic; default tests |
+| `file` | Load JSON from `scenario_id` or `fixture_relpath` | Deterministic; no network |
+| `mcp` | Same file loading as `file`, labeled runner `mcp` (fixture bridge) | Remote MCP tools **not** implemented |
+| `playwright` | Live navigation; requires `start_url` | Set **`ALWM_BENCHMARK_PLAYWRIGHT=1`**, install **`[browser]`** + `playwright install …`; not part of default `just ci` |
+
+### Taxonomy and optional metadata (v1)
+
+Example and production definitions may add **optional** fields (older suites omit them; still valid):
+
+| Field | Meaning |
+| --- | --- |
+| `taxonomy` | `taxonomy_version: 1`, **task_family**, **difficulty**, **determinism**, optional **tool_requirements[]**. Schema: `schemas/v1/benchmark_taxonomy.schema.json`. |
+| `time_budget_seconds` | Wall-clock hint for agent runners (not enforced by the harness). |
+| `token_budget` | Token budget hint (not enforced). |
+| `retry_policy` | `{ max_attempts, backoff_seconds }` for agent implementations (harness does not loop yet). |
+| `tags` | Free-form labels for filters and dashboards. |
+| `expected_artifact_kinds` | Registered `alwm validate` kinds expected when reviewing cells. |
+
+These copy into **`manifest.json`** when set. Example suites: `examples/benchmark_suites/v1/suite.taxonomy.*.v1.yaml`; example runs with taxonomy: `examples/benchmark_runs/taxonomy-repo-governance/`, `taxonomy-runtime-config/`.
+
+**Task families:** `repo_governance`, `runtime_config`, `documentation`, `browser_evidence`, `matrix_reasoning`, `multi_agent_coordination`, `campaign`, `scaffolding`, `integration`, `other`. **Difficulty:** `trivial` … `stress`. **Determinism:** `deterministic_fixture`, `deterministic_scoring`, `stochastic_live`. **Tool requirements (hints):** `none`, `cli`, `registry`, `browser_mock`, `repo_context`, `live_llm`, `playwright`, `compose`, `multi_variant`.
 
 ## Running locally (offline)
 
@@ -31,7 +55,8 @@ alwm benchmark run \
 
 Artifacts (under `--output-dir`; lexicographic cell order in `manifest.json`):
 
-- `cells/{variant}__{prompt}/request.json` — persisted **benchmark_request** (prompt + model + ids).
+- `cells/{variant}__{prompt}/request.json` — persisted **benchmark_request** (effective prompt + model + ids; may include optional **`browser_runner`** / **`browser_evidence_relpath`**).
+- `cells/.../browser_evidence.json` — **browser_evidence** for `browser_mock` variants (omitted for `cli` / `repo_governed`).
 - `cells/.../response.raw.txt` — provider output **before** execution-mode tagging.
 - `cells/.../response.normalized.txt` — text after tagging (what the rubric scores).
 - `cells/.../benchmark_response.json` — aggregate **benchmark_response** record.

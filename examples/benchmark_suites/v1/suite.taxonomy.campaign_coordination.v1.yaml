@@ -1,0 +1,43 @@
+# Taxonomy: campaign — multi-prompt, multi-mode sweep (neutral campaign style).
+schema_version: 1
+id: bench.examples.taxonomy.campaign_coordination.v1
+title: Taxonomy — campaign (balanced rubric, CLI + browser + repo modes)
+rubric_ref: examples/dataset/rubrics/balanced.v1.json
+taxonomy:
+  taxonomy_version: 1
+  task_family: campaign
+  difficulty: medium
+  determinism: deterministic_fixture
+  tool_requirements: [multi_variant, browser_mock, cli, repo_context]
+time_budget_seconds: 600
+token_budget: 12000
+tags: [taxonomy, campaign, sweep]
+expected_artifact_kinds: [benchmark_response, evaluation, matrix, report]
+prompts:
+  - id: q1
+    text: >-
+      Summarize how you would structure a small RAG pipeline for Markdown notes in a git repo,
+      including where JSON Schema validation fits.
+  - id: q2
+    text: >-
+      List three trade-offs between dense retrieval and lexical search for agent tool-calling
+      documentation, in under 120 words.
+variants:
+  - id: v-cli
+    agent_stack: alwm-cli
+    execution_mode: cli
+    backend:
+      kind: mock
+      model: mock-model
+  - id: v-browser
+    agent_stack: browser-mock
+    execution_mode: browser_mock
+    backend:
+      kind: mock
+      model: mock-model
+  - id: v-repo
+    agent_stack: repo-governed
+    execution_mode: repo_governed
+    backend:
+      kind: mock
+      model: mock-model

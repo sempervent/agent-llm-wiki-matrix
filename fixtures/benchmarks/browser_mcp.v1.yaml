@@ -1,0 +1,18 @@
+# MCP runner uses fixture bridge (same JSON as file runner).
+schema_version: 1
+id: bench.fixtures.browser.mcp.v1
+title: Browser MCP-label fixture bridge
+rubric_ref: fixtures/v1/rubric.json
+prompts:
+  - id: p-one
+    text: "Reply OK."
+variants:
+  - id: v-mcp
+    agent_stack: browser-mcp
+    execution_mode: browser_mock
+    backend:
+      kind: mock
+      model: mock-model
+    browser:
+      runner: mcp
+      fixture_relpath: fixtures/browser_evidence/v1/export_flow.json

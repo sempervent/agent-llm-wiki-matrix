@@ -2,6 +2,18 @@
 
 Chronological record of repository work. Latest entries first.
 
+## 2026-04-17 — Browser-backed benchmark execution
+
+**Why:** `browser_mock` previously only tagged LLM output; benchmarks did not exercise `BrowserRunner` or persist evidence.
+
+**Delivered:** `BrowserBenchConfig` + optional `variant.browser` in `benchmark/definitions.py` and `schemas/v1/benchmark_definition.schema.json`. `run_benchmark` calls `run_benchmark_browser_phase` for `execution_mode: browser_mock`, writes **`cells/.../browser_evidence.json`**, augments the provider prompt, and records **`browser_runner`** / **`browser_evidence_relpath`** on request/response/manifest cells. **`MCPBrowserRunner`** (`browser/mcp_runner.py`): fixture-backed bridge; remote MCP tools not wired. Playwright gated by **`ALWM_BENCHMARK_PLAYWRIGHT=1`**. Fixtures under `fixtures/benchmarks/browser_*.v1.yaml`; example `examples/benchmarks/v1/browser_file.v1.yaml`. Tests: `tests/test_benchmark_browser.py`. Docs: `docs/workflows/benchmarking.md`, `benchmarks/v1/README.md`, `docs/architecture/browser.md`, `docs/audits/capability-classification.md`. **`evaluation.schema.json`:** optional `scoring_backend` / `judge_provenance_relpath` (not in `required`) for Pydantic alignment.
+
+**Verification:** `just ci` (default tests; no Playwright in CI).
+
+## 2026-04-17 — Benchmark corpus expansion: taxonomy metadata + eight tagged suites
+
+**Delivered:** `BenchmarkTaxonomyV1`, optional `time_budget_seconds`, `token_budget`, `retry_policy`, `tags`, `expected_artifact_kinds` on `BenchmarkDefinitionV1`; same fields on `BenchmarkRunManifest` and `schemas/v1/manifest.schema.json` (optional). New prompts `bench.task.runtime_config.v1`, `bench.task.multi_agent_coord.v1`; registry **0.3.0**. Eight example suites under `examples/benchmark_suites/v1/suite.taxonomy.*.v1.yaml` covering repo, runtime, docs, browser evidence, matrix reasoning, multi-agent coordination, campaign sweep, and integration stress. Fixture `fixtures/benchmarks/suite_taxonomy_minimal.v1.yaml`; example runs `examples/benchmark_runs/taxonomy-repo-governance/`, `taxonomy-runtime-config/`. Tests: `tests/test_benchmark_taxonomy.py`, manifest validation. Docs: `docs/workflows/benchmarking.md`, `examples/benchmark_suites/v1/README.md`. `schemas/v1/benchmark_taxonomy.schema.json` for standalone taxonomy JSON.
+
 ## 2026-04-17 — v0.1.0 release preparation
 
 **Delivered:** First semver release tag readiness: `CHANGELOG.md`, `docs/releases/v0.1.0.md`, `docs/release-readiness.md`, `docs/audits/release-readiness-audit.md`, `docs/workflows/walkthrough-v0.1.0.md`. README quickstarts (exact local, benchmark, prompt registry, manifest validate, optional live verification) and `pyproject.toml` `urls` + sdist `CHANGELOG.md` include. Version metadata remains **0.1.0** (`pyproject.toml`, `__version__`). Evidence: `just ci` (85 passed, 1 skipped), `just compose-help`, `docker buildx bake --print`.

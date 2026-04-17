@@ -222,7 +222,7 @@ Run `just` with no arguments to list recipes. Common tasks:
 | `alwm report --matrix … --out-json … --out-md …` | Matrix → report JSON + Markdown |
 | `alwm providers show` | Print resolved provider config (API keys redacted) |
 | `alwm benchmark probe` | Check Ollama + OpenAI-compatible HTTP APIs (for live runs) |
-| `alwm benchmark run --definition … --output-dir … [--prompt-registry PATH]` | Full harness: responses → evals → matrices → report; optional registry YAML override |
+| `alwm benchmark run --definition … --output-dir … [--prompt-registry PATH]` | Full harness: responses → evals → matrices + report; `browser_mock` variants run the browser abstraction and write `browser_evidence.json`; Playwright requires `ALWM_BENCHMARK_PLAYWRIGHT=1` + `[browser]` extra |
 | `alwm prompts check` / `list` / `show <id>` | Validate and read `prompts/registry.yaml` (paths relative to repo root) |
 
 ## Repository layout

@@ -1,0 +1,23 @@
+# Minimal taxonomy fixture for tests (single cell).
+schema_version: 1
+id: bench.fixtures.taxonomy.minimal.v1
+title: Fixture taxonomy minimal
+rubric_ref: fixtures/v1/rubric.json
+taxonomy:
+  taxonomy_version: 1
+  task_family: scaffolding
+  difficulty: trivial
+  determinism: deterministic_fixture
+  tool_requirements: [none]
+tags: [fixture]
+expected_artifact_kinds: [evaluation]
+prompts:
+  - id: p-one
+    text: "Reply with FIXTURE-OK."
+variants:
+  - id: v-cli
+    agent_stack: alwm-cli
+    execution_mode: cli
+    backend:
+      kind: mock
+      model: mock-model

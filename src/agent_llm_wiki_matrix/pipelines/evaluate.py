@@ -1,4 +1,4 @@
-"""Deterministic rubric evaluation (no live network)."""
+"""Rubric evaluation: deterministic by default; semantic/hybrid via ``evaluation_backends``."""
 
 from __future__ import annotations
 
@@ -15,6 +15,11 @@ def _score_byte_hash(text: str, criterion_id: str) -> float:
     """Map (text, criterion) to a stable score in ``[0, 1]``."""
     digest = hashlib.sha256(f"{criterion_id}\n{text}".encode()).digest()
     return int.from_bytes(digest[:4], "big") / 2**32
+
+
+def load_evaluation_subject(path: Path) -> tuple[str, str]:
+    """Public wrapper: return ``(subject_ref, text)`` for Markdown or Thought JSON."""
+    return _load_subject_text(path)
 
 
 def _load_subject_text(path: Path) -> tuple[str, str]:
@@ -65,6 +70,8 @@ def _evaluate_text_core(
         evaluated_at=evaluated_at,
         evaluator=evaluator,
         notes_markdown=notes_markdown,
+        scoring_backend="deterministic",
+        judge_provenance_relpath=None,
     )
 
 
