@@ -2,6 +2,21 @@
 
 Chronological record of repository work. Latest entries first.
 
+## 2026-04-17 — Phase 5 complete (benchmark harness)
+
+**Delivered:**
+
+- **Provider execution:** `providers/execution.py` applies deterministic execution-mode tags (`cli`, `browser_mock`, `repo_governed`) on top of the same `CompletionRequest` for all backends.
+- **Backend selection:** `providers/benchmark_config.py` merges global YAML/env with per-variant `mock` / `ollama` / `openai_compatible` settings; `ALWM_FIXTURE_MODE=1` forces mock unless `--no-fixture-mock`.
+- **Benchmark definitions:** Pydantic `BenchmarkDefinitionV1` + `load_benchmark_definition` for YAML/JSON under `benchmarks/v1/` (mirrored in `fixtures/benchmarks/` for tests).
+- **Artifacts:** `schemas/v1/benchmark_response.schema.json`, `BenchmarkResponse` model, `alwm validate … benchmark_response`.
+- **Pipeline:** `benchmark/runner.py` stores raw responses, rubric-evaluates each cell, builds **grid** and **pairwise** `ComparisonMatrix` JSON + Markdown, `report.json` / `report.md`, and `manifest.json`.
+- **CLI:** `alwm benchmark run --definition … --output-dir …`.
+- **Compose / Make:** profiles **`benchmark-offline`**, **`benchmark-ollama`** (+ `ollama` service), **`benchmark-llamacpp`**; targets `make benchmark-offline`, `benchmark-ollama`, `benchmark-llamacpp`.
+- **Tests:** `tests/test_benchmark.py` asserts deterministic offline matrix output and validates artifacts.
+
+**Next:** Richer prompt registry wiring; optional LLM rubric; real browser trace ingestion.
+
 ## 2026-04-17 — Phase 4 complete (pipelines + Compose test image)
 
 **Delivered:**

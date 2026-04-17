@@ -20,13 +20,20 @@ See `.env.example`. Notable keys:
 | `ALWM_PROVIDER_CONFIG` | Optional path to YAML (see `config/providers.example.yaml`) |
 | `OLLAMA_HOST`, `OLLAMA_MODEL` | Ollama endpoint overrides |
 | `OPENAI_BASE_URL`, `OPENAI_API_KEY`, `OPENAI_MODEL` | OpenAI-compatible server overrides |
+| `LLAMACPP_OPENAI_BASE_URL` | Override for Compose **benchmark-llamacpp** (default `host.docker.internal:8080/v1`) |
 
 ## Docker
 
 - **Image:** `Dockerfile` `runtime` target (CLI); `test` target installs `.[dev]` for pytest. Non-root user `alwm` (uid 1000); workdir `/workspace`.
-- **Compose:** `orchestrator` (**dev**), `tests` (**test**, pytest), `benchmark` (**benchmark**, `alwm info` smoke); bind-mounts the project to `/workspace`.
+- **Compose:** `orchestrator` (**dev**), `tests` (**test**, pytest), `benchmark` (**benchmark**, `alwm info` smoke), **`benchmark-offline`** (`alwm benchmark run` with `ALWM_FIXTURE_MODE=1` and mock backends), **`benchmark-ollama`** (bundled `ollama` service + `benchmarks/v1/ollama.v1.yaml`), **`benchmark-llamacpp`** (OpenAI-compatible URL toward the host for llama.cpp-style servers). All bind-mount the project to `/workspace`.
 - **Bake:** `docker-bake.hcl` — variable `PLATFORM` (comma-separated) defaults to `linux/amd64,linux/arm64`; targets `orchestrator`, `orchestrator-amd64`, `orchestrator-arm64`.
+
+## Benchmark execution
+
+- **Provider layer:** `BaseProvider.complete` via `providers/factory.py` (`mock`, `ollama`, `openai_compatible`).
+- **Execution tagging:** `providers/execution.py` wraps outputs for `cli` vs `browser_mock` vs `repo_governed` so rubric scores differ by execution mode without a real browser.
+- **Per-variant config:** `providers/benchmark_config.py` merges `ProviderConfig` with each variant’s backend; when `ALWM_FIXTURE_MODE=1`, backends are forced to **mock** unless `alwm benchmark run --no-fixture-mock`.
 
 ## CI-friendly commands
 
-`make ci` runs Ruff, Mypy, and pytest without Docker. For container parity, build the image and run `docker run --rm -v "$PWD":/workspace -w /workspace agent-llm-wiki-matrix:local …` (pattern to be wrapped in Make targets in Phase 6+).
+`make ci` runs Ruff, Mypy, and pytest without Docker. `make benchmark-offline` runs the full harness in a container (mock-only, deterministic).

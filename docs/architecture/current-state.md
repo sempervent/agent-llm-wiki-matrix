@@ -1,6 +1,6 @@
 # Current architecture
 
-_Last updated: 2026-04-17 (Phase 4 — pipelines)._
+_Last updated: 2026-04-17 (Phase 5 — benchmark harness)._
 
 ## Summary
 
@@ -10,13 +10,13 @@ The repository is a **docs-first** workspace for an LLM wiki and comparison matr
 
 | Component | Status | Notes |
 | --- | --- | --- |
-| CLI (`alwm`) | Implemented | `version`, `info`, `validate`, `ingest`, `evaluate`, `compare`, `report`, `providers show` |
-| JSON Schema + Pydantic | Implemented | Thought, Event, Experiment, Evaluation, Matrix, Report, **Rubric** |
+| CLI (`alwm`) | Implemented | `version`, `info`, `validate`, `ingest`, `evaluate`, `compare`, `report`, `benchmark run`, `providers show` |
+| JSON Schema + Pydantic | Implemented | Thought, Event, Experiment, Evaluation, Matrix, Report, **Rubric**, **BenchmarkResponse** |
 | Wiki `WikiNote` schema | Implemented | `note.schema.json`; examples still JSON-only |
 | Prompt registry | Skeleton | `prompts/registry.yaml` |
 | Markdown templates | Implemented | `templates/matrix.md`, `templates/report.md`, weekly stub |
 | Provider layer | Implemented | Mock / Ollama / OpenAI-compatible HTTP; YAML/env config |
-| Pipelines | Implemented | Ingest → evaluate → compare → report (deterministic scoring; no network in tests) |
+| Pipelines | Implemented | Ingest → evaluate → compare → report; **benchmark run** (responses → evals → grid + pairwise matrices + report) |
 | Browser evidence layer | Not implemented | Planned: mock + fixtures |
 
 ## Runtime

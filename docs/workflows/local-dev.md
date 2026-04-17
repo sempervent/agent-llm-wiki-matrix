@@ -23,6 +23,9 @@ docker run --rm agent-llm-wiki-matrix:local version
 | `dev` | `orchestrator` | Interactive `alwm` against the mounted repo (`command` defaults to `--help`; override when running) |
 | `test` | `tests` | `python -m pytest` in the `Dockerfile` `test` stage (dev dependencies installed) |
 | `benchmark` | `benchmark` | Smoke `alwm info` with repo mounted at `/workspace` |
+| `benchmark-offline` | `benchmark-offline` | `alwm benchmark run` with mock backends (`ALWM_FIXTURE_MODE=1`) → `out/benchmark-offline` |
+| `benchmark-ollama` | `ollama`, `benchmark-ollama` | Ollama daemon + `benchmarks/v1/ollama.v1.yaml` → `out/benchmark-ollama` |
+| `benchmark-llamacpp` | `benchmark-llamacpp` | OpenAI-compatible URL (default host port 8080) + `llamacpp.v1.yaml` → `out/benchmark-llamacpp` |
 
 Examples:
 
@@ -30,9 +33,10 @@ Examples:
 docker compose --profile dev run --rm orchestrator version
 docker compose --profile test run --rm tests
 docker compose --profile benchmark run --rm benchmark
+docker compose --profile benchmark-offline run --rm benchmark-offline
 ```
 
-`make compose-help` validates the Compose file for each profile and prints service names.
+`make compose-help` validates the Compose file for each profile and prints service names. Shortcut targets: `make benchmark-offline`, `make benchmark-ollama`, `make benchmark-llamacpp`.
 
 ## Buildx Bake
 

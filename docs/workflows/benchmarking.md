@@ -2,63 +2,55 @@
 
 ## Goals
 
-- Compare **agent stacks**, **models**, **backends**, **prompts**, and **orchestration patterns** with reproducible inputs.
-- Emit **pairwise or grid matrices** and **weighted scores** as structured JSON plus human-readable Markdown.
+- Compare **agent stacks**, **models**, **backends**, **prompts**, and **execution modes** with reproducible inputs.
+- Emit **grid** and **pairwise** matrices plus **weighted rubric scores** as structured JSON and Markdown.
 
-## Configuration
+## Definitions
 
-1. Copy `.env.example` to `.env` and set `ALWM_PROVIDER` to `mock` (CI), `ollama`, or `openai_compatible` (llama.cpp-style HTTP servers exposing `/v1/chat/completions`).
-2. Optionally add `config/providers.yaml` (see `config/providers.example.yaml`); override with `OLLAMA_*` or `OPENAI_*` environment variables.
-3. Record **prompt registry** IDs and **schema versions** in benchmark outputs when publishing results.
+Versioned files live in `benchmarks/v1/` (see `benchmarks/v1/README.md`). Each file includes:
 
-## Running comparisons (offline matrix)
+| Field | Meaning |
+| --- | --- |
+| `prompts[]` | Stable prompt ids and text (the shared prompt set). |
+| `variants[]` | **agent_stack** (label), **execution_mode** (`cli` \| `browser_mock` \| `repo_governed`), **backend** (`kind` + `model`). |
 
-Deterministic scoring (no LLM calls) is the default for `alwm evaluate`. It uses **SHA-256–derived** per-criterion scores in `[0, 1]` so the same subject text always produces the same evaluation JSON.
+The same prompt text is executed for every variant; execution mode prefixes model output deterministically so rubric hashes differ by mode without a real browser.
 
-1. Ingest Markdown pages to Thought JSON (optional if you already have subjects):
+## Running locally (offline)
 
-   ```bash
-   alwm ingest examples/dataset/pages examples/dataset/thoughts --created-at 1970-01-01T00:00:00Z
-   ```
+```bash
+export ALWM_FIXTURE_MODE=1
+alwm benchmark run \
+  --definition fixtures/benchmarks/offline.v1.yaml \
+  --output-dir out/benchmark-offline \
+  --created-at 1970-01-01T00:00:00Z \
+  --run-id local
+```
 
-2. Evaluate each subject against a rubric:
+Artifacts:
 
-   ```bash
-   alwm evaluate --subject examples/dataset/pages/retrieval-basics.md \
-     --rubric examples/v1/rubric.json \
-     --out examples/dataset/evals/retrieval-basics.eval.json
-   ```
-
-3. Compare evaluations into a matrix (optional Markdown sidecar):
-
-   ```bash
-   alwm compare eval-a.json eval-b.json \
-     --out matrix.json --out-md matrix.md \
-     --id bench-matrix --title "Bench run"
-   ```
-
-4. Render a report artifact + Markdown:
-
-   ```bash
-   alwm report --matrix matrix.json \
-     --out-json report.json --out-md report.md \
-     --id bench-report-001
-   ```
+- `responses/*.response.json` — raw provider outputs (`benchmark_response` schema).
+- `evaluations/*.eval.json` — rubric scores per cell.
+- `matrix.grid.json` / `matrix.grid.md` — variants × prompts (total weighted score).
+- `matrix.pairwise.json` / `matrix.pairwise.md` — variants × variants (mean absolute score delta across prompts).
+- `report.json` / `report.md` — summary report from the grid matrix.
+- `manifest.json` — index of paths for the run.
 
 ## Docker Compose
 
-- **benchmark** profile runs `alwm info` against the mounted repository as a quick smoke (replace `command` in `docker-compose.yml` for custom harnesses).
-
-```bash
-docker compose --profile benchmark run --rm benchmark
-```
+| Make target | Profile | Notes |
+| --- | --- | --- |
+| `make benchmark-offline` | `benchmark-offline` | Mock-only; `ALWM_FIXTURE_MODE=1`; writes `out/benchmark-offline`. |
+| `make benchmark-ollama` | `benchmark-ollama` | Starts `ollama/ollama`; run `docker compose exec ollama ollama pull llama3.2` (or your model) before benchmarking. |
+| `make benchmark-llamacpp` | `benchmark-llamacpp` | Points `OPENAI_BASE_URL` at `LLAMACPP_OPENAI_BASE_URL` (default `http://host.docker.internal:8080/v1`); start `llama-server` on the host first. |
 
 ## Determinism
 
-- Set `ALWM_FIXTURE_MODE=1` in `.env` as a convention when runs must avoid live endpoints (providers still read config; pipelines themselves do not call the network).
-- Use fixed `--created-at` / `--evaluated-at` timestamps when you need byte-stable JSON across machines.
+- CI uses `fixtures/benchmarks/offline.v1.yaml` with mock backends only.
+- Use a fixed `--created-at` for byte-stable JSON when comparing runs.
+- Live runs should record model ids and provider hostnames in your own experiment notes (future: automatic metadata block in manifest).
 
 ## Current state
 
-- Provider adapters are available for **Ollama** (`/api/chat`) and **OpenAI-compatible** servers (`/v1/chat/completions`).
-- LLM-assisted rubric scoring can be layered on later; today’s `evaluate` command is **pipeline-only** for reproducibility.
+- End-to-end harness is implemented (`alwm benchmark run`).
+- Ollama and OpenAI-compatible paths require running services and models; offline tests stay on **mock** only.

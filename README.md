@@ -54,6 +54,27 @@ alwm validate examples/generated/wiki_matrix.json matrix
 alwm validate examples/generated/wiki_report.json report
 ```
 
+### Benchmark harness (prompts × variants × backends)
+
+Runs versioned YAML under `benchmarks/v1/` (see `benchmarks/v1/README.md`). Each variant specifies **agent stack**, **backend** (`mock` / `ollama` / `openai_compatible`), and **execution mode** (`cli`, `browser_mock`, `repo_governed`). Responses are stored as `benchmark_response` JSON, scored with the rubric, then aggregated into **grid** and **pairwise** matrices plus reports.
+
+```bash
+ALWM_FIXTURE_MODE=1 alwm benchmark run \
+  --definition fixtures/benchmarks/offline.v1.yaml \
+  --output-dir out/benchmark-offline \
+  --created-at 1970-01-01T00:00:00Z \
+  --run-id local-bench
+alwm validate out/benchmark-offline/responses/v-cli__p-one.response.json benchmark_response
+```
+
+Compose shortcuts (writes under `out/` in the mounted repo):
+
+```bash
+make benchmark-offline
+make benchmark-ollama    # pull a model into the ollama service first
+make benchmark-llamacpp    # start llama-server on the host (default :8080/v1)
+```
+
 ### Docker
 
 ```bash
@@ -77,10 +98,11 @@ docker buildx bake orchestrator-arm64
 docker compose --profile dev run --rm orchestrator version
 docker compose --profile test run --rm tests
 docker compose --profile benchmark run --rm benchmark
+docker compose --profile benchmark-offline run --rm benchmark-offline
 make compose-help
 ```
 
-See `docs/workflows/local-dev.md` for profile details (`dev`, `test`, `benchmark`).
+See `docs/workflows/local-dev.md` for profile details (`dev`, `test`, `benchmark`, `benchmark-offline`, `benchmark-ollama`, `benchmark-llamacpp`).
 
 ## Architecture (summary)
 
@@ -90,7 +112,8 @@ See `docs/workflows/local-dev.md` for profile details (`dev`, `test`, `benchmark
 | **Schemas** | JSON Schema for structured artifacts under `schemas/` |
 | **Templates** | Markdown templates under `templates/` |
 | **Prompts** | Versioned prompt registry under `prompts/` |
-| **Python package** | `src/agent_llm_wiki_matrix` — CLI, pipelines, validators |
+| **Python package** | `src/agent_llm_wiki_matrix` — CLI, pipelines, benchmark harness, validators |
+| **Benchmarks** | `benchmarks/v1/*.yaml` — versioned definitions; `fixtures/benchmarks/` for tests |
 | **Docker** | `Dockerfile`, `docker-compose.yml`, `docker-bake.hcl` |
 
 Detailed diagrams and data flow: `docs/architecture/runtime.md`, `docs/architecture/data-model.md`, `docs/architecture/evaluation-pipeline.md`.
@@ -108,13 +131,17 @@ Detailed diagrams and data flow: `docs/architecture/runtime.md`, `docs/architect
 | `make ci` | Lint + typecheck + tests |
 | `make docker-build` | Build local image (`runtime` target) |
 | `make docker-bake` | Multi-arch bake via `docker-bake.hcl` |
-| `make compose-help` | Validate Compose for `dev`, `test`, `benchmark` and list services |
+| `make compose-help` | Validate Compose for dev/test/benchmark + benchmark-offline/ollama/llamacpp |
+| `make benchmark-offline` | Run mock benchmark via Compose → `out/benchmark-offline` |
+| `make benchmark-ollama` | Ollama service + smoke benchmark → `out/benchmark-ollama` |
+| `make benchmark-llamacpp` | OpenAI-compatible endpoint on host → `out/benchmark-llamacpp` |
 | `alwm validate <file> <kind>` | Validate JSON against schema + Pydantic |
 | `alwm ingest <input_dir> <output_dir>` | Markdown pages → Thought JSON |
 | `alwm evaluate --subject … --rubric … --out …` | Deterministic rubric scoring |
 | `alwm compare <eval.json>… --out … [--out-md …]` | Evaluations → matrix JSON (+ optional matrix Markdown) |
 | `alwm report --matrix … --out-json … --out-md …` | Matrix → report JSON + Markdown |
 | `alwm providers show` | Print resolved provider config (API keys redacted) |
+| `alwm benchmark run --definition … --output-dir …` | Full harness: responses → evals → matrices → report |
 
 ## Repository layout
 
@@ -130,7 +157,8 @@ Detailed diagrams and data flow: `docs/architecture/runtime.md`, `docs/architect
 ├── prompts/               # Versioned prompts
 ├── config/                # Optional provider YAML (see providers.example.yaml)
 ├── examples/              # Example artifacts + dataset + generated matrix/report
-├── fixtures/              # Deterministic test inputs
+├── benchmarks/v1/         # Versioned benchmark YAML
+├── fixtures/              # Deterministic test inputs (+ benchmarks/)
 ├── src/agent_llm_wiki_matrix/
 ├── tests/
 └── docs/
