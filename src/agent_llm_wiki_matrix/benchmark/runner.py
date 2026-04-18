@@ -13,6 +13,7 @@ from agent_llm_wiki_matrix.benchmark.browser_execution import (
     run_benchmark_browser_phase,
 )
 from agent_llm_wiki_matrix.benchmark.definitions import BenchmarkDefinitionV1, EvalHybridWeights
+from agent_llm_wiki_matrix.benchmark.fingerprints import build_benchmark_comparison_fingerprints
 from agent_llm_wiki_matrix.benchmark.matrices import (
     grid_inputs_from_scores,
     grid_matrix_from_scores,
@@ -38,6 +39,7 @@ from agent_llm_wiki_matrix.models import (
 )
 from agent_llm_wiki_matrix.pipelines.evaluate import evaluate_text, evaluation_to_json
 from agent_llm_wiki_matrix.pipelines.evaluation_backends import (
+    JudgeRepeatParams,
     ScoringBackendName,
     evaluate_with_scoring_backend,
     judge_live_enabled,
@@ -52,6 +54,7 @@ from agent_llm_wiki_matrix.providers.benchmark_config import (
     load_judge_provider_config,
     load_provider_config_for_benchmark_variant,
 )
+from agent_llm_wiki_matrix.providers.config import ProviderConfig
 from agent_llm_wiki_matrix.providers.execution import run_prompt_with_execution_mode
 from agent_llm_wiki_matrix.providers.factory import create_provider
 
@@ -129,6 +132,19 @@ def run_benchmark(
     if scoring_backend == "hybrid" and hybrid_weights is None:
         hybrid_weights = EvalHybridWeights(deterministic_weight=0.5, semantic_weight=0.5)
 
+    judge_repeat_params = JudgeRepeatParams()
+    if definition.eval_scoring is not None:
+        es = definition.eval_scoring
+        judge_repeat_params = JudgeRepeatParams(
+            count=es.judge_repeats,
+            strategy=es.semantic_aggregation,
+            trim_fraction=es.trim_fraction,
+            max_criterion_range=es.judge_max_criterion_range,
+            max_criterion_stdev=es.judge_max_criterion_stdev,
+            max_mean_criterion_stdev=es.judge_max_mean_criterion_stdev,
+            max_total_weighted_stdev=es.judge_max_total_weighted_stdev,
+        )
+
     jl = judge_live_enabled(env) if judge_live is None else judge_live
     judge_yaml_effective = (
         judge_provider_yaml if judge_provider_yaml is not None else judge_ref_path
@@ -141,6 +157,28 @@ def run_benchmark(
             judge_live=jl,
         )
 
+    variant_provider_cfgs: dict[str, ProviderConfig] = {}
+    for v in definition.variants:
+        variant_provider_cfgs[v.id] = load_provider_config_for_benchmark_variant(
+            yaml_path=provider_yaml,
+            environ=env,
+            backend_kind=v.backend.kind,
+            backend_model=v.backend.model,
+            fixture_mode_force_mock=fixture_mode_force_mock,
+        )
+
+    comparison_fingerprints = build_benchmark_comparison_fingerprints(
+        repo_root=repo_root,
+        definition=definition,
+        resolved_prompts=resolved_prompts,
+        variant_provider_configs=variant_provider_cfgs,
+        scoring_backend=scoring_backend,
+        hybrid_weights=hybrid_weights,
+        judge_repeat_params=judge_repeat_params,
+        judge_provider_cfg=judge_cfg,
+        prompt_registry_path=prompt_registry_path,
+    )
+
     scores: dict[tuple[str, str], float] = {}
     evaluation_relpaths: dict[tuple[str, str], str] = {}
     cell_manifest_rows: list[BenchmarkCellArtifactPaths] = []
@@ -149,13 +187,7 @@ def run_benchmark(
     prompt_ids = [p.id for p in definition.prompts]
 
     for variant in definition.variants:
-        cfg = load_provider_config_for_benchmark_variant(
-            yaml_path=provider_yaml,
-            environ=env,
-            backend_kind=variant.backend.kind,
-            backend_model=variant.backend.model,
-            fixture_mode_force_mock=fixture_mode_force_mock,
-        )
+        cfg = variant_provider_cfgs[variant.id]
         provider = create_provider(cfg)
         for prompt, resolved in zip(definition.prompts, resolved_prompts, strict=True):
             base = f"{_safe_segment(variant.id)}__{_safe_segment(prompt.id)}"
@@ -271,6 +303,7 @@ def run_benchmark(
                     judge_provider_cfg=judge_cfg,
                     judge_live=jl,
                     evaluation_json_relpath=evaluation_json_relpath,
+                    judge_repeat=judge_repeat_params,
                 )
                 jp = rel_cell / "evaluation_judge_provenance.json"
                 judge_provenance_cell_relpath = str(jp.as_posix())
@@ -402,6 +435,9 @@ def run_benchmark(
         retry_policy=definition.retry_policy,
         tags=definition.tags,
         expected_artifact_kinds=definition.expected_artifact_kinds,
+        success_criteria=definition.success_criteria,
+        failure_taxonomy_hints=definition.failure_taxonomy_hints,
+        comparison_fingerprints=comparison_fingerprints,
     )
     write_benchmark_manifest(output_dir / "manifest.json", manifest)
     return manifest

@@ -1,0 +1,42 @@
+{
+  "benchmark_id": "bench.fixtures.longitudinal.v1",
+  "cells": [
+    {
+      "aggregate_response_relpath": "cells/v-cli__p-one/benchmark_response.json",
+      "cell_id": "v-cli__p-one",
+      "evaluation_relpath": "cells/v-cli__p-one/evaluation.json",
+      "normalized_response_relpath": "cells/v-cli__p-one/response.normalized.txt",
+      "raw_response_relpath": "cells/v-cli__p-one/response.raw.txt",
+      "request_relpath": "cells/v-cli__p-one/request.json"
+    }
+  ],
+  "created_at": "2026-03-02T12:00:00Z",
+  "matrix_grid_md_path": "markdown/matrix.grid.md",
+  "matrix_grid_path": "matrices/grid.json",
+  "matrix_grid_row_inputs_path": "matrices/grid.row_inputs.json",
+  "matrix_pairwise_md_path": "markdown/matrix.pairwise.md",
+  "matrix_pairwise_path": "matrices/pairwise.json",
+  "matrix_pairwise_row_inputs_path": "matrices/pairwise.row_inputs.json",
+  "prompt_ids": ["p-one"],
+  "report_json_path": "reports/report.json",
+  "report_md_path": "reports/report.md",
+  "rubric_ref": "examples/dataset/rubrics/comparison.v1.json",
+  "run_id": "longitudinal-w02",
+  "schema_version": 1,
+  "title": "Longitudinal fixture (baseline week)",
+  "taxonomy": {
+    "taxonomy_version": 1,
+    "task_family": "documentation",
+    "difficulty": "low",
+    "determinism": "deterministic_scoring"
+  },
+  "variant_ids": ["v-cli"],
+  "comparison_fingerprints": {
+    "suite_definition": "sha256:4b999adcafe86132a87263d19979bcb48b809ed69ba081ba3e8deb4a6057bb7f",
+    "prompt_set": "sha256:4048d181372ff71e4b334ad58393708d16edb34507573b5ad9469921731afb4b",
+    "provider_config": "sha256:4fbcb71d4546d6de7a19213a0a060a65b4c35192a1afb41b7016bedf3d728498",
+    "scoring_config": "sha256:f958bcbda76ceda7438ca44922ecf99f6ef81948463ec797c7b454a29b249496",
+    "browser_config": "sha256:0801b86094b64df0a6e4bb551818c221b30cdd4410397056547e695d3e75c9db",
+    "prompt_registry_state": "sha256:9604a174787655177b3c8c0e634e5a80348399f090bc741cac5825a8a5b128f2"
+  }
+}

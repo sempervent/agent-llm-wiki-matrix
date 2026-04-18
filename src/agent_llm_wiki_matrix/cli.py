@@ -6,13 +6,15 @@ import json
 import os
 import sys
 from pathlib import Path
-from typing import Any, Literal, cast
+from typing import Literal, cast
 
 import click
 
 from agent_llm_wiki_matrix import __version__
 from agent_llm_wiki_matrix.artifacts import list_artifact_kinds, load_artifact_file
 from agent_llm_wiki_matrix.benchmark import load_benchmark_definition, run_benchmark
+from agent_llm_wiki_matrix.benchmark.campaign_definitions import load_benchmark_campaign_definition
+from agent_llm_wiki_matrix.benchmark.campaign_runner import run_benchmark_campaign
 from agent_llm_wiki_matrix.benchmark.definitions import EvalHybridWeights
 from agent_llm_wiki_matrix.benchmark.live_probe import (
     ollama_model_available,
@@ -36,10 +38,17 @@ from agent_llm_wiki_matrix.pipelines.evaluate import (
     load_evaluation_subject,
 )
 from agent_llm_wiki_matrix.pipelines.evaluation_backends import (
+    JudgeRepeatParams,
     evaluate_with_scoring_backend,
     judge_live_enabled,
 )
 from agent_llm_wiki_matrix.pipelines.ingest import ingest_markdown_pages
+from agent_llm_wiki_matrix.pipelines.longitudinal import (
+    analyze_longitudinal,
+    discover_manifest_paths,
+    load_run_snapshots,
+    write_longitudinal_bundle,
+)
 from agent_llm_wiki_matrix.pipelines.reporting import (
     build_report_from_matrix,
     render_matrix_markdown,
@@ -242,7 +251,7 @@ def cmd_browser_run_playwright(
     steps: tuple[str, ...],
     headless: bool,
 ) -> None:
-    """Run PlaywrightBrowserRunner and print JSON (needs `pip install '.[browser]'`)."""
+    """Run PlaywrightBrowserRunner and print JSON (needs `uv pip install -e ".[browser]"`)."""
     runner = PlaywrightBrowserRunner(headless=headless)
     req = BrowserRunRequest(
         scenario_id=scenario_id,
@@ -358,6 +367,51 @@ def cmd_ingest(input_dir: Path, output_dir: Path, created_at: str, status: str) 
     type=float,
     help="For hybrid: weight on deterministic scores (semantic gets 1 minus this).",
 )
+@click.option(
+    "--judge-repeats",
+    default=1,
+    show_default=True,
+    type=int,
+    help="Semantic/hybrid: number of judge runs (aggregated per criterion).",
+)
+@click.option(
+    "--semantic-aggregation",
+    type=click.Choice(["mean", "median", "trimmed_mean"]),
+    default="mean",
+    show_default=True,
+    help="How to aggregate scores across judge repeats.",
+)
+@click.option(
+    "--trim-fraction",
+    default=0.1,
+    show_default=True,
+    type=float,
+    help="For trimmed_mean: fraction trimmed from each tail before averaging.",
+)
+@click.option(
+    "--judge-max-criterion-range",
+    type=float,
+    default=None,
+    help="Optional: flag low confidence if max criterion range across runs exceeds this.",
+)
+@click.option(
+    "--judge-max-criterion-stdev",
+    type=float,
+    default=None,
+    help="Optional: flag low confidence if any criterion stdev across runs exceeds this.",
+)
+@click.option(
+    "--judge-max-mean-criterion-stdev",
+    type=float,
+    default=None,
+    help="Optional: flag low confidence if mean criterion stdev exceeds this.",
+)
+@click.option(
+    "--judge-max-total-weighted-stdev",
+    type=float,
+    default=None,
+    help="Optional: flag low confidence if stdev of total weighted score exceeds this.",
+)
 def cmd_evaluate(
     subject_path: Path,
     rubric_path: Path,
@@ -368,6 +422,13 @@ def cmd_evaluate(
     judge_provider_config: Path | None,
     judge_live: bool,
     hybrid_deterministic_weight: float,
+    judge_repeats: int,
+    semantic_aggregation: str,
+    trim_fraction: float,
+    judge_max_criterion_range: float | None,
+    judge_max_criterion_stdev: float | None,
+    judge_max_mean_criterion_stdev: float | None,
+    judge_max_total_weighted_stdev: float | None,
 ) -> None:
     """Run rubric scoring (deterministic default; optional semantic or hybrid judge)."""
     repo = Path(os.environ.get("ALWM_REPO_ROOT", ".")).resolve()
@@ -403,7 +464,17 @@ def cmd_evaluate(
             deterministic_weight=hybrid_deterministic_weight,
             semantic_weight=1.0 - hybrid_deterministic_weight,
         )
-    sb = cast(Any, scoring_backend)
+    assert scoring_backend in ("semantic_judge", "hybrid")
+    sb = cast(Literal["semantic_judge", "hybrid"], scoring_backend)
+    jr = JudgeRepeatParams(
+        count=judge_repeats,
+        strategy=cast(Literal["mean", "median", "trimmed_mean"], semantic_aggregation),
+        trim_fraction=trim_fraction,
+        max_criterion_range=judge_max_criterion_range,
+        max_criterion_stdev=judge_max_criterion_stdev,
+        max_mean_criterion_stdev=judge_max_mean_criterion_stdev,
+        max_total_weighted_stdev=judge_max_total_weighted_stdev,
+    )
     ev, prov = evaluate_with_scoring_backend(
         subject_ref=subject_ref,
         text=text,
@@ -415,6 +486,7 @@ def cmd_evaluate(
         judge_provider_cfg=jcfg,
         judge_live=jl,
         evaluation_json_relpath=eval_ref,
+        judge_repeat=jr,
     )
     prov_path = out_path.parent / f"{out_path.stem}_judge_provenance.json"
     try:
@@ -647,7 +719,7 @@ def cmd_benchmark_run(
 @click.option(
     "--ollama-model",
     envvar="OLLAMA_MODEL",
-    default="llama3.2",
+    default="gpt-oss:20b",
     show_default=True,
     help="Model name to check in GET /api/tags (when Ollama is up).",
 )
@@ -665,6 +737,227 @@ def cmd_benchmark_probe(ollama_host: str, openai_base_url: str, ollama_model: st
         "ollama_model_checked": ollama_model,
     }
     click.echo(json.dumps(payload, indent=2, sort_keys=True))
+
+
+@benchmark_cmd.group("campaign")
+def benchmark_campaign_cmd() -> None:
+    """Sweep benchmark suites across providers, scoring backends, and browser configs."""
+
+
+@benchmark_campaign_cmd.command("run")
+@click.option(
+    "--definition",
+    "definition_path",
+    type=click.Path(path_type=Path, exists=True, dir_okay=False, readable=True),
+    required=True,
+    help="Campaign YAML or JSON (see examples/campaigns/v1/).",
+)
+@click.option(
+    "--output-dir",
+    "output_dir",
+    type=click.Path(path_type=Path, file_okay=False, writable=True),
+    required=True,
+)
+@click.option(
+    "--created-at",
+    default="1970-01-01T00:00:00Z",
+    show_default=True,
+    help="RFC 3339 timestamp for member runs and the campaign manifest.",
+)
+@click.option(
+    "--no-fixture-mock",
+    is_flag=True,
+    help="Do not force mock providers when ALWM_FIXTURE_MODE=1 (for live integration runs).",
+)
+@click.option(
+    "--dry-run",
+    is_flag=True,
+    help="Plan sweep only: write campaign-dry-run.json (no member benchmark runs).",
+)
+def cmd_benchmark_campaign_run(
+    definition_path: Path,
+    output_dir: Path,
+    created_at: str,
+    no_fixture_mock: bool,
+    dry_run: bool,
+) -> None:
+    """Execute a campaign sweep: campaign manifest, per-run benchmark manifests, summaries."""
+    repo = Path(os.environ.get("ALWM_REPO_ROOT", ".")).resolve()
+    campaign = load_benchmark_campaign_definition(definition_path)
+    out = output_dir.resolve()
+    manifest = run_benchmark_campaign(
+        repo_root=repo,
+        campaign=campaign,
+        campaign_definition_path=definition_path.resolve(),
+        output_dir=out,
+        created_at=created_at,
+        environ=os.environ,
+        fixture_mode_force_mock=not no_fixture_mock,
+        dry_run=dry_run,
+    )
+    if dry_run:
+        click.echo(
+            f"dry-run: planned {manifest.run_count} run(s); "
+            f"see {out / 'campaign-dry-run.json'} and {out / 'manifest.json'}",
+        )
+    else:
+        click.echo(f"wrote campaign with {len(manifest.runs)} run(s) under {out}")
+
+
+@benchmark_campaign_cmd.command("plan")
+@click.option(
+    "--definition",
+    "definition_path",
+    type=click.Path(path_type=Path, exists=True, dir_okay=False, readable=True),
+    required=True,
+    help="Campaign YAML or JSON (see examples/campaigns/v1/).",
+)
+@click.option(
+    "--output-dir",
+    "output_dir",
+    type=click.Path(path_type=Path, file_okay=False, writable=True),
+    required=True,
+)
+@click.option(
+    "--created-at",
+    default="1970-01-01T00:00:00Z",
+    show_default=True,
+    help="RFC 3339 timestamp stamped on planned manifest and summaries.",
+)
+def cmd_benchmark_campaign_plan(
+    definition_path: Path,
+    output_dir: Path,
+    created_at: str,
+) -> None:
+    """Plan a campaign sweep without executing member runs (manifest + dry-run plan)."""
+    repo = Path(os.environ.get("ALWM_REPO_ROOT", ".")).resolve()
+    campaign = load_benchmark_campaign_definition(definition_path)
+    out = output_dir.resolve()
+    manifest = run_benchmark_campaign(
+        repo_root=repo,
+        campaign=campaign,
+        campaign_definition_path=definition_path.resolve(),
+        output_dir=out,
+        created_at=created_at,
+        environ=os.environ,
+        fixture_mode_force_mock=True,
+        dry_run=True,
+    )
+    planned = manifest.run_count if manifest.run_count is not None else 0
+    click.echo(f"planned {planned} run(s); wrote dry-run manifest under {out}")
+
+
+@benchmark_cmd.command("longitudinal")
+@click.option(
+    "--runs-glob",
+    required=True,
+    help=(
+        "Glob for benchmark manifests, relative to repo root "
+        "(e.g. fixtures/longitudinal/paired/*/manifest.json)."
+    ),
+)
+@click.option(
+    "--out-dir",
+    type=click.Path(path_type=Path, file_okay=False, writable=True),
+    required=True,
+    help="Output directory for the longitudinal bundle (Markdown + summary.json).",
+)
+@click.option(
+    "--title",
+    default="Longitudinal benchmark analysis",
+    show_default=True,
+    help="Title line in longitudinal.md.",
+)
+@click.option(
+    "--regression-delta",
+    default=0.03,
+    type=float,
+    show_default=True,
+    help="Min absolute score drop (per cell) to flag regression vs prior run.",
+)
+@click.option(
+    "--low-score",
+    default=0.55,
+    type=float,
+    show_default=True,
+    help="Scores below this trigger FT-ABS-LOW; recurring uses --min-recurring.",
+)
+@click.option(
+    "--min-recurring",
+    default=2,
+    type=int,
+    show_default=True,
+    help="Min distinct runs below --low-score to flag FT-RECUR-LOW.",
+)
+@click.option(
+    "--mode-gap",
+    default=0.12,
+    type=float,
+    show_default=True,
+    help="Min spread across execution modes (same prompt, one run) for FT-MODE-GAP.",
+)
+@click.option(
+    "--semantic-stdev-threshold",
+    default=0.12,
+    type=float,
+    show_default=True,
+    help="Flag FT-JUDGE-UNSTABLE when repeat total_weighted_stdev exceeds this.",
+)
+@click.option(
+    "--semantic-range-threshold",
+    default=0.22,
+    type=float,
+    show_default=True,
+    help="Flag FT-JUDGE-UNSTABLE when max_range_across_criteria exceeds this.",
+)
+@click.option(
+    "--series-swing-threshold",
+    default=0.06,
+    type=float,
+    show_default=True,
+    help="Flag FT-SERIES-SWING when population stdev of total scores exceeds this (≥3 runs).",
+)
+@click.option(
+    "--min-runs-for-swing",
+    default=3,
+    type=int,
+    show_default=True,
+    help="Minimum snapshots per cell to evaluate FT-SERIES-SWING.",
+)
+def cmd_benchmark_longitudinal(
+    runs_glob: str,
+    out_dir: Path,
+    title: str,
+    regression_delta: float,
+    low_score: float,
+    min_recurring: int,
+    mode_gap: float,
+    semantic_stdev_threshold: float,
+    semantic_range_threshold: float,
+    series_swing_threshold: float,
+    min_runs_for_swing: int,
+) -> None:
+    """Build weekly, longitudinal, regression, and provider Markdown plus failure atlas."""
+    repo = Path(os.environ.get("ALWM_REPO_ROOT", ".")).resolve()
+    paths = discover_manifest_paths(repo, runs_glob)
+    if not paths:
+        msg = f"No manifests matched {runs_glob!r} under {repo}"
+        raise click.ClickException(msg)
+    snaps = load_run_snapshots(repo, paths)
+    analysis = analyze_longitudinal(
+        snaps,
+        regression_delta=regression_delta,
+        low_score=low_score,
+        min_recurring=min_recurring,
+        mode_gap_threshold=mode_gap,
+        semantic_stdev_threshold=semantic_stdev_threshold,
+        semantic_range_threshold=semantic_range_threshold,
+        series_swing_threshold=series_swing_threshold,
+        min_runs_for_swing=min_runs_for_swing,
+    )
+    out = out_dir.resolve()
+    write_longitudinal_bundle(repo, analysis, out, title=title)
+    click.echo(f"wrote longitudinal bundle under {out} ({len(snaps)} run(s))")
 
 
 @main.command("info")

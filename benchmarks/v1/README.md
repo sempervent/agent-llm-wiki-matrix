@@ -5,10 +5,13 @@ Versioned YAML files consumed by `alwm benchmark run`.
 | File | Purpose |
 | --- | --- |
 | `offline.v1.yaml` | All **mock** backends; deterministic with `ALWM_FIXTURE_MODE=1` (default offline Compose profile). |
-| `ollama.v1.yaml` | Single **Ollama** variant; use with `benchmark-ollama` Compose profile (pull a model first). |
+| `ollama.v1.yaml` | Single **Ollama** variant (**gpt-oss:20b**); use **`just ollama-gptoss-setup`** then **`just benchmark-ollama`** or host **`just smoke-ollama-live`**. |
 | `llamacpp.v1.yaml` | **OpenAI-compatible** backend (e.g. llama.cpp `llama-server`); use `benchmark-llamacpp` and set `LLAMACPP_OPENAI_BASE_URL` if needed. |
 
-Mirror for tests: `fixtures/benchmarks/offline.v1.yaml` matches `offline.v1.yaml`. Browser-backed examples: `fixtures/benchmarks/browser_file.v1.yaml`, `examples/benchmarks/v1/browser_file.v1.yaml`.
+Mirror for tests: `fixtures/benchmarks/offline.v1.yaml` matches `offline.v1.yaml`. Browser-backed examples: `fixtures/benchmarks/browser_file.v1.yaml`, `examples/benchmarks/v1/browser_file.v1.yaml`. Repeated semantic judge (aggregation + disagreement): `examples/benchmarks/v1/semantic_repeats.v1.yaml`.
+Each run’s **`manifest.json`** includes **`comparison_fingerprints`** (six **`sha256:`** hashes, including prompt registry state) for stable cross-run comparison; see `docs/workflows/longitudinal-reporting.md`.
+
+**Cross-system agent evaluation:** `examples/benchmark_suites/v1/agentic/` (suites + `examples/benchmark_runs/agentic-pack-*`); workflow **`docs/workflows/agentic-benchmark-pack.md`**.
 
 ## Browser-backed variants (`execution_mode: browser_mock`)
 

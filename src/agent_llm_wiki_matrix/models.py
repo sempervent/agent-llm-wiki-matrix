@@ -74,6 +74,18 @@ class Evaluation(BaseModel):
             "Repo-relative path to evaluation_judge_provenance.json when semantic or hybrid."
         ),
     )
+    judge_repeat_count: int | None = Field(
+        default=None,
+        description="Semantic judge invocations when >1; omitted for deterministic",
+    )
+    judge_semantic_aggregation: Literal["mean", "median", "trimmed_mean"] | None = Field(
+        default=None,
+        description="How repeated semantic scores were combined",
+    )
+    judge_low_confidence: bool | None = Field(
+        default=None,
+        description="True when disagreement thresholds flagged instability",
+    )
 
 
 class JudgeProviderInfo(BaseModel):
@@ -95,6 +107,64 @@ class JudgeHybridAggregation(BaseModel):
     deterministic_scores: dict[str, float]
     semantic_scores: dict[str, float]
     blend_method: Literal["weighted_per_criterion"] = "weighted_per_criterion"
+    semantic_repeat_count: int = Field(
+        default=1,
+        ge=1,
+        description="Semantic judge runs aggregated before blending",
+    )
+
+
+class JudgeRepeatRunRecord(BaseModel):
+    """One semantic judge invocation."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    run_index: int = Field(ge=0)
+    raw_response_text: str
+    parsed_criterion_scores: dict[str, float]
+    parse_ok: bool
+    parse_error: str | None = None
+
+
+class JudgeCriterionDisagreement(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    min: float
+    max: float
+    score_range: float
+    stdev: float
+
+
+class JudgeDisagreementSummary(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    per_criterion: dict[str, JudgeCriterionDisagreement]
+    mean_stdev_across_criteria: float
+    total_weighted_per_run: list[float]
+    total_weighted_stdev: float
+    max_range_across_criteria: float
+
+
+class JudgeRepeatConfidence(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    low_confidence: bool
+    flags: list[str] = Field(default_factory=list)
+    thresholds: dict[str, float | None] = Field(default_factory=dict)
+
+
+class JudgeRepeatAggregation(BaseModel):
+    """Repeated semantic runs: per-run records, aggregation, disagreement, confidence."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    repeat_count: int = Field(ge=1)
+    strategy: Literal["mean", "median", "trimmed_mean"]
+    trim_fraction: float = Field(0.1, ge=0.0, le=0.45)
+    runs: list[JudgeRepeatRunRecord] = Field(min_length=1)
+    aggregated_semantic_scores: dict[str, float]
+    disagreement: JudgeDisagreementSummary
+    confidence: JudgeRepeatConfidence
 
 
 class EvaluationJudgeProvenance(BaseModel):
@@ -119,6 +189,10 @@ class EvaluationJudgeProvenance(BaseModel):
     aggregation_notes: str | None = Field(
         default=None,
         description="Short summary of how total_weighted_score was derived",
+    )
+    repeat_aggregation: JudgeRepeatAggregation | None = Field(
+        default=None,
+        description="Present when multiple semantic judge runs were aggregated",
     )
 
 
@@ -179,7 +253,15 @@ class Report(BaseModel):
 
     id: str = Field(min_length=1)
     title: str
-    kind: Literal["weekly", "model_comparison", "agent_stack", "browser_evidence"]
+    kind: Literal[
+        "weekly",
+        "model_comparison",
+        "agent_stack",
+        "browser_evidence",
+        "longitudinal",
+        "benchmark_weekly",
+        "failure_atlas",
+    ]
     period_start: str = Field(description="RFC 3339 date (or date-time)")
     period_end: str = Field(description="RFC 3339 date (or date-time)")
     body_markdown: str
@@ -354,6 +436,200 @@ class BenchmarkCase(BaseModel):
         return self
 
 
+class BenchmarkCampaignRunEntry(BaseModel):
+    """One benchmark run produced inside a campaign output directory."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    run_index: int = Field(ge=0, description="Stable ordering within the campaign (0-based).")
+    run_id: str = Field(min_length=1)
+    suite_ref: str = Field(description="Repo-relative path to the benchmark definition YAML/JSON.")
+    benchmark_id: str = Field(min_length=1)
+    provider_config_ref: str | None = Field(
+        default=None,
+        description="Repo-relative providers YAML, or null for harness default resolution.",
+    )
+    eval_scoring_label: str = Field(
+        min_length=1,
+        description="Label for the eval_scoring axis (e.g. suite_default, deterministic).",
+    )
+    execution_modes_filter: list[str] | None = Field(
+        default=None,
+        description="If set, variants were restricted to these execution_mode values.",
+    )
+    browser_config_applied: bool = Field(
+        default=False,
+        description="True when a campaign browser_configs entry was merged into browser_mock.",
+    )
+    status: Literal["succeeded", "failed"] = Field(
+        default="succeeded",
+        description="Whether this member run completed without harness error.",
+    )
+    error: str | None = Field(default=None, description="Populated when status is failed.")
+    duration_seconds: float | None = Field(
+        default=None,
+        ge=0.0,
+        description="Wall time for this member run (seconds).",
+    )
+    output_relpath: str = Field(
+        min_length=1,
+        description="Directory for this run, relative to campaign root (e.g. runs/run0000).",
+    )
+    manifest_relpath: str = Field(
+        min_length=1,
+        description="manifest.json for this run, relative to campaign root.",
+    )
+    comparison_fingerprints: BenchmarkComparisonFingerprints | None = Field(
+        default=None,
+        description="Copied from member manifest.json when present for cross-run comparison.",
+    )
+    mean_total_weighted_score: float | None = Field(
+        default=None,
+        description="Mean of cell total_weighted_score values when evaluations were readable.",
+    )
+    cell_count: int = Field(ge=0)
+
+
+class CampaignRunStatusSummary(BaseModel):
+    """Aggregate counts for campaign execution."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    succeeded: int = Field(ge=0, default=0)
+    failed: int = Field(ge=0, default=0)
+
+
+class CampaignFailureRecord(BaseModel):
+    """One failed member run."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    run_index: int = Field(ge=0)
+    run_id: str = Field(min_length=1)
+    message: str = Field(min_length=1)
+
+
+class CampaignGeneratedReportPaths(BaseModel):
+    """Repo-relative paths to top-level campaign artifacts."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    campaign_manifest: str = Field(default="manifest.json")
+    campaign_summary_json: str = Field(default="campaign-summary.json")
+    campaign_summary_md: str = Field(default="campaign-summary.md")
+
+
+class CampaignExperimentFingerprints(BaseModel):
+    """Per-axis stable hashes for a campaign definition (longitudinal grouping, reporting)."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    campaign_definition: str = Field(
+        min_length=8,
+        description="sha256:… canonical campaign definition (cosmetic fields excluded).",
+    )
+    suite_definitions: str = Field(
+        min_length=8,
+        description="sha256:… composite of loaded suite definition fingerprints (sorted by path).",
+    )
+    provider_configs: str = Field(
+        min_length=8,
+        description="sha256:… provider YAML paths + file digests (campaign axis order).",
+    )
+    scoring_configs: str = Field(
+        min_length=8,
+        description="sha256:… eval_scoring_options axis (including null entries).",
+    )
+    browser_configs: str = Field(
+        min_length=8,
+        description="sha256:… browser_configs axis (including null entries).",
+    )
+    prompt_registry_state: str = Field(
+        min_length=8,
+        description="sha256:… campaign prompt_registry_ref path + bytes when set.",
+    )
+
+
+class BenchmarkCampaignManifest(BaseModel):
+    """Index of a campaign: each run has a normal benchmark manifest.json."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    schema_version: Literal[1] = 1
+    campaign_id: str = Field(min_length=1)
+    title: str
+    created_at: str = Field(description="RFC 3339 date-time used for member runs.")
+    definition_source_relpath: str = Field(
+        min_length=1,
+        description="Repo-relative path to the campaign definition YAML/JSON.",
+    )
+    fixture_mode_force_mock: bool = Field(
+        default=True,
+        description="Whether member runs forced mock providers (offline fixture mode).",
+    )
+    campaign_definition_fingerprint: str | None = Field(
+        default=None,
+        description="sha256:… over canonical campaign definition payload.",
+    )
+    campaign_experiment_fingerprints: CampaignExperimentFingerprints | None = Field(
+        default=None,
+        description=(
+            "Per-axis fingerprints (definition, suites, providers, scoring, browser, registry)."
+        ),
+    )
+    campaign_version: str | None = Field(default=None)
+    description: str | None = Field(default=None)
+    owner: str | None = Field(default=None)
+    definition_created_at: str | None = Field(
+        default=None,
+        description="created_at from the campaign definition when present.",
+    )
+    tags: list[str] = Field(default_factory=list)
+    notes: str | None = Field(default=None)
+    expected_artifact_kinds: list[str] = Field(default_factory=list)
+    retry_policy: BenchmarkRetryPolicy | None = Field(default=None)
+    time_budget_seconds: float | None = Field(default=None)
+    token_budget: int | None = Field(default=None)
+    dry_run: bool = Field(default=False, description="True when no member runs executed.")
+    run_status_summary: CampaignRunStatusSummary | None = Field(default=None)
+    run_count: int | None = Field(default=None, ge=0)
+    started_at_utc: str | None = Field(default=None)
+    finished_at_utc: str | None = Field(default=None)
+    duration_seconds: float | None = Field(default=None, ge=0.0)
+    failures: list[CampaignFailureRecord] = Field(default_factory=list)
+    generated_report_paths: CampaignGeneratedReportPaths | None = Field(default=None)
+    git_commit_sha: str | None = Field(default=None)
+    git_describe: str | None = Field(default=None)
+    inputs_snapshot: dict[str, object] | None = Field(default=None)
+    runs: list[BenchmarkCampaignRunEntry] = Field(
+        default_factory=list,
+        description="Member runs in stable order (longitudinal glob: runs/*/manifest.json).",
+    )
+
+
+class CampaignSummaryV1(BaseModel):
+    """Structured campaign-summary.json (artifact kind campaign_summary)."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    schema_version: Literal[1] = 1
+    campaign_id: str = Field(min_length=1)
+    title: str
+    created_at: str
+    definition_source_relpath: str
+    fixture_mode_force_mock: bool = True
+    campaign_definition_fingerprint: str | None = None
+    campaign_experiment_fingerprints: CampaignExperimentFingerprints | None = None
+    campaign_version: str | None = None
+    run_count: int = Field(ge=0)
+    run_status_summary: CampaignRunStatusSummary | None = None
+    dry_run: bool = False
+    failures: list[CampaignFailureRecord] = Field(default_factory=list)
+    git_commit_sha: str | None = None
+    git_describe: str | None = None
+    runs: list[dict[str, object]] = Field(default_factory=list)
+
+
 BenchmarkTaskFamily = Literal[
     "repo_governance",
     "runtime_config",
@@ -410,6 +686,43 @@ class BenchmarkRetryPolicy(BaseModel):
 
     max_attempts: int = Field(default=1, ge=1, le=64)
     backoff_seconds: float = Field(default=0.0, ge=0.0)
+
+
+class BenchmarkComparisonFingerprints(BaseModel):
+    """Stable SHA-256 fingerprints for comparing benchmark configurations across runs."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    suite_definition: str = Field(
+        min_length=8,
+        description=(
+            "sha256:… hash of canonical suite definition (title excluded; sorted tag lists)."
+        ),
+    )
+    prompt_set: str = Field(
+        description=(
+            "sha256:… hash of resolved prompt ids + inline/registry provenance + text digests"
+        ),
+    )
+    provider_config: str = Field(
+        description="sha256:… hash of per-variant resolved ProviderConfig (sorted by variant id)",
+    )
+    scoring_config: str = Field(
+        description=(
+            "sha256:… hash of effective scoring backend, eval_scoring, judge repeat, "
+            "judge provider"
+        ),
+    )
+    browser_config: str = Field(
+        description="sha256:… hash of per-variant browser blocks (sorted by variant id)",
+    )
+    prompt_registry_state: str = Field(
+        min_length=8,
+        description=(
+            "sha256:… hash of effective prompt registry YAML (path + bytes) when "
+            "prompt_ref is used; otherwise inline-only sentinel"
+        ),
+    )
 
 
 class BenchmarkCellArtifactPaths(BaseModel):
@@ -488,6 +801,20 @@ class BenchmarkRunManifest(BaseModel):
     expected_artifact_kinds: list[str] = Field(
         default_factory=list,
         description="Expected alwm artifact kinds produced when reviewing cells (metadata).",
+    )
+    success_criteria: list[str] = Field(
+        default_factory=list,
+        description="Human-readable pass conditions for external agent evaluations (metadata).",
+    )
+    failure_taxonomy_hints: list[str] = Field(
+        default_factory=list,
+        description="Suggested failure labels when comparing systems on this suite (metadata).",
+    )
+    comparison_fingerprints: BenchmarkComparisonFingerprints | None = Field(
+        default=None,
+        description=(
+            "Stable hashes of suite, prompts, providers, scoring, browser, and prompt registry"
+        ),
     )
 
     @model_validator(mode="after")

@@ -17,7 +17,7 @@ class OllamaSection(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     host: str = Field(default="http://127.0.0.1:11434", description="Ollama server base URL")
-    model: str = Field(default="llama3.2")
+    model: str = Field(default="gpt-oss:20b")
 
 
 class OpenAICompatibleSection(BaseModel):

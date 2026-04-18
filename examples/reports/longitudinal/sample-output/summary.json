@@ -1,0 +1,100 @@
+{
+  "comparison_fingerprints_by_run": [
+    {
+      "comparison_fingerprints": {
+        "browser_config": "sha256:0801b86094b64df0a6e4bb551818c221b30cdd4410397056547e695d3e75c9db",
+        "prompt_registry_state": "sha256:9604a174787655177b3c8c0e634e5a80348399f090bc741cac5825a8a5b128f2",
+        "prompt_set": "sha256:4048d181372ff71e4b334ad58393708d16edb34507573b5ad9469921731afb4b",
+        "provider_config": "sha256:4fbcb71d4546d6de7a19213a0a060a65b4c35192a1afb41b7016bedf3d728498",
+        "scoring_config": "sha256:f958bcbda76ceda7438ca44922ecf99f6ef81948463ec797c7b454a29b249496",
+        "suite_definition": "sha256:4b999adcafe86132a87263d19979bcb48b809ed69ba081ba3e8deb4a6057bb7f"
+      },
+      "run_id": "longitudinal-w02"
+    },
+    {
+      "comparison_fingerprints": {
+        "browser_config": "sha256:0801b86094b64df0a6e4bb551818c221b30cdd4410397056547e695d3e75c9db",
+        "prompt_registry_state": "sha256:9604a174787655177b3c8c0e634e5a80348399f090bc741cac5825a8a5b128f2",
+        "prompt_set": "sha256:4048d181372ff71e4b334ad58393708d16edb34507573b5ad9469921731afb4b",
+        "provider_config": "sha256:4fbcb71d4546d6de7a19213a0a060a65b4c35192a1afb41b7016bedf3d728498",
+        "scoring_config": "sha256:f958bcbda76ceda7438ca44922ecf99f6ef81948463ec797c7b454a29b249496",
+        "suite_definition": "sha256:4b999adcafe86132a87263d19979bcb48b809ed69ba081ba3e8deb4a6057bb7f"
+      },
+      "run_id": "longitudinal-w03"
+    }
+  ],
+  "criterion_drops": [
+    {
+      "benchmark_id": "bench.fixtures.longitudinal.v1",
+      "cell_id": "v-cli__p-one",
+      "criterion_id": "brevity",
+      "curr": 0.7,
+      "from_run": "fixtures/longitudinal/paired/run_2026_w02",
+      "prev": 0.82,
+      "to_run": "fixtures/longitudinal/paired/run_2026_w03"
+    },
+    {
+      "benchmark_id": "bench.fixtures.longitudinal.v1",
+      "cell_id": "v-cli__p-one",
+      "criterion_id": "grounding",
+      "curr": 0.7,
+      "from_run": "fixtures/longitudinal/paired/run_2026_w02",
+      "prev": 0.82,
+      "to_run": "fixtures/longitudinal/paired/run_2026_w03"
+    },
+    {
+      "benchmark_id": "bench.fixtures.longitudinal.v1",
+      "cell_id": "v-cli__p-one",
+      "criterion_id": "structure",
+      "curr": 0.7,
+      "from_run": "fixtures/longitudinal/paired/run_2026_w02",
+      "prev": 0.82,
+      "to_run": "fixtures/longitudinal/paired/run_2026_w03"
+    },
+    {
+      "benchmark_id": "bench.fixtures.longitudinal.v1",
+      "cell_id": "v-cli__p-one",
+      "criterion_id": "task_fit",
+      "curr": 0.7,
+      "from_run": "fixtures/longitudinal/paired/run_2026_w02",
+      "prev": 0.82,
+      "to_run": "fixtures/longitudinal/paired/run_2026_w03"
+    }
+  ],
+  "failure_tags": {
+    "FT-CRIT-DROP": [
+      "bench.fixtures.longitudinal.v1::v-cli__p-one::brevity",
+      "bench.fixtures.longitudinal.v1::v-cli__p-one::grounding",
+      "bench.fixtures.longitudinal.v1::v-cli__p-one::structure",
+      "bench.fixtures.longitudinal.v1::v-cli__p-one::task_fit"
+    ],
+    "FT-RUN-REG": [
+      "bench.fixtures.longitudinal.v1::v-cli__p-one"
+    ]
+  },
+  "improvements": [],
+  "mode_gaps": [],
+  "recurring_lows": [],
+  "regressions": [
+    {
+      "benchmark_id": "bench.fixtures.longitudinal.v1",
+      "cell_id": "v-cli__p-one",
+      "curr_score": 0.7,
+      "delta": -0.12,
+      "from_run": "fixtures/longitudinal/paired/run_2026_w02",
+      "prev_score": 0.82,
+      "to_run": "fixtures/longitudinal/paired/run_2026_w03"
+    }
+  ],
+  "runs": 2,
+  "score_oscillations": [],
+  "semantic_stability": [],
+  "weekly": {
+    "2026-W10": [
+      "longitudinal-w02"
+    ],
+    "2026-W11": [
+      "longitudinal-w03"
+    ]
+  }
+}

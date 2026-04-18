@@ -1,0 +1,112 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/sempervent/agent-llm-wiki-matrix/schemas/v1/campaign_summary.schema.json",
+  "title": "CampaignSummaryV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "campaign_id",
+    "title",
+    "created_at",
+    "definition_source_relpath",
+    "fixture_mode_force_mock",
+    "run_count"
+  ],
+  "properties": {
+    "schema_version": { "type": "integer", "const": 1 },
+    "campaign_id": { "type": "string", "minLength": 1 },
+    "title": { "type": "string", "minLength": 1 },
+    "created_at": { "type": "string", "minLength": 1 },
+    "definition_source_relpath": { "type": "string", "minLength": 1 },
+    "fixture_mode_force_mock": { "type": "boolean" },
+    "campaign_definition_fingerprint": {
+      "oneOf": [{ "type": "null" }, { "type": "string", "minLength": 8, "pattern": "^sha256:[a-f0-9]{64}$" }]
+    },
+    "campaign_experiment_fingerprints": {
+      "oneOf": [{ "type": "null" }, { "$ref": "#/$defs/campaignExperimentFingerprints" }]
+    },
+    "campaign_version": { "oneOf": [{ "type": "null" }, { "type": "string", "minLength": 1 }] },
+    "run_count": { "type": "integer", "minimum": 0 },
+    "run_status_summary": {
+      "oneOf": [
+        { "type": "null" },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["succeeded", "failed"],
+          "properties": {
+            "succeeded": { "type": "integer", "minimum": 0 },
+            "failed": { "type": "integer", "minimum": 0 }
+          }
+        }
+      ]
+    },
+    "dry_run": { "type": "boolean" },
+    "failures": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["run_index", "run_id", "message"],
+        "properties": {
+          "run_index": { "type": "integer", "minimum": 0 },
+          "run_id": { "type": "string", "minLength": 1 },
+          "message": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "git_commit_sha": { "oneOf": [{ "type": "null" }, { "type": "string", "minLength": 1 }] },
+    "git_describe": { "oneOf": [{ "type": "null" }, { "type": "string", "minLength": 1 }] },
+    "runs": {
+      "type": "array",
+      "items": { "type": "object" }
+    }
+  },
+  "$defs": {
+    "campaignExperimentFingerprints": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "campaign_definition",
+        "suite_definitions",
+        "provider_configs",
+        "scoring_configs",
+        "browser_configs",
+        "prompt_registry_state"
+      ],
+      "properties": {
+        "campaign_definition": {
+          "type": "string",
+          "minLength": 8,
+          "pattern": "^sha256:[a-f0-9]{64}$"
+        },
+        "suite_definitions": {
+          "type": "string",
+          "minLength": 8,
+          "pattern": "^sha256:[a-f0-9]{64}$"
+        },
+        "provider_configs": {
+          "type": "string",
+          "minLength": 8,
+          "pattern": "^sha256:[a-f0-9]{64}$"
+        },
+        "scoring_configs": {
+          "type": "string",
+          "minLength": 8,
+          "pattern": "^sha256:[a-f0-9]{64}$"
+        },
+        "browser_configs": {
+          "type": "string",
+          "minLength": 8,
+          "pattern": "^sha256:[a-f0-9]{64}$"
+        },
+        "prompt_registry_state": {
+          "type": "string",
+          "minLength": 8,
+          "pattern": "^sha256:[a-f0-9]{64}$"
+        }
+      }
+    }
+  }
+}

@@ -62,7 +62,7 @@ class PlaywrightBrowserRunner(BrowserRunner):
         except ImportError as e:
             msg = (
                 "Playwright is not installed. Install optional deps: "
-                "pip install 'agent-llm-wiki-matrix[browser]' "
+                "uv pip install -e '.[browser]' "
                 "and run: playwright install chromium"
             )
             raise RuntimeError(msg) from e

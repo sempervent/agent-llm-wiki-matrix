@@ -1,0 +1,50 @@
+{
+  "campaign_definition_fingerprint": "sha256:340780556158635e0b33298b726f530cbc86f7dcfdd8923934bbb14a0734e47b",
+  "campaign_experiment_fingerprints": {
+    "browser_configs": "sha256:591cbc3aa572200862e2f336261f05849fe93c17d226a939565815d0cb075961",
+    "campaign_definition": "sha256:340780556158635e0b33298b726f530cbc86f7dcfdd8923934bbb14a0734e47b",
+    "prompt_registry_state": "sha256:d409ed75b3cb355ac6727f09877d7ef98c40adce16e3e8284c6dcfe9c5c3db21",
+    "provider_configs": "sha256:69c4ef3c9876f8d46bd609d755baa1bb850cd8d9fdcbdee0748b6e10c36cf5f1",
+    "scoring_configs": "sha256:2c7f1b6d79305cde67076936152d80992802d413157de43143bac86c13c21fc8",
+    "suite_definitions": "sha256:89fed34c06b5afbe00f18b22f21c268389fdf928f73f446796d8c19666514348"
+  },
+  "campaign_id": "campaign.examples.minimal_offline.v1",
+  "created_at": "1970-01-01T00:00:00Z",
+  "definition_source_relpath": "examples/campaigns/v1/minimal_offline.v1.yaml",
+  "dry_run": false,
+  "failures": [],
+  "fixture_mode_force_mock": true,
+  "git_commit_sha": "0a2acbfcd670589ccd2ab5723382194871097525",
+  "git_describe": "v0.1.0-1-g0a2acbf-dirty",
+  "run_count": 1,
+  "run_status_summary": {
+    "failed": 0,
+    "succeeded": 1
+  },
+  "runs": [
+    {
+      "benchmark_id": "bench.fixtures.campaign.micro.v1",
+      "browser_config_applied": false,
+      "cell_count": 1,
+      "comparison_fingerprints": {
+        "browser_config": "sha256:0801b86094b64df0a6e4bb551818c221b30cdd4410397056547e695d3e75c9db",
+        "prompt_registry_state": "sha256:9604a174787655177b3c8c0e634e5a80348399f090bc741cac5825a8a5b128f2",
+        "prompt_set": "sha256:5939745c0633bdffb37cd1491e722b6375fdd7b7ca27da391e0ac9035252a1b7",
+        "provider_config": "sha256:4fbcb71d4546d6de7a19213a0a060a65b4c35192a1afb41b7016bedf3d728498",
+        "scoring_config": "sha256:f958bcbda76ceda7438ca44922ecf99f6ef81948463ec797c7b454a29b249496",
+        "suite_definition": "sha256:a772457f2824d25d4b0e6c9219772ecc45fe305e20596091b81fac9db218308a"
+      },
+      "duration_seconds": 0.017137,
+      "eval_scoring_label": "suite_default",
+      "manifest_relpath": "runs/run0000/manifest.json",
+      "mean_total_weighted_score": 0.667276,
+      "output_relpath": "runs/run0000",
+      "run_id": "campaign.examples.minimal_offline.v1__0000",
+      "run_index": 0,
+      "status": "succeeded",
+      "suite_ref": "fixtures/benchmarks/campaign_micro.v1.yaml"
+    }
+  ],
+  "schema_version": 1,
+  "title": "Minimal offline campaign (single suite, deterministic)"
+}

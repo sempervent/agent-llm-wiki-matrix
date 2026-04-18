@@ -13,10 +13,25 @@ This repository is **agent-llm-wiki-matrix**: a markdown-first, git-native syste
 | Criterion | Signal |
 | --- | --- |
 | **Contracts are real** | JSON Schema + Pydantic (or documented exceptions) for user-facing payloads; `alwm validate` kinds stay in sync with `artifacts.py`. |
-| **Default CI is offline** | `just ci` passes without Ollama, llama.cpp, or Playwright browsers; integration/live tests are opt-in (`tests/integration/`, env gates such as `ALWM_PLAYWRIGHT_SMOKE`, `ALWM_LIVE_BENCHMARK_*`). |
+| **Default CI is offline** | `uv run just ci` (or `just ci` with an activated uv `.venv`) passes without Ollama, llama.cpp, or Playwright browsers; integration/live tests are opt-in (`tests/integration/`, env gates such as `ALWM_PLAYWRIGHT_SMOKE`, `ALWM_LIVE_BENCHMARK_*`). |
 | **No silent drift** | Benchmarks, prompts, and CLI outputs that matter are covered by tests or documented as intentionally manual. |
 | **Operations are discoverable** | `README.md`, `docs/workflows/`, `docs/architecture/`, and this file tell a contributor how to run, verify, and extend the system. |
 | **Claims match evidence** | Features are labeled with the taxonomy in `docs/audits/capability-classification.md`; **complete** is not used without tests/commands to back it. |
+
+## v0.2.0 focus
+
+Current milestone priority is to strengthen the repository as a comparative experiment platform. Roadmap details: **`docs/roadmap/v0.2.0.md`**.
+
+Prefer work that improves:
+- campaign orchestration and campaign-level reporting
+- stable experiment identity and fingerprints
+- browser-backed benchmark realism with deterministic fixtures
+- longitudinal comparison and regression analysis
+- semantic/hybrid scoring auditability
+
+Avoid expanding unrelated feature surface until these areas are coherent.
+
+Contract summary for shipped fingerprint fields: **[CHANGELOG.md](CHANGELOG.md)** section **[0.2.0]** (six-axis **`comparison_fingerprints`** on benchmark runs; six-axis **`campaign_experiment_fingerprints`** on campaign manifests and summaries).
 
 ---
 
@@ -30,15 +45,45 @@ This repository is **agent-llm-wiki-matrix**: a markdown-first, git-native syste
 
 ---
 
+## Python environment management (uv — required on the host)
+
+**Canonical tooling:** **[uv](https://docs.astral.sh/uv/)** is **required** for local virtualenv creation, package installation, and running this project’s Python tools on the host (Python **3.11+**, matching `requires-python` and the `Dockerfile`). Do not document or recommend **`python -m venv`**, bare **`pip` / `pip install`** (outside what **`uv pip`** invokes), **`virtualenv`**, **Poetry**, **Pipenv**, or **Conda** for this repository unless the user **explicitly** asks for a different tool. **Docker** and **Compose** images use their own install path (`Dockerfile`); that is not a substitute for the host workflow below.
+
+**Agents and contributors must:**
+
+1. Create the project environment with **`uv venv`** (default path: **`.venv`** at the repo root).
+2. Install the package and extras with **`uv pip`** (see **Canonical setup** — primarily `uv pip install -e ".[dev]"`).
+3. Run project commands with **`uv run …`** so the correct interpreter and dependencies are used without relying on manual `PATH` hacks. Examples: `uv run alwm version`, `uv run pytest`, `uv run ruff check src`, `uv run mypy src`, `uv run just ci`. Activating `.venv` is optional if you prefer `uv run` for everything.
+
+**`just` recipes** in this repo assume **`uv`** is on your `PATH` and use **`uv run`** for lint, tests, and typecheck (see `justfile`).
+
+**Canonical setup (repository root):**
+
+```bash
+uv venv --python 3.11
+uv pip install -e ".[dev]"
+```
+
+You can then use either activated shell (`source .venv/bin/activate` on Unix; `.\.venv\Scripts\activate` on Windows) **or** prefix commands with `uv run` (recommended in docs and CI parity examples).
+
+Optional Playwright extra (not required for `just ci`):
+
+```bash
+uv pip install -e ".[browser]"
+uv run playwright install chromium
+```
+
+---
+
 ## Required contribution loop
 
 For any non-trivial change (feature, fix, refactor that touches behavior or contracts):
 
 1. **Locate** — Identify the owning area: `benchmark/`, `pipelines/`, `providers/`, `browser/`, `schemas/`, `prompts/`, `docs/`.
 2. **Contract** — If you add or change structured data, update **JSON Schema** and **Pydantic** (and `alwm validate` registration in `artifacts.py` when applicable).
-3. **Verify** — Run `just ci`. If you touch benchmarks or providers, consider `alwm benchmark probe` or (opt-in) `just test-integration`. Optional Playwright: `ALWM_PLAYWRIGHT_SMOKE=1` + `tests/integration/` (requires `pip install '.[browser]'` and `playwright install chromium`).
+3. **Verify** — Run `uv run just ci` (or activate `.venv` and run `just ci`). If you touch benchmarks or providers, consider `uv run alwm benchmark probe` or (opt-in) `uv run just test-integration`. Optional Playwright: `ALWM_PLAYWRIGHT_SMOKE=1` + `tests/integration/` (requires `uv pip install -e '.[browser]'` and `uv run playwright install chromium`).
 4. **Document** — Append a dated entry to `docs/implementation-log.md`. If architecture or workflows change, update the relevant file under `docs/architecture/` or `docs/workflows/` (do not let docs rot).
-5. **Report** — Commit message: full sentences, *what* + *why*; PR/description should list verification performed (`just ci`, manual command, etc.).
+5. **Report** — Commit message: full sentences, *what* + *why*; PR/description should list verification performed (`uv run just ci`, manual command, etc.).
 
 **Phased work:** If the change fits a named phase in `docs/implementation-log.md`, note completion there and adjust `docs/architecture/current-state.md` when behavior materially changes.
 
@@ -52,7 +97,7 @@ For any non-trivial change (feature, fix, refactor that touches behavior or cont
 | New structured artifact type? | Add **JSON Schema** under `schemas/v1/`, model in `models.py` or the owning package, register in **`artifacts.py`**, add **fixture + example**, **pytest**. |
 | Network in tests? | **No** in default suite. Use mocks, `httpx.MockTransport`, or files under `fixtures/`. Live calls only in `tests/integration/` behind env flags. |
 | New CLI surface? | Implement in `cli.py`, document in **README** command tables and/or `docs/workflows/`, add **smoke or unit test** where feasible. Do not rename existing commands casually. |
-| Browser automation? | **Default / CI:** **`MockBrowserRunner`** and **`FileBrowserRunner`** + `BrowserEvidence` JSON—no browser binary. **Optional live:** **`PlaywrightBrowserRunner`** (`pip install '.[browser]'`, `playwright install …`, `alwm browser run-playwright`); integration smoke is opt-in (`ALWM_PLAYWRIGHT_SMOKE=1`). **`MCPBrowserRunner`** remains a **stub** (`NotImplementedError`) until implemented with tests and docs—no silent half-wiring. |
+| Browser automation? | **Default / CI:** **`MockBrowserRunner`** and **`FileBrowserRunner`** + `BrowserEvidence` JSON—no browser binary. **Optional live:** **`PlaywrightBrowserRunner`** (`uv pip install -e '.[browser]'`, `uv run playwright install …`, `alwm browser run-playwright`); integration smoke is opt-in (`ALWM_PLAYWRIGHT_SMOKE=1`). **`MCPBrowserRunner`** remains a **stub** (`NotImplementedError`) until implemented with tests and docs—no silent half-wiring. |
 | Docker/Compose change? | Run `just compose-help`. Document new profiles in `docs/workflows/local-dev.md` or `benchmarking.md`. |
 
 ---
@@ -73,11 +118,35 @@ Multiple agents may edit the repo concurrently. Follow **`docs/workflows/multi-a
 - **Claiming “complete” without evidence** — No matching tests/commands: use **partial**, **stub**, or **documented-only** per `docs/audits/capability-classification.md`.
 - **Duplicating long prompt strings** in benchmark YAML when an equivalent **`prompt_ref`** exists or should exist in the registry—duplication drifts from `prompts/versions/*.txt` and breaks auditability.
 - **Placeholder “TODO” behavior without tests**—either implement, stub with explicit `NotImplementedError` + doc, or do not merge.
-- **Skipping `just ci`** because “it’s only docs”—if docs claim a command, verify the command still runs or qualify the doc.
+- **Skipping `uv run just ci`** because “it’s only docs”—if docs claim a command, verify the command still runs or qualify the doc.
 - **Broad refactors** mixed with a targeted fix—keep diffs reviewable.
 - **Live integration tests** in the default `tests/` tree without `--ignore=tests/integration` compatibility—default `just test` must stay offline-safe.
 - **Inventing vendor APIs**—use existing provider adapters; extend `BaseProvider` and config loading instead of hard-coding URLs in random modules.
 - **Parallel agents editing the same command surface** without coordination—see Multi-agent parallel work.
+
+
+---
+
+## Campaign orchestration
+
+Use campaign orchestration when a task requires coordinated execution across multiple benchmark suites, providers, scoring backends, execution modes, or browser configurations.
+
+Prefer a campaign definition over ad hoc repeated CLI invocations when:
+- the run set is intended to be reproducible
+- the outputs should be compared longitudinally
+- the experiment needs a shared manifest and summary
+- multiple dimensions are being swept together
+
+Campaign-related changes must update:
+- schemas
+- artifact registration
+- CLI docs
+- README
+- wiki (`docs/wiki/campaign-orchestration.md`, index `docs/wiki/benchmark-campaigns.md`)
+- tracking (`docs/tracking/campaign-orchestration.md`; legacy `docs/tracking/benchmark-campaign-orchestration.md` if still referenced)
+- ADR (`docs/adr/0001-campaign-orchestration.md` and/or `docs/architecture/adr/0001-benchmark-campaign-orchestration.md`)
+- CHANGELOG
+- implementation log
 
 ---
 
@@ -85,10 +154,11 @@ Multiple agents may edit the repo concurrently. Follow **`docs/workflows/multi-a
 
 | Layer | Minimum bar |
 | --- | --- |
-| **Python** | `just ci` = ruff + mypy + pytest (`tests/` excluding `tests/integration/`). |
+| **Python** | `uv run just ci` (or `just ci` with an activated uv‑managed `.venv`) = ruff + mypy + pytest (`tests/` excluding `tests/integration/`). |
+| **Full-stack smoke** | Optional pre-release: `just smoke` (`scripts/smoke.sh`) — pytest `-m smoke`, host `alwm` benchmark + campaign, Docker Compose + offline benchmark; failure recovery analysis on errors. `SMOKE_SKIP_DOCKER=1` if Docker unavailable. See `docs/workflows/smoke.md`. |
 | **CLI** | Smoke the commands you changed (`alwm … --help`, one happy path). |
 | **Benchmarks** | Offline: `alwm benchmark run --definition fixtures/benchmarks/…` or `benchmarks/v1/offline`-style defs; outputs under `--output-dir` validate as artifacts (`benchmark_manifest` for `manifest.json`, per-cell kinds as today). |
-| **Live backends** | Optional: `alwm benchmark probe`; `just test-integration` with `ALWM_LIVE_BENCHMARK_OLLAMA` / `ALWM_LIVE_BENCHMARK_LLAMACPP`—never required for merge by default. |
+| **Live backends** | Optional: `just ollama-gptoss-setup` (Compose Ollama + **gpt-oss:20b** + probe), `just smoke-ollama-live` (minimal benchmark); `alwm benchmark probe`; `just test-integration` with `ALWM_LIVE_BENCHMARK_OLLAMA` / `ALWM_LIVE_BENCHMARK_LLAMACPP`—never required for merge by default. See `docs/workflows/benchmarking.md`. |
 | **Browser (offline)** | `alwm validate … browser_evidence`; `alwm browser prompt-block` / `run-mock` on fixtures—no browser binary. |
 | **Browser (Playwright)** | Optional extra `[browser]`; not part of default `just ci`. |
 
@@ -101,6 +171,7 @@ Multiple agents may edit the repo concurrently. Follow **`docs/workflows/multi-a
 | Change type | Update |
 | --- | --- |
 | New/changed CLI subcommand or flag | `README.md` command table and/or `docs/workflows/*.md` |
+| Local Python setup / install commands | `README.md`, **Python environment (uv — required on the host)** in this file, and `docs/workflows/local-dev.md` — always **`uv`** (`uv venv`, `uv pip`, `uv run`), not `python -m venv` or bare `pip` |
 | New schema or artifact kind | `docs/architecture/data-model.md` (if entities change), `docs/implementation-log.md` |
 | New Compose profile or recipe | `docs/workflows/local-dev.md` or `benchmarking.md`, `justfile` comment if needed |
 | Behavioral milestone | `docs/architecture/current-state.md`, `docs/implementation-log.md` |
@@ -202,9 +273,9 @@ The **prompt registry** (`prompts/registry.yaml` + `prompts/versions/*.txt`, sch
 
 ## Commands (quick reference)
 
-- Install: `pip install -e ".[dev]"` (Python 3.11+ recommended; matches `Dockerfile`). Optional Playwright: `pip install -e ".[browser]"` then `playwright install chromium` (not required for `just ci`).
-- CI parity: `just ci` (ruff, mypy, pytest; excludes `tests/integration/`).
-- CLI: `alwm` — see `alwm --help`; registry `alwm prompts …`; benchmarks `alwm benchmark run|probe`; providers `alwm providers show`; browser `alwm browser prompt-block`, `run-mock`, `run-playwright` (requires `[browser]` + browsers).
+- Install: see **Python environment (uv — required on the host)** — e.g. `uv pip install -e ".[dev]"` (Python 3.11+; matches `Dockerfile`). Optional Playwright: `uv pip install -e ".[browser]"` then `uv run playwright install chromium` (not required for `just ci`).
+- CI parity: `uv run just ci` (ruff, mypy, pytest; excludes `tests/integration/`).
+- CLI: `uv run alwm …` (or `alwm` after `source .venv/bin/activate`) — see `alwm --help`; registry `alwm prompts …`; benchmarks `alwm benchmark run|probe`; providers `alwm providers show`; browser `alwm browser prompt-block`, `run-mock`, `run-playwright` (requires `[browser]` + browsers).
 - Images: `just docker-build` / `just docker-bake`.
 
 ## Commits

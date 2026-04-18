@@ -7,7 +7,15 @@ from typing import Literal
 
 from agent_llm_wiki_matrix.models import ComparisonMatrix, Report
 
-ReportKind = Literal["weekly", "model_comparison", "agent_stack", "browser_evidence"]
+ReportKind = Literal[
+    "weekly",
+    "model_comparison",
+    "agent_stack",
+    "browser_evidence",
+    "longitudinal",
+    "benchmark_weekly",
+    "failure_atlas",
+]
 
 
 def _read_template(name: str) -> str:

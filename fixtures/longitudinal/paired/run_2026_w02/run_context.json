@@ -1,0 +1,7 @@
+{
+  "schema_version": 1,
+  "git_ref": "fixture-abc123",
+  "release_tag": "v0.0.0-fixture",
+  "provider_fingerprint": "mock-cli",
+  "notes": "Example run_context.json for longitudinal grouping (fixture only)."
+}

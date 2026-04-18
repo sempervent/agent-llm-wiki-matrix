@@ -1,4 +1,4 @@
-"""Rubric evaluation: deterministic by default; semantic/hybrid via ``evaluation_backends``."""
+"""Deterministic rubric evaluation (default); semantic/hybrid via ``evaluation_backends``."""
 
 from __future__ import annotations
 

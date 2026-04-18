@@ -49,6 +49,44 @@ class EvalScoringSpec(BaseModel):
             "Defaults to the same --provider-config as the benchmark run when unset."
         ),
     )
+    judge_repeats: int = Field(
+        default=1,
+        ge=1,
+        le=32,
+        description=(
+            "Semantic judge calls per cell; scores are aggregated (mean/median/trimmed mean)."
+        ),
+    )
+    semantic_aggregation: Literal["mean", "median", "trimmed_mean"] = Field(
+        default="mean",
+        description="How to combine per-criterion scores across judge_repeats runs.",
+    )
+    trim_fraction: float = Field(
+        default=0.1,
+        ge=0.0,
+        le=0.45,
+        description="Tail fraction removed on each side when semantic_aggregation is trimmed_mean.",
+    )
+    judge_max_criterion_range: float | None = Field(
+        default=None,
+        ge=0.0,
+        description="Flag low confidence when max criterion score range across runs exceeds this.",
+    )
+    judge_max_criterion_stdev: float | None = Field(
+        default=None,
+        ge=0.0,
+        description="Flag when any criterion's stdev across runs exceeds this.",
+    )
+    judge_max_mean_criterion_stdev: float | None = Field(
+        default=None,
+        ge=0.0,
+        description="Flag when mean of per-criterion stdevs exceeds this.",
+    )
+    judge_max_total_weighted_stdev: float | None = Field(
+        default=None,
+        ge=0.0,
+        description="Flag when stdev of total weighted score across runs exceeds this.",
+    )
 
 
 class BrowserBenchConfig(BaseModel):
@@ -194,6 +232,18 @@ class BenchmarkDefinitionV1(BaseModel):
     expected_artifact_kinds: list[str] = Field(
         default_factory=list,
         description="Artifact kinds reviewers expect under each cell (metadata).",
+    )
+    success_criteria: list[str] = Field(
+        default_factory=list,
+        description=(
+            "Pass conditions for external agent comparisons (not enforced by harness)."
+        ),
+    )
+    failure_taxonomy_hints: list[str] = Field(
+        default_factory=list,
+        description=(
+            "Suggested failure labels for longitudinal or cross-system reports (metadata only)."
+        ),
     )
     eval_scoring: EvalScoringSpec | None = Field(
         default=None,

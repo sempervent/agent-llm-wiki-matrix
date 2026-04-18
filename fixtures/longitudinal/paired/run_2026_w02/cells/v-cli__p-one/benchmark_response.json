@@ -1,0 +1,15 @@
+{
+  "agent_stack": "alwm-cli",
+  "backend_kind": "mock",
+  "backend_model": "mock-model",
+  "benchmark_id": "bench.fixtures.longitudinal.v1",
+  "created_at": "2026-03-02T12:00:00Z",
+  "execution_mode": "cli",
+  "id": "resp-w02",
+  "prompt_id": "p-one",
+  "prompt_source": "inline",
+  "prompt_text": "fixture",
+  "response_text": "[mock:mock-model] baseline",
+  "schema_version": 1,
+  "variant_id": "v-cli"
+}

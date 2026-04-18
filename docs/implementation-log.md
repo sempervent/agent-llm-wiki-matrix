@@ -2,6 +2,74 @@
 
 Chronological record of repository work. Latest entries first.
 
+## 2026-04-18 — v0.2.0 documentation consolidation (fingerprints)
+
+**Delivered:** **`CHANGELOG.md`** **[0.2.0]** entry (comparison + campaign experiment fingerprints, longitudinal updates). Audited **`README.md`**, **`AGENTS.md`**, **`docs/roadmap/v0.2.0.md`**, workflows (notably **`benchmarking.md`**, **`benchmark-campaigns.md`**, **`longitudinal-reporting.md`**), **`docs/architecture/data-model.md`**, **`docs/wiki/campaign-orchestration.md`**, **`docs/tracking/campaign-orchestration.md`**, **`docs/tracking/benchmark-campaign-orchestration.md`**, ADRs **`docs/adr/0001-campaign-orchestration.md`** and **`docs/architecture/adr/0001-benchmark-campaign-orchestration.md`**, **`examples/campaigns/v1/README.md`** for consistent **six-axis** `comparison_fingerprints`, **`campaign_experiment_fingerprints`**, and **`prompt_registry_state_fingerprint`** wording. Removed duplicate milestone block from **`README.md`**.
+
+**Verification:** documentation-only pass (no code changes).
+
+## 2026-04-17 — v0.2.0 fingerprints: prompt registry state + campaign experiment axes
+
+**Delivered:** **`BenchmarkComparisonFingerprints.prompt_registry_state`** — hash of effective registry YAML (or inline-only sentinel). **`CampaignExperimentFingerprints`** on **`BenchmarkCampaignManifest`** / **`CampaignSummaryV1`** (campaign definition, suite stack, provider files, scoring axis, browser axis, registry override). Canonical **`fingerprint_campaign_definition`** excludes cosmetic fields and sorts list fields. **`build_campaign_experiment_fingerprints`**, **`fingerprint_prompt_registry_effective_state`** in **`benchmark/fingerprints.py`**. Longitudinal **`group_snapshots_by`** key **`prompt_registry_state_fingerprint`**; **`render_provider_comparison_markdown`** registry column. Schemas: **`manifest.schema.json`**, **`benchmark_campaign_manifest.schema.json`**, **`campaign_summary.schema.json`**. Roadmap **`docs/roadmap/v0.2.0.md`**; **`README`** milestone blurb. Regenerated **`examples/campaign_runs/minimal_offline/`**, **`examples/reports/longitudinal/sample-output/`**, longitudinal fixtures.
+
+**Verification:** `uv run just ci`.
+
+## 2026-04-17 — Ollama gpt-oss:20b first-class workflow
+
+**Delivered:** Default **`OLLAMA_MODEL`** / **`OllamaSection.model`** → **`gpt-oss:20b`**; **`benchmarks/v1/ollama.v1.yaml`**, **`config/providers.example.yaml`**, **`alwm benchmark probe`** default, integration test default aligned. **`scripts/ollama-gptoss-setup.sh`** (start Compose Ollama, pull, **`alwm benchmark probe`**), **`scripts/smoke-ollama-live.sh`** (minimal live benchmark + validate). **`just ollama-gptoss-setup`**, **`just smoke-ollama-live`**; **`verify-ollama-gptoss-smoke`** calls the live smoke script. Docs: **`docs/workflows/benchmarking.md`** (workflow + migration from named volume **`ollama_models`** → bind **`./.ollama-models`**), **`README.md`**, **`AGENTS.md`**, **`docs/workflows/live-verification.md`**, **`docs/workflows/local-dev.md`**, **`.env.example`**.
+
+**Verification:** `uv run just ci` (deterministic); live path opt-in.
+
+## 2026-04-17 — Campaign orchestration: dry-run, wiki, ADR, tracking
+
+**Delivered:** **`alwm benchmark campaign run --dry-run`** (wraps `run_benchmark_campaign(..., dry_run=True)`; no separate `plan` command). Extended **campaign manifest** / **`CampaignSummaryV1`** + **`schemas/v1/campaign_summary.schema.json`**; artifact kinds **`campaign_definition`**, **`campaign_manifest`**, **`campaign_summary`**. **Docs:** **`docs/wiki/campaign-orchestration.md`**, **`docs/tracking/campaign-orchestration.md`**, **`docs/adr/0001-campaign-orchestration.md`**; updates to **`docs/workflows/benchmark-campaigns.md`**, **`docs/workflows/benchmarking.md`**, **`docs/architecture/evaluation-pipeline.md`**, **`README.md`**, **`CHANGELOG.md`**, **`docs/architecture/adr/0001-benchmark-campaign-orchestration.md`**, **`examples/campaigns/v1/README.md`**. Tests: **`tests/test_benchmark_campaign.py`** (dry-run writes `campaign-dry-run.json`, manifest, summary).
+
+**Verification:** `uv run just ci`.
+
+## 2026-04-17 — Benchmark comparison fingerprints (manifest + campaign)
+
+**Delivered:** **`benchmark/fingerprints.py`** — SHA-256 over canonical JSON for **suite definition** (title excluded; sorted tags), **prompt set** (resolved prompt ids + text digests + registry provenance), **provider config** (per-variant sorted), **scoring config** (effective backend, eval_scoring, judge repeat, judge provider), **browser config** (per-variant sorted). **`BenchmarkComparisonFingerprints`** on **`BenchmarkRunManifest`** and **`BenchmarkCampaignRunEntry`**; **`schemas/v1/manifest.schema.json`**, **`schemas/v1/benchmark_campaign_manifest.schema.json`**. **`run_benchmark`** always emits fingerprints; **`campaign_runner`** copies them from member manifests. **`RunSnapshot.comparison_fingerprints`**, **`group_snapshots_by`** keys **`suite_definition_fingerprint`** … **`browser_config_fingerprint`**, **`provider-comparison.md`** + **`summary.json`** updates. Fixture **`fixtures/benchmarks/longitudinal.v1.yaml`**, longitudinal manifests updated. Tests **`tests/test_fingerprints.py`**, **`tests/test_longitudinal.py`**, **`tests/test_manifest.py`**, **`tests/test_benchmark_campaign.py`**. Docs: **`data-model.md`**, **`longitudinal-reporting.md`**, **`benchmarking.md`**, **`examples/reports/longitudinal/README.md`**.
+
+**Note:** Extended in **v0.2.0** with **`prompt_registry_state`**, **`campaign_experiment_fingerprints`**, and **`prompt_registry_state_fingerprint`** (see log entries above).
+
+**Verification:** `uv run pytest` (full suite).
+
+## 2026-04-17 — Benchmark campaign sweeps
+
+**Delivered:** **`BenchmarkCampaignDefinitionV1`** + **`schemas/v1/benchmark_campaign.schema.json`**; **`BenchmarkCampaignManifest`** / **`BenchmarkCampaignRunEntry`** + **`schemas/v1/benchmark_campaign_manifest.schema.json`**. **`benchmark/campaign_definitions.py`**, **`benchmark/campaign_runner.py`**. CLI **`alwm benchmark campaign run`**. Artifact kinds **`benchmark_campaign_definition`**, **`benchmark_campaign_manifest`**; **`write_benchmark_campaign_manifest`** in **`persistence.py`**. Fixture **`fixtures/benchmarks/campaign_micro.v1.yaml`**; examples **`examples/campaigns/v1/minimal_offline.v1.yaml`**, **`examples/campaign_runs/minimal_offline/`**. Docs **`docs/workflows/benchmark-campaigns.md`**, cross-link in **`docs/workflows/benchmarking.md`**, **`examples/campaigns/v1/README.md`**. Tests **`tests/test_benchmark_campaign.py`**.
+
+**Verification:** `just ci`.
+
+## 2026-04-17 — Agentic benchmark pack (cross-system evaluation)
+
+**Delivered:** **`BenchmarkDefinitionV1` / `BenchmarkRunManifest`** optional **`success_criteria`** and **`failure_taxonomy_hints`** (metadata; JSON Schema + Pydantic + runner copy-through). **Prompt registry 0.4.0** — `bench.task.repo_implementation.v1`, `bench.task.docs_drift_repair.v1`, `bench.task.benchmark_authoring.v1`. Five suites under **`examples/benchmark_suites/v1/agentic/`** (repo implementation, docs drift, benchmark authoring, browser interpretation with file-backed evidence, multi-agent coordination). Committed offline runs **`examples/benchmark_runs/agentic-pack-*`**. Docs: **`docs/workflows/agentic-benchmark-pack.md`**, **`examples/benchmark_suites/v1/agentic/README.md`**, updates to **`benchmarking.md`**, **`benchmarks/v1/README.md`**, **`examples/benchmark_suites/v1/README.md`**, **`data-model.md`**. Tests: **`tests/test_agentic_benchmark_pack.py`**, manifest validation in **`tests/test_manifest.py`**.
+
+**Verification:** `just ci` or `uv run just ci`.
+
+## 2026-04-17 — uv canonical workflow (enforced in docs + `justfile`)
+
+**Policy:** Host development **must** use **[uv](https://docs.astral.sh/uv/)** for virtualenv creation (`uv venv`), installs (`uv pip install …`), and running tools (`uv run …`). **`AGENTS.md`** states this explicitly; **`README.md`** and **`docs/workflows/local-dev.md`** / **`walkthrough-v0.1.0.md`** default to `uv run alwm` and `uv run just ci` without requiring `python -m venv` or bare `pip`. **`justfile`** recipes now use **`uv pip`** for `install` / `install-dev` and **`uv run`** for pytest, ruff, and mypy (no `python -m pip` fallback). **Runtime:** `src/.../cli.py` and **`playwright_runner.py`** user-facing messages updated to `uv pip`. Docker image builds unchanged (`Dockerfile` still uses pip inside the image).
+
+**Verification:** `uv run just ci`.
+
+## 2026-04-17 — Repeated semantic judge: aggregation, disagreement, low-confidence flags
+
+**Delivered:** `pipelines/judge_repeat.py` — **mean**, **median**, **trimmed_mean** aggregation; per-criterion and total-weighted disagreement; threshold-based **`assess_low_confidence`**. `Evaluation` gains optional **`judge_repeat_count`**, **`judge_semantic_aggregation`**, **`judge_low_confidence`**; **`JudgeRepeatAggregation`** + nested models on **`EvaluationJudgeProvenance.repeat_aggregation`** (omitted when `judge_repeats` is 1). `evaluate_with_scoring_backend` accepts **`JudgeRepeatParams`**; mock semantic scores vary by **`run_index`** for stable multi-run tests. **`EvalScoringSpec`** + **`schemas/v1/benchmark_definition.schema.json`**: **`judge_repeats`**, **`semantic_aggregation`**, **`trim_fraction`**, optional stdev/range thresholds. **`alwm evaluate`** flags mirror repeat/aggregation/thresholds. Example: **`examples/benchmarks/v1/semantic_repeats.v1.yaml`**. Tests: **`tests/test_evaluation_backends.py`**, **`tests/test_benchmark.py`**. Docs: **`data-model.md`**, **`benchmarking.md`**, **`evaluation-pipeline.md`**, **`benchmarks/v1/README.md`**.
+
+**Verification:** `uv run pytest` (full suite).
+
+## 2026-04-17 — Longitudinal benchmark reporting
+
+**Delivered:** `pipelines/longitudinal.py` — load runs from manifests + evaluations + optional grid and judge provenance; **weekly** and **longitudinal** Markdown; **failure taxonomy** (`FT-*`) and **failure atlas**; regression-focused **`regression.md`** and **`provider-comparison.md`**; optional **`run_context.json`** grouping via `group_snapshots_by`. CLI **`alwm benchmark longitudinal`** (`--runs-glob`, thresholds for regression, semantic instability, series swing). Lazy **`benchmark_run_context`** registration in **`artifacts.py`** to break an import cycle. **`schemas/v1/evaluation.schema.json`** — nullable semantic judge fields aligned with `Evaluation`. Fixtures **`fixtures/longitudinal/paired/`**; example bundle **`examples/reports/longitudinal/sample-output/`**; tests **`tests/test_longitudinal.py`**. Docs **`docs/workflows/longitudinal-reporting.md`**, **`examples/reports/longitudinal/README.md`**.
+
+**Verification:** `just ci`.
+
+## 2026-04-17 — Semantic and hybrid rubric scoring (optional)
+
+**Delivered:** `pipelines/evaluation_backends.py` — backends **`deterministic`** (default), **`semantic_judge`**, **`hybrid`**; `EvaluationJudgeProvenance` model + **`schemas/v1/evaluation_judge_provenance.schema.json`**; artifact kind **`evaluation_judge_provenance`**. `Evaluation` gains **`scoring_backend`**, **`judge_provenance_relpath`**. `BenchmarkDefinitionV1.eval_scoring` (`EvalScoringSpec`, `EvalHybridWeights`); `load_judge_provider_config` in `providers/benchmark_config.py`. Benchmark cells write **`evaluation_judge_provenance.json`** when non-deterministic; manifest cells include optional **`judge_provenance_relpath`**. CLI: **`alwm evaluate`** (`--scoring-backend`, `--judge-provider-config`, `--judge-live`, `--hybrid-deterministic-weight`); **`alwm benchmark run`** (`--eval-scoring-backend`, `--judge-provider-config`). Opt-in live judge: **`ALWM_JUDGE_LIVE=1`**; fixture mode keeps mock judge unless set. Tests: **`tests/test_evaluation_backends.py`**. Docs: **`data-model.md`**, **`evaluation-pipeline.md`**, **`benchmarking.md`**. Fixtures: **`fixtures/v1/evaluation_judge_provenance.json`**.
+
+**Verification:** `just ci`.
+
 ## 2026-04-17 — Browser-backed benchmark execution
 
 **Why:** `browser_mock` previously only tagged LLM output; benchmarks did not exercise `BrowserRunner` or persist evidence.
@@ -159,7 +227,7 @@ Chronological record of repository work. Latest entries first.
 - Schemas: `schemas/v1/note.schema.json`; example `examples/sample-note.json`.
 - Prompt registry skeleton: `prompts/registry.yaml` + `prompts/versions/scaffold.echo.v1.txt`.
 - Report template skeleton: `templates/report-weekly.md`.
-- Smoke tests: CLI and schema validation (`tests/test_smoke.py`).
+- Smoke tests: `just smoke` runs `scripts/smoke.sh` — `pytest -m smoke`, host `alwm benchmark` + `benchmark campaign`, Docker Compose config + `dev` + `benchmark-offline` (optional; `SMOKE_SKIP_DOCKER=1`); prints **failure recovery analysis** on errors. Docs: `docs/workflows/smoke.md`. Dockerfile bundles `templates/` for runtime image matrix/report rendering.
 - Docker: orchestrator image (`Dockerfile`); Compose profiles `dev`, `test`, `benchmark`; Bake targets for multi-arch and single-arch convenience (`orchestrator-amd64`, `orchestrator-arm64`).
 
 **Known gaps (by design until later phases):**

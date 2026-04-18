@@ -8,12 +8,15 @@ from typing import Any
 
 from pydantic import BaseModel
 
+from agent_llm_wiki_matrix.benchmark.campaign_definitions import BenchmarkCampaignDefinitionV1
 from agent_llm_wiki_matrix.browser.models import BrowserEvidence
 from agent_llm_wiki_matrix.models import (
+    BenchmarkCampaignManifest,
     BenchmarkCase,
     BenchmarkRequestRecord,
     BenchmarkResponse,
     BenchmarkRunManifest,
+    CampaignSummaryV1,
     ComparisonMatrix,
     Evaluation,
     EvaluationJudgeProvenance,
@@ -49,15 +52,42 @@ _ARTIFACTS: dict[str, tuple[type[BaseModel], str]] = {
     ),
     "browser_evidence": (BrowserEvidence, "schemas/v1/browser_evidence.schema.json"),
     "benchmark_manifest": (BenchmarkRunManifest, "schemas/v1/manifest.schema.json"),
+    "benchmark_campaign_definition": (
+        BenchmarkCampaignDefinitionV1,
+        "schemas/v1/benchmark_campaign.schema.json",
+    ),
+    "benchmark_campaign_manifest": (
+        BenchmarkCampaignManifest,
+        "schemas/v1/benchmark_campaign_manifest.schema.json",
+    ),
+    "campaign_definition": (
+        BenchmarkCampaignDefinitionV1,
+        "schemas/v1/benchmark_campaign.schema.json",
+    ),
+    "campaign_manifest": (
+        BenchmarkCampaignManifest,
+        "schemas/v1/benchmark_campaign_manifest.schema.json",
+    ),
+    "campaign_summary": (CampaignSummaryV1, "schemas/v1/campaign_summary.schema.json"),
 }
+
+
+def _benchmark_run_context_model() -> tuple[type[BaseModel], str]:
+    """Lazy import to keep ``artifacts`` import graph small."""
+    from agent_llm_wiki_matrix.pipelines.benchmark_run_context import BenchmarkRunContextV1
+
+    return BenchmarkRunContextV1, "schemas/v1/benchmark_run_context.schema.json"
 
 
 def parse_artifact(kind: str, data: dict[str, Any]) -> BaseModel:
     """Validate `data` with JSON Schema then parse with the matching Pydantic model."""
-    if kind not in _ARTIFACTS:
+    if kind == "benchmark_run_context":
+        model_cls, schema_path = _benchmark_run_context_model()
+    elif kind not in _ARTIFACTS:
         msg = f"Unknown artifact kind: {kind}"
         raise KeyError(msg)
-    model_cls, schema_path = _ARTIFACTS[kind]
+    else:
+        model_cls, schema_path = _ARTIFACTS[kind]
     schema = load_schema(schema_path)
     validate_json(data, schema)
     return model_cls.model_validate(data)
@@ -75,4 +105,4 @@ def load_artifact_file(path: Path, kind: str) -> BaseModel:
 
 def list_artifact_kinds() -> tuple[str, ...]:
     """Return supported artifact kinds."""
-    return tuple(sorted(_ARTIFACTS.keys()))
+    return tuple(sorted((*_ARTIFACTS.keys(), "benchmark_run_context")))

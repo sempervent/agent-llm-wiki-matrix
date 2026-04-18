@@ -182,6 +182,66 @@
       "type": "array",
       "items": { "type": "string", "minLength": 1 },
       "description": "Expected alwm artifact kind names for cell outputs (metadata)"
+    },
+    "success_criteria": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "description": "Pass conditions for external agent comparisons (metadata)"
+    },
+    "failure_taxonomy_hints": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "description": "Suggested failure labels for cross-system reports (metadata)"
+    },
+    "comparison_fingerprints": {
+      "description": "Stable configuration hashes for cross-run comparison",
+      "oneOf": [{ "type": "null" }, { "$ref": "#/$defs/benchmarkComparisonFingerprints" }]
+    }
+  },
+  "$defs": {
+    "benchmarkComparisonFingerprints": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "suite_definition",
+        "prompt_set",
+        "provider_config",
+        "scoring_config",
+        "browser_config",
+        "prompt_registry_state"
+      ],
+      "properties": {
+        "suite_definition": {
+          "type": "string",
+          "minLength": 8,
+          "pattern": "^sha256:[a-f0-9]{64}$"
+        },
+        "prompt_set": {
+          "type": "string",
+          "minLength": 8,
+          "pattern": "^sha256:[a-f0-9]{64}$"
+        },
+        "provider_config": {
+          "type": "string",
+          "minLength": 8,
+          "pattern": "^sha256:[a-f0-9]{64}$"
+        },
+        "scoring_config": {
+          "type": "string",
+          "minLength": 8,
+          "pattern": "^sha256:[a-f0-9]{64}$"
+        },
+        "browser_config": {
+          "type": "string",
+          "minLength": 8,
+          "pattern": "^sha256:[a-f0-9]{64}$"
+        },
+        "prompt_registry_state": {
+          "type": "string",
+          "minLength": 8,
+          "pattern": "^sha256:[a-f0-9]{64}$"
+        }
+      }
     }
   }
 }

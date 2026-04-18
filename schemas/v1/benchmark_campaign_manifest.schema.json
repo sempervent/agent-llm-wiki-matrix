@@ -1,0 +1,255 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/sempervent/agent-llm-wiki-matrix/schemas/v1/benchmark_campaign_manifest.schema.json",
+  "title": "BenchmarkCampaignManifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "campaign_id",
+    "title",
+    "created_at",
+    "definition_source_relpath",
+    "fixture_mode_force_mock",
+    "runs"
+  ],
+  "properties": {
+    "schema_version": { "type": "integer", "const": 1 },
+    "campaign_id": { "type": "string", "minLength": 1 },
+    "title": { "type": "string", "minLength": 1 },
+    "created_at": { "type": "string", "minLength": 1 },
+    "definition_source_relpath": { "type": "string", "minLength": 1 },
+    "fixture_mode_force_mock": { "type": "boolean" },
+    "campaign_definition_fingerprint": {
+      "oneOf": [{ "type": "null" }, { "type": "string", "minLength": 8, "pattern": "^sha256:[a-f0-9]{64}$" }]
+    },
+    "campaign_experiment_fingerprints": {
+      "oneOf": [{ "type": "null" }, { "$ref": "#/$defs/campaignExperimentFingerprints" }]
+    },
+    "campaign_version": { "oneOf": [{ "type": "null" }, { "type": "string", "minLength": 1 }] },
+    "description": { "oneOf": [{ "type": "null" }, { "type": "string" }] },
+    "owner": { "oneOf": [{ "type": "null" }, { "type": "string", "minLength": 1 }] },
+    "definition_created_at": { "oneOf": [{ "type": "null" }, { "type": "string", "minLength": 1 }] },
+    "notes": { "oneOf": [{ "type": "null" }, { "type": "string" }] },
+    "retry_policy": {
+      "oneOf": [
+        { "type": "null" },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["max_attempts", "backoff_seconds"],
+          "properties": {
+            "max_attempts": { "type": "integer", "minimum": 1, "maximum": 64 },
+            "backoff_seconds": { "type": "number", "minimum": 0 }
+          }
+        }
+      ]
+    },
+    "time_budget_seconds": { "oneOf": [{ "type": "null" }, { "type": "number", "exclusiveMinimum": 0 }] },
+    "token_budget": { "oneOf": [{ "type": "null" }, { "type": "integer", "minimum": 1 }] },
+    "tags": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "expected_artifact_kinds": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "dry_run": { "type": "boolean" },
+    "run_status_summary": {
+      "oneOf": [
+        { "type": "null" },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["succeeded", "failed"],
+          "properties": {
+            "succeeded": { "type": "integer", "minimum": 0 },
+            "failed": { "type": "integer", "minimum": 0 }
+          }
+        }
+      ]
+    },
+    "run_count": { "oneOf": [{ "type": "null" }, { "type": "integer", "minimum": 0 }] },
+    "started_at_utc": { "oneOf": [{ "type": "null" }, { "type": "string", "minLength": 1 }] },
+    "finished_at_utc": { "oneOf": [{ "type": "null" }, { "type": "string", "minLength": 1 }] },
+    "duration_seconds": { "oneOf": [{ "type": "null" }, { "type": "number", "minimum": 0 }] },
+    "generated_report_paths": {
+      "oneOf": [
+        { "type": "null" },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "campaign_manifest": { "type": "string", "minLength": 1 },
+            "campaign_summary_json": { "type": "string", "minLength": 1 },
+            "campaign_summary_md": { "type": "string", "minLength": 1 }
+          }
+        }
+      ]
+    },
+    "git_commit_sha": { "oneOf": [{ "type": "null" }, { "type": "string", "minLength": 1 }] },
+    "git_describe": { "oneOf": [{ "type": "null" }, { "type": "string", "minLength": 1 }] },
+    "inputs_snapshot": { "oneOf": [{ "type": "null" }, { "type": "object" }] },
+    "failures": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/campaignFailureRecord" }
+    },
+    "runs": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/runEntry" }
+    }
+  },
+  "$defs": {
+    "campaignFailureRecord": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["run_index", "run_id", "message"],
+      "properties": {
+        "run_index": { "type": "integer", "minimum": 0 },
+        "run_id": { "type": "string", "minLength": 1 },
+        "message": { "type": "string", "minLength": 1 }
+      }
+    },
+    "runEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "run_index",
+        "run_id",
+        "suite_ref",
+        "benchmark_id",
+        "eval_scoring_label",
+        "browser_config_applied",
+        "output_relpath",
+        "manifest_relpath",
+        "cell_count"
+      ],
+      "properties": {
+        "run_index": { "type": "integer", "minimum": 0 },
+        "run_id": { "type": "string", "minLength": 1 },
+        "suite_ref": { "type": "string", "minLength": 1 },
+        "benchmark_id": { "type": "string", "minLength": 1 },
+        "provider_config_ref": { "oneOf": [{ "type": "null" }, { "type": "string", "minLength": 1 }] },
+        "eval_scoring_label": { "type": "string", "minLength": 1 },
+        "execution_modes_filter": {
+          "oneOf": [
+            { "type": "null" },
+            {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["cli", "browser_mock", "repo_governed"]
+              }
+            }
+          ]
+        },
+        "browser_config_applied": { "type": "boolean" },
+        "output_relpath": { "type": "string", "minLength": 1 },
+        "manifest_relpath": { "type": "string", "minLength": 1 },
+        "mean_total_weighted_score": { "type": ["number", "null"] },
+        "cell_count": { "type": "integer", "minimum": 0 },
+        "comparison_fingerprints": {
+          "oneOf": [{ "type": "null" }, { "$ref": "#/$defs/benchmarkComparisonFingerprints" }]
+        },
+        "status": {
+          "type": "string",
+          "enum": ["succeeded", "failed"],
+          "default": "succeeded"
+        },
+        "error": { "oneOf": [{ "type": "null" }, { "type": "string", "minLength": 1 }] },
+        "duration_seconds": {
+          "oneOf": [{ "type": "null" }, { "type": "number", "minimum": 0 }]
+        }
+      }
+    },
+    "benchmarkComparisonFingerprints": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "suite_definition",
+        "prompt_set",
+        "provider_config",
+        "scoring_config",
+        "browser_config",
+        "prompt_registry_state"
+      ],
+      "properties": {
+        "suite_definition": {
+          "type": "string",
+          "minLength": 8,
+          "pattern": "^sha256:[a-f0-9]{64}$"
+        },
+        "prompt_set": {
+          "type": "string",
+          "minLength": 8,
+          "pattern": "^sha256:[a-f0-9]{64}$"
+        },
+        "provider_config": {
+          "type": "string",
+          "minLength": 8,
+          "pattern": "^sha256:[a-f0-9]{64}$"
+        },
+        "scoring_config": {
+          "type": "string",
+          "minLength": 8,
+          "pattern": "^sha256:[a-f0-9]{64}$"
+        },
+        "browser_config": {
+          "type": "string",
+          "minLength": 8,
+          "pattern": "^sha256:[a-f0-9]{64}$"
+        },
+        "prompt_registry_state": {
+          "type": "string",
+          "minLength": 8,
+          "pattern": "^sha256:[a-f0-9]{64}$"
+        }
+      }
+    },
+    "campaignExperimentFingerprints": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "campaign_definition",
+        "suite_definitions",
+        "provider_configs",
+        "scoring_configs",
+        "browser_configs",
+        "prompt_registry_state"
+      ],
+      "properties": {
+        "campaign_definition": {
+          "type": "string",
+          "minLength": 8,
+          "pattern": "^sha256:[a-f0-9]{64}$"
+        },
+        "suite_definitions": {
+          "type": "string",
+          "minLength": 8,
+          "pattern": "^sha256:[a-f0-9]{64}$"
+        },
+        "provider_configs": {
+          "type": "string",
+          "minLength": 8,
+          "pattern": "^sha256:[a-f0-9]{64}$"
+        },
+        "scoring_configs": {
+          "type": "string",
+          "minLength": 8,
+          "pattern": "^sha256:[a-f0-9]{64}$"
+        },
+        "browser_configs": {
+          "type": "string",
+          "minLength": 8,
+          "pattern": "^sha256:[a-f0-9]{64}$"
+        },
+        "prompt_registry_state": {
+          "type": "string",
+          "minLength": 8,
+          "pattern": "^sha256:[a-f0-9]{64}$"
+        }
+      }
+    }
+  }
+}
