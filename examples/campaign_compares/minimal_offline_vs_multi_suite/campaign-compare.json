@@ -356,6 +356,34 @@
       "campaign.examples.multi_suite.v1__0001"
     ]
   },
+  "reader_interpretation": {
+    "browser_evidence_narrative": "Browser rows: left 0, right 2; \u0394 DOM excerpts **2**, \u0394 screenshots **2**. Paired cells (both sides): **0**; unpaired keys \u2014 left-only: 0, right-only: 2. Differences reflect **fixture/capture** choices, not product quality by themselves.",
+    "comparison_kind": "campaign_directory",
+    "dimensions_fingerprint_mismatch_axes": [
+      "campaign_definition",
+      "suite_definitions"
+    ],
+    "evidence_strength": "weak",
+    "failure_tags_narrative": "**FT-* taxonomy:** 2 code(s) with count movement; only left: 0, only right: 2 \u2014 compare failure atlas sections in each campaign report for context.",
+    "fingerprint_insights_narrative": null,
+    "instability_narrative": "No non-zero **semantic instability** rows to contrast (or analysis missing on a side).",
+    "schema_version": 1,
+    "semantic_summary_narrative": "**Semantic / judge rollup deltas** (right \u2212 left, selected numeric fields): `cells_flagged_judge_low_confidence` \u2192 \u0394 0.0; `cells_flagged_repeat_confidence_low` \u2192 \u0394 0.0; `cells_semantic_or_hybrid` \u2192 \u0394 0.0; `cells_total` \u2192 \u0394 6.0; `cells_with_repeat_judge` \u2192 \u0394 0.0; `low_confidence_cells` \u2192 \u0394 0.0 \u2014 interpret with **repeat-judge** context in the semantic summary files.",
+    "sweep_dimensions_narrative": "**Sweep manifest:** `varied` flags differ on `benchmark_id`, `suite_ref` \u2014 the two campaigns **do not expose the same axes** the same way.",
+    "uncertainty_caveats": [
+      "Comparison uses **aggregates** from each side's `campaign-analysis.json` (when present). This is **not** a paired statistical test.",
+      "Deltas (right \u2212 left) describe **reported** counts and means \u2014 not proven causal effects.",
+      "When **evidence_strength** is **weak**, treat narratives as **orientation**, not proof.",
+      "**No overlapping member run_ids** \u2014 pooled backend/instability rows are **not** paired runs."
+    ],
+    "what_changed": [
+      "**Different `campaign_id`** \u2014 these are different campaign definitions or outputs.",
+      "**Campaign definition fingerprint differs** \u2014 the underlying sweep definition changed.",
+      "**Experiment fingerprint axes that differ:** `campaign_definition`, `suite_definitions`.",
+      "**Campaign definition YAML path** differs between sides.",
+      "**Member runs:** 1 only on left, 2 only on right, 0 in both \u2014 overlap affects how directly you can compare pooled tables."
+    ]
+  },
   "right": {
     "campaign_id": "campaign.examples.multi_suite.v1",
     "definition_source_relpath": "examples/campaigns/v1/multi_suite.v1.yaml",

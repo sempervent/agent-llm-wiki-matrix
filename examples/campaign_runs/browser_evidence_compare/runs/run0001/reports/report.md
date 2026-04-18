@@ -73,12 +73,12 @@ _Notes:_ Stress a11y roles + console errors without navigation churn.
 
 | Field | Value |
 | --- | --- |
-| started_at_utc | `2026-04-18T01:11:09Z` |
-| finished_at_utc | `2026-04-18T01:11:09Z` |
-| duration_seconds | 0.013046 |
-| browser_phase_seconds | 0.001869 |
-| provider_completion_seconds | 0.000016 |
-| evaluation_phase_seconds | 0.002902 |
+| started_at_utc | `2026-04-18T01:41:39Z` |
+| finished_at_utc | `2026-04-18T01:41:39Z` |
+| duration_seconds | 0.002325 |
+| browser_phase_seconds | 0.000540 |
+| provider_completion_seconds | 0.000006 |
+| evaluation_phase_seconds | 0.000259 |
 | judge_phase_seconds | 0.000000 |
 
 ### Retry and judge summary

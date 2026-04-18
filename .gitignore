@@ -52,3 +52,6 @@ data/
 # Generated reports (optional local output)
 out/
 reports/local/
+
+# MkDocs static site output (see mkdocs.yml, docs/workflows/docs-site.md)
+/site/

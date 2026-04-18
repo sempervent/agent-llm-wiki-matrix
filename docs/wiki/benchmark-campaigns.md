@@ -10,6 +10,7 @@
 | --- | --- |
 | Concept + failure modes | [docs/wiki/campaign-orchestration.md](campaign-orchestration.md) |
 | Walkthrough (committed examples) | [docs/workflows/campaign-walkthrough.md](../workflows/campaign-walkthrough.md) |
+| End-to-end publication (run → validate → pack → compare → publish) | [docs/workflows/campaign-result-pack-publication.md](../workflows/campaign-result-pack-publication.md) |
 | Workflow (CLI, fields, outputs, validation) | [docs/workflows/benchmark-campaigns.md](../workflows/benchmark-campaigns.md) |
 | Architecture decision | [docs/adr/0001-campaign-orchestration.md](../adr/0001-campaign-orchestration.md) or [docs/architecture/adr/0001-benchmark-campaign-orchestration.md](../architecture/adr/0001-benchmark-campaign-orchestration.md) |
 | Contract + tracking checklist | [docs/tracking/campaign-orchestration.md](../tracking/campaign-orchestration.md) |

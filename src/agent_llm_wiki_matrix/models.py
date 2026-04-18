@@ -861,6 +861,10 @@ class CampaignResultPackArtifacts(BaseModel):
         default=None,
         description="JSON mirror (e.g. reports/campaign-analysis.json).",
     )
+    campaign_dry_run_json: str | None = Field(
+        default=None,
+        description="Present when campaign-dry-run.json was copied into the pack (plan-only runs).",
+    )
     campaign_result_pack_json: str = Field(
         default="campaign-result-pack.json",
         min_length=1,
@@ -1002,6 +1006,10 @@ class CampaignResultPackComparisonV1(BaseModel):
     portability: dict[str, Any] = Field(
         description="member_depth, glob, source_campaign_dir, pack-check warnings per side.",
     )
+    reader_interpretation: dict[str, Any] | None = Field(
+        default=None,
+        description="Optional non-scoring narrative for humans (orientation, not causal claims).",
+    )
 
 
 class CampaignCompareV1(BaseModel):
@@ -1038,6 +1046,10 @@ class CampaignCompareV1(BaseModel):
     member_runs: dict[str, Any] = Field(description="Member run id presence and counts.")
     run_health: dict[str, Any] = Field(
         description="Dry-run flags and manifest run counts per side.",
+    )
+    reader_interpretation: dict[str, Any] | None = Field(
+        default=None,
+        description="Optional non-scoring narrative for humans (orientation, not causal claims).",
     )
 
 

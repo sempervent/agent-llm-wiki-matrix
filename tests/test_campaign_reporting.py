@@ -391,7 +391,7 @@ def test_campaign_run_writes_comparative_report(tmp_path: Path) -> None:
         fixture_mode_force_mock=True,
     )
     report_md = (out / "reports" / "campaign-report.md").read_text(encoding="utf-8")
-    assert "## At a glance" in report_md
+    assert "## Executive summary" in report_md
     analysis_path = out / "reports" / "campaign-analysis.json"
     assert analysis_path.is_file()
     analysis_json = json.loads(analysis_path.read_text(encoding="utf-8"))

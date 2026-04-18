@@ -1,10 +1,53 @@
 # Campaign result pack comparison
 
+Side-by-side view of two **`campaign_result_pack`** trees (published bundles). **Δ** columns use **right − left** when both sides are numeric. See **`pack-compare.json`** for the full structured diff.
+
 - **Left:** `examples/campaign_result_packs/minimal_offline` — `examples/campaign_result_packs/minimal_offline` (`pack_id`: `minimal-offline`)
 - **Right:** `examples/campaign_result_packs/multi_suite` — `examples/campaign_result_packs/multi_suite` (`pack_id`: `multi-suite`)
-- **Generated:** `2026-04-18T01:35:17Z`
+- **Generated:** `2026-04-18T01:42:23Z`
 
-## Campaign identity & fingerprints
+## Reader interpretation
+
+> **Non-causal summary** — use this to orient; confirm in per-campaign reports and manifests.
+
+- **Evidence strength (aggregate):** **weak** (heuristic from analysis presence, member overlap, and run counts — not a power analysis).
+
+### What changed
+
+- **Different `campaign_id`** — these are different campaign definitions or outputs.
+- **Pack identity fingerprint differs** — pack contents or provenance are not the same bundle.
+- **Campaign definition fingerprint differs** — the underlying sweep definition changed.
+- **Experiment fingerprint axes that differ:** `campaign_definition`, `suite_definitions`.
+- **Member runs:** 1 only on left, 2 only on right, 0 in both — overlap affects how directly you can compare pooled tables.
+
+### Dimensions (experiment fingerprints)
+
+Axes where digests **differ** (configuration / suite / provider / scoring / registry / browser): `campaign_definition`, `suite_definitions`.
+
+### Instability (longitudinal counts)
+
+No non-zero **semantic instability** rows to contrast (or analysis missing on a side).
+
+### Browser evidence (structured traces)
+
+Browser rows: left 0, right 2; Δ DOM excerpts **2**, Δ screenshots **2**. Paired cells (both sides): **0**; unpaired keys — left-only: 0, right-only: 2. Differences reflect **fixture/capture** choices, not product quality by themselves.
+
+### Semantic summary (judge rollup)
+
+**Semantic / judge rollup deltas** (right − left, selected numeric fields): `cells_flagged_judge_low_confidence` → Δ 0.0; `cells_flagged_repeat_confidence_low` → Δ 0.0; `cells_semantic_or_hybrid` → Δ 0.0; `cells_total` → Δ 6.0; `cells_with_repeat_judge` → Δ 0.0; `low_confidence_cells` → Δ 0.0 — interpret with **repeat-judge** context in the semantic summary files.
+
+### Failure tags (FT-*)
+
+**FT-* taxonomy:** 2 code(s) with count movement; only left: 0, only right: 2 — compare failure atlas sections in each campaign report for context.
+
+### Uncertainty & limits
+
+- Comparison uses **aggregates** from each side's `campaign-analysis.json` (when present). This is **not** a paired statistical test.
+- Deltas (right − left) describe **reported** counts and means — not proven causal effects.
+- When **evidence_strength** is **weak**, treat narratives as **orientation**, not proof.
+- **No overlapping member run_ids** — pooled backend/instability rows are **not** paired runs.
+
+## Identity & fingerprints
 
 | Check | Value |
 | --- | --- |
@@ -29,6 +72,7 @@
 | --- | --- | --- | --- |
 | `campaign_analysis_json` | `reports/campaign-analysis.json` | `reports/campaign-analysis.json` | yes |
 | `campaign_comparative_report_md` | `reports/campaign-report.md` | `reports/campaign-report.md` | yes |
+| `campaign_dry_run_json` | `—` | `—` | yes |
 | `campaign_manifest` | `manifest.json` | `manifest.json` | yes |
 | `campaign_result_pack_json` | `campaign-result-pack.json` | `campaign-result-pack.json` | yes |
 | `campaign_semantic_summary_json` | `campaign-semantic-summary.json` | `campaign-semantic-summary.json` | yes |

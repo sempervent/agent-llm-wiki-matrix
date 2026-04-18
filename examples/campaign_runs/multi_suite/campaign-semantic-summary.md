@@ -1,11 +1,14 @@
-# Judge variance — `campaign.examples.multi_suite.v1`
+# Campaign semantic summary
 
-- **title:** Example — multi-suite sweep (two fixtures)
-- **created_at:** `1970-01-01T00:00:00Z`
+- **Campaign:** `campaign.examples.multi_suite.v1`
+- **Title:** Example — multi-suite sweep (two fixtures)
+- **Created:** `1970-01-01T00:00:00Z`
 
-## Snapshot
+Rolls up **semantic** and **hybrid** scoring cells: repeat-judge disagreement, low-confidence flags, per-criterion instability, and per-axis hotspots. **Deterministic** cells are counted but do not contribute judge spread. Use with **`campaign-summary.md`** (run index) and **`reports/campaign-report.md`** (full comparative narrative).
 
-Low-confidence flags, repeat-judge spread, and per-criterion disagreement.
+## Executive snapshot
+
+Counts below combine judge metadata from member-run **evaluation** artifacts.
 
 | Signal | Count |
 | --- | ---: |
@@ -44,24 +47,24 @@ Low-confidence flags, repeat-judge spread, and per-criterion disagreement.
 
 ## Instability hotspots
 
-Highest disagreement on repeat-judge cells (`mean_range_across_cells` / `max_range_observed`).
+Axes with the largest judge disagreement on repeat-judge cells (**`mean_range_across_cells`** / **`max_range_observed`**).
 
 _No semantic / hybrid cells — hotspots apply when `eval_scoring.backend` is semantic or hybrid with repeat judges._
 
-## Detailed rollups — by suite
+## Detailed rollups by suite
 
 | Suite | Cells | Semantic | Repeat judge | Low conf. | Max range | Mean range | Mean σ_tot |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
 | `fixtures/benchmarks/campaign_micro.v1.yaml` | 1 | 0 | 0 | 0 | — | — | — |
 | `fixtures/benchmarks/offline.v1.yaml` | 6 | 0 | 0 | 0 | — | — | — |
 
-## Detailed rollups — by provider config (campaign axis)
+## Detailed rollups by provider config
 
 | Provider ref | Cells | Semantic | Repeat judge | Low conf. | Max range | Mean range | Mean σ_tot |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
 | `(default)` | 7 | 0 | 0 | 0 | — | — | — |
 
-## Detailed rollups — by execution mode
+## Detailed rollups by execution mode
 
 | Mode | Cells | Semantic | Repeat judge | Low conf. | Max range | Mean range | Mean σ_tot |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |

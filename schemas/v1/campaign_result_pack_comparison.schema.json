@@ -153,6 +153,11 @@
         "left": { "$ref": "#/$defs/portabilitySide" },
         "right": { "$ref": "#/$defs/portabilitySide" }
       }
+    },
+    "reader_interpretation": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "Optional human-oriented summary (non-scoring narrative; schema_version inside object)."
     }
   },
   "$defs": {

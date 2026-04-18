@@ -187,20 +187,27 @@ def render_campaign_summary_markdown(
     lines = [
         f"# Campaign summary: `{manifest.campaign_id}`",
         "",
-        f"- **title:** {manifest.title}",
-        f"- **created_at:** `{manifest.created_at}`",
-        f"- **definition:** `{manifest.definition_source_relpath}`",
+        "Single-page index for this campaign: **metadata**, a **snapshot digest** (spreads, "
+        "backends, instability, tags), the **member run table**, and links to comparative "
+        "artifacts when generated.",
+        "",
+        "## Metadata",
+        "",
+        f"- **Title:** {manifest.title}",
+        f"- **Created:** `{manifest.created_at}`",
+        f"- **Definition:** `{manifest.definition_source_relpath}`",
     ]
     if manifest.campaign_definition_fingerprint:
-        lines.append(f"- **definition_fingerprint:** `{manifest.campaign_definition_fingerprint}`")
+        lines.append(f"- **Definition fingerprint:** `{manifest.campaign_definition_fingerprint}`")
     if manifest.campaign_experiment_fingerprints is not None:
         cef = manifest.campaign_experiment_fingerprints
         lines.extend(
             [
                 "",
-                "## Experiment fingerprints (axes)",
+                "## Experiment fingerprints (six axes)",
                 "",
-                "Stable per-axis hashes for longitudinal grouping and comparability checks.",
+                "Stable per-axis hashes for longitudinal grouping and comparability checks "
+                "(see `docs/workflows/longitudinal-reporting.md`).",
                 "",
                 f"- **campaign_definition:** `{cef.campaign_definition}`",
                 f"- **suite_definitions:** `{cef.suite_definitions}`",
@@ -212,14 +219,17 @@ def render_campaign_summary_markdown(
         )
     lines.extend(
         [
+            "",
+            "## Execution context",
+            "",
             f"- **fixture_mode_force_mock:** `{manifest.fixture_mode_force_mock}`",
             f"- **dry_run:** `{manifest.dry_run}`",
-            f"- **runs:** {len(manifest.runs)}",
+            f"- **Planned runs:** {len(manifest.runs)}",
         ],
     )
     if manifest.run_status_summary:
         rs = manifest.run_status_summary
-        lines.append(f"- **succeeded / failed:** {rs.succeeded} / {rs.failed}")
+        lines.append(f"- **Succeeded / failed:** {rs.succeeded} / {rs.failed}")
     if manifest.git_commit_sha:
         lines.append(f"- **git_commit:** `{manifest.git_commit_sha}`")
     if manifest.git_describe:
@@ -235,6 +245,12 @@ def render_campaign_summary_markdown(
     lines.append(at_a_glance.rstrip())
     lines.extend(
         [
+            "",
+            "## Member run index",
+            "",
+            "One row per planned member benchmark run (including failures). **Mean score** is the "
+            "run-level mean of total weighted cell scores when present.",
+            "",
             (
                 "| # | run_id | suite | benchmark_id | eval axis | modes filter | "
                 "status | mean score | cells |"
@@ -265,7 +281,7 @@ def render_campaign_summary_markdown(
             or gp.campaign_semantic_summary_json
             or gp.campaign_semantic_summary_md
         ):
-            lines.extend(["", "## Comparative reports", ""])
+            lines.extend(["", "## Generated reports", ""])
             if gp.campaign_comparative_report_md:
                 lines.append(
                     f"- **Markdown:** `{gp.campaign_comparative_report_md}` "
@@ -289,11 +305,11 @@ def render_campaign_summary_markdown(
     lines.extend(
         [
             "",
-            "## Longitudinal analysis",
+            "## Longitudinal follow-up",
             "",
-            "Each successful row is a standard benchmark run directory. Point longitudinal tooling "
-            "at ``runs/*/manifest.json`` under this campaign root (see "
-            "``docs/workflows/longitudinal-reporting.md``).",
+            "Each **succeeded** row is a standard benchmark tree under `runs/runNNNN/`. Point "
+            "**`alwm benchmark longitudinal`** (or other tooling) at `runs/*/manifest.json` under "
+            "this campaign root. See **`docs/workflows/longitudinal-reporting.md`**.",
             "",
         ],
     )

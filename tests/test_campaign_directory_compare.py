@@ -28,10 +28,17 @@ def test_build_compare_minimal_vs_multi(tmp_path: Path) -> None:
     assert data["schema_version"] == 1
     assert data["identity"]["same_campaign_id"] is False
     assert data["sweep_dimensions"]["per_axis"]
+    ri = data["reader_interpretation"]
+    assert ri["schema_version"] == 1
+    assert ri["comparison_kind"] == "campaign_directory"
+    assert ri["evidence_strength"] in {"weak", "moderate"}
     bec = data["comparative_analysis"]["browser_evidence_comparison"]
     assert bec["right_row_count"] >= 1
     assert bec["aggregate"]["delta_dom_excerpts_right_minus_left"] >= 1
     md = render_campaign_compare_markdown(data)
+    assert md.startswith("# Campaign directory comparison")
+    assert "## Reader interpretation" in md
+    assert "right − left" in md
     assert "## Browser evidence (`browser_evidence_member_cells`)" in md
     assert "local MCP" in md
     jp, mp = write_campaign_compare_artifacts(tmp_path, data)

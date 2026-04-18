@@ -2,7 +2,7 @@
 
 A **campaign** runs multiple **benchmark harness** executions from one **campaign definition** file. Each member run is a normal benchmark output tree (``cells/``, ``matrices/``, ``manifest.json``), so results are **longitudinal-compatible**: point ``alwm benchmark longitudinal`` at ``runs/*/manifest.json`` under the campaign directory (see [longitudinal-reporting.md](longitudinal-reporting.md)). The campaign root adds **`manifest.json`** (**campaign manifest**: **`campaign_definition_fingerprint`**, **`campaign_experiment_fingerprints`** — six axes) and **`campaign-summary.json`** / **`.md`** (**campaign summary**).
 
-**Walkthrough (committed examples):** [campaign-walkthrough.md](campaign-walkthrough.md) · **Publish a pack (outward-facing bundle):** [campaign-result-pack-publication.md](campaign-result-pack-publication.md) · **Wiki:** [docs/wiki/campaign-orchestration.md](../wiki/campaign-orchestration.md) · **ADR:** [docs/architecture/adr/0001-benchmark-campaign-orchestration.md](../architecture/adr/0001-benchmark-campaign-orchestration.md) · **Tracking:** [docs/tracking/campaign-orchestration.md](../tracking/campaign-orchestration.md).
+**Walkthrough (committed examples):** [campaign-walkthrough.md](campaign-walkthrough.md) · **End-to-end publication:** [campaign-result-pack-publication.md](campaign-result-pack-publication.md) · **Verification:** [verification.md](verification.md) · **Wiki:** [Campaign orchestration (index)](../wiki/campaign-orchestration.md) · **ADR:** [Benchmark campaign orchestration](../architecture/adr/0001-benchmark-campaign-orchestration.md) · **Tracking:** [Campaign orchestration](../tracking/campaign-orchestration.md).
 
 ## Campaign definition
 
@@ -81,10 +81,10 @@ Under ``--output-dir``:
 | ``manifest.json`` | **Campaign manifest** (kinds ``benchmark_campaign_manifest`` or ``campaign_manifest``): ``campaign_definition_fingerprint``, ``campaign_experiment_fingerprints`` (six axes), timing, git provenance, ``run_status_summary``, ``runs[]`` with per-row status and copied **six-axis** ``comparison_fingerprints``, paths to each run’s benchmark ``manifest.json``. |
 | ``runs/runNNNN/`` | Full per-run benchmark directory (same layout as ``alwm benchmark run``). Omitted when using ``--dry-run``. |
 | ``campaign-summary.json`` | JSON rollup (kinds ``campaign_summary`` or legacy validation path). |
-| ``campaign-summary.md`` | Markdown table for humans, plus **At a glance** when comparative artifacts ran: best/worst mean scores by sweep axis, backend leaders, semantic instability counts, mode gaps, top **FT-\*** tags, and semantic judge hotspots (when ``campaign-semantic-summary.json`` exists). |
+| ``campaign-summary.md`` | Publication-style index: **metadata**, **experiment fingerprints**, **execution context**, **Snapshot digest** (when comparative artifacts ran), **Member run index** table, optional **Generated reports** links. The digest summarizes best/worst mean scores by sweep axis, backend means, semantic instability, mode gaps, **FT-\*** tags, and judge rollups (when ``campaign-semantic-summary.json`` exists). |
 | ``campaign-semantic-summary.json`` | **Semantic / hybrid judge rollup** (kind ``campaign_semantic_summary``): per-cell metrics from **evaluation** + **evaluation_judge_provenance**; **totals** split ``Evaluation.judge_low_confidence`` vs repeat ``confidence.low_confidence``; **criterion_instability** (per-criterion **score_range** from ``repeat_aggregation.disagreement``); **instability_highlights** (ranked unstable suites / providers / modes + **confidence_flag_counts**); rollups by suite / provider / mode. Deterministic-only campaigns still emit zeros / empty lists. |
-| ``campaign-semantic-summary.md`` | Human-readable mirror: **Judge confidence & disagreement** snapshot first, then totals, hotspots, rollups, per-cell table (eval vs repeat confidence + flags). |
-| ``reports/campaign-report.md`` | **Comparative report:** executive summary, optional **Semantic / hybrid judge — confidence & instability** section (rollup short form), **fingerprint-axis** section with **Axis interpretation** (ranked score spread, instability hotspots per axis, heuristic drift hints), per-axis bucket tables, correlation-style notes, mean scores, longitudinal semantic instability by **scoring_backend**, mode gaps, **FT-\*** tags, failure atlas. **browser_mock** runs add **Browser evidence**: **Cross-run contrast** when multiple members carry traces (deterministic fixture comparison), summary table (**signals** + **extension digest**), then per-cell traces (compact extension tables). |
+| ``campaign-semantic-summary.md`` | Human-readable mirror: **Campaign semantic summary** title, **Executive snapshot**, threshold flags, criteria, instability hotspots, detailed rollups, per-cell low-confidence table. |
+| ``reports/campaign-report.md`` | **Comparative report:** **Executive summary** first, optional **Semantic judge variance** embed, sweep dimensions, member mean-score tables, fingerprint-axis interpretation, backends, instability, mode gaps, **FT-\*** tags, failure atlas. **browser_mock** runs add **Browser evidence** sections as before. |
 | ``reports/campaign-analysis.json`` | Machine-readable mirror (``fingerprint_compare_axes``, ``fingerprint_axis_insights`` — per-group **run_count** when varied; **``fingerprint_axis_interpretation``** — **attribution_by_axis** rows add **attribution_label**, **evidence_strength**, **uncertainty_notes**, **metrics** (incl. **min_bucket_cell_count**); **differentiation_overview**, **interpretation_caveats**, spread ranking, hotspots, hints with **signal_class**; schema **1**; not ``alwm validate``). May include ``browser_evidence_member_cells`` and **judge_campaign_semantic**. |
 | ``campaign-dry-run.json`` | Only for ``--dry-run``: planned run count + inputs snapshot + ``campaign_definition_fingerprint`` + ``campaign_experiment_fingerprints`` (no ``runs/`` trees). |
 
@@ -112,9 +112,9 @@ uv run alwm benchmark longitudinal \
 
 ## Result packs (publishing and comparison)
 
-**Step-by-step publication (assemble → validate → compare → interpret):** **[campaign-result-pack-publication.md](campaign-result-pack-publication.md)**.
+**End-to-end publication workflow** (run campaign, validate, pack, compare, interpret, publish): **[campaign-result-pack-publication.md](campaign-result-pack-publication.md)** — single checklist with committed example paths; this section remains the **detailed CLI and output reference**.
 
-A **campaign result pack** is the **canonical outward-facing bundle** for a completed campaign: a **git-friendly** directory that copies the important parts of a finished campaign tree—**campaign manifest**, **summaries**, **semantic summary** (when present), **comparative report** + **analysis JSON** (when present), optional **dry-run** artifact, and **selected member runs** (full trees by default). The pack root adds **`campaign-result-pack.json`** (kind **`campaign_result_pack`**) and **`INDEX.md`** (publication checklist, workflow, provenance, fingerprints, validation commands).
+A **campaign result pack** is the **canonical outward-facing bundle** for a completed campaign: a **git-friendly** directory that copies the important parts of a finished campaign tree—**campaign manifest**, **summaries**, **semantic summary** (when present), **comparative report** + **analysis JSON** (when present), optional **`campaign-dry-run.json`** (plan-only campaigns), and **selected member runs** (full trees by default). The pack root adds **`campaign-result-pack.json`** (kind **`campaign_result_pack`**) and **`INDEX.md`**. The JSON records which optional layers are included (paths such as **`campaign_dry_run_json`** when the dry-run file was copied). **`INDEX.md`** is written for **cold reviewers**: **Start here** (reading order), **Bundle completeness** (yes/no per layer), **Publish-ready checklist**, provenance, fingerprints, and validation commands.
 
 **What to publish:** the **pack directory**, not only the raw **`examples/campaign_runs/…`** output. The pack is what you **cite, archive, or attach**; it includes **`pack_identity_fingerprint`** and a consistent **artifact inventory** for reviewers.
 
@@ -124,9 +124,12 @@ A **campaign result pack** is the **canonical outward-facing bundle** for a comp
 | --- | --- |
 | Pack JSON valid | `alwm validate …/campaign-result-pack.json campaign_result_pack` |
 | Campaign manifest valid | `alwm validate …/manifest.json campaign_manifest` |
+| Campaign summary valid | `alwm validate …/campaign-summary.json campaign_summary` |
+| Optional layers | When semantic files exist: `alwm validate …/campaign-semantic-summary.json campaign_semantic_summary`; confirm **Bundle completeness** in **`INDEX.md`** matches expectations |
 | On-disk layout matches manifest | `alwm benchmark campaign pack-check <pack_dir>` (`--strict` for stricter CI) |
 | No accidental absolute paths | `source_campaign_dir` absent unless you used `--record-source-abspath` on purpose |
 | Member trees sufficient for your audience | `member_depth: full` in pack JSON unless reviewers only need manifests |
+| Subset packs explained | If `included_member_count` < `campaign_run_count`, document why in **`notes`** or the PR |
 | Repo contracts unchanged | `just validate-artifacts` (swept `examples/` + `fixtures/`) |
 
 Assemble from a completed campaign directory:
@@ -160,7 +163,7 @@ uv run alwm benchmark campaign pack-check /tmp/campaign-pack
 uv run alwm benchmark campaign pack-check /tmp/campaign-pack --strict
 ```
 
-**Comparing two packs (CLI):** emit **`pack-compare.json`** (kind **`campaign_result_pack_comparison`**) and **`pack-compare-report.md`** summarizing identity and **campaign_experiment_fingerprints** diffs, included artifact paths, **`campaign-analysis.json`** deltas (backend means, semantic instability counts), **`browser_evidence_comparison`** when **`browser_evidence_member_cells`** exists (paired DOM/screenshot counts, signals/extension digests, extension keys; honest **Playwright** optional / **local MCP stdio** wording), **FT-\*** counts, semantic summary totals (when present), member run ids, and **pack-check** portability warnings. Use **`--repo-root .`** (from the repo root) to store pack paths **relative** to the repo for git-friendly committed reports.
+**Comparing two packs (CLI):** emit **`pack-compare.json`** (kind **`campaign_result_pack_comparison`**) and **`pack-compare-report.md`** summarizing identity and **campaign_experiment_fingerprints** diffs, included artifact paths, **`campaign-analysis.json`** deltas (backend means, semantic instability counts), **`browser_evidence_comparison`** when **`browser_evidence_member_cells`** exists (paired DOM/screenshot counts, signals/extension digests, extension keys; honest **Playwright** optional / **local MCP stdio** wording), **FT-\*** counts, semantic summary totals (when present), member run ids, **pack-check** portability warnings, and optional **`reader_interpretation`** (non-causal **Reader interpretation** section + JSON block — orientation, not proof). Use **`--repo-root .`** (from the repo root) to store pack paths **relative** to the repo for git-friendly committed reports.
 
 ```bash
 uv run alwm benchmark campaign compare-packs \
@@ -174,7 +177,7 @@ uv run alwm validate /tmp/pack-compare/pack-compare.json campaign_result_pack_co
 
 Example output: **`examples/campaign_result_packs/compare_minimal_vs_multi/`**. Manual review: **`INDEX.md`** in each pack still lists fingerprints and validation commands.
 
-**Comparing two completed campaign directories (CLI):** emit **`campaign-compare.json`** (kind **`campaign_compare`**) and **`campaign-compare-report.md`** without building result packs first. The report highlights **sweep dimensions** (which axes vary per manifest), **campaign_experiment_fingerprints** and **fingerprint_axis_insights** (from each **`campaign-analysis.json`**), **pooled backend mean scores**, **semantic instability** counts, the same **`browser_evidence_comparison`** block as pack compare (plus legacy **`browser_evidence`** rollups in JSON), **FT-\*** deltas, and **member run_id** overlap. Default is **offline** (reads committed JSON only). Use a fixed **`--created-at`** for reproducible committed examples.
+**Comparing two completed campaign directories (CLI):** emit **`campaign-compare.json`** (kind **`campaign_compare`**) and **`campaign-compare-report.md`** without building result packs first. The report highlights **sweep dimensions** (which axes vary per manifest), **campaign_experiment_fingerprints** and **fingerprint_axis_insights** (from each **`campaign-analysis.json`**), **pooled backend mean scores**, **semantic instability** counts, the same **`browser_evidence_comparison`** block as pack compare (plus legacy **`browser_evidence`** rollups in JSON), **FT-\*** deltas, **member run_id** overlap, and optional **`reader_interpretation`** (same role as pack compare). Default is **offline** (reads committed JSON only). Use a fixed **`--created-at`** for reproducible committed examples.
 
 ```bash
 uv run alwm benchmark campaign compare \

@@ -53,6 +53,10 @@ def test_assemble_full_pack_validates_and_copies_runs(
     chk = validate_campaign_result_pack_directory(pack_dir)
     assert chk.ok(strict_portability=False)
     assert not chk.errors
+    index_text = (pack_dir / "INDEX.md").read_text(encoding="utf-8")
+    assert "Start here (reviewing this bundle cold)" in index_text
+    assert "Bundle completeness" in index_text
+    assert "Publish-ready checklist" in index_text
 
 
 def test_pack_identity_fingerprint_stable_across_pack_ids(
@@ -104,6 +108,27 @@ def test_pack_check_strict_flags_manifest_depth(minimal_campaign_dir: Path, tmp_
     assert loose.warnings
     strict = validate_campaign_result_pack_directory(pack_dir, strict_portability=True)
     assert not strict.ok(strict_portability=True)
+
+
+def test_pack_records_dry_run_artifact_when_present(
+    minimal_campaign_dir: Path,
+    tmp_path: Path,
+) -> None:
+    (minimal_campaign_dir / "campaign-dry-run.json").write_text(
+        '{"schema_version":1,"planned_run_count":1}\n',
+        encoding="utf-8",
+    )
+    pack_dir = tmp_path / "pack-dry"
+    pack = assemble_campaign_result_pack(
+        campaign_dir=minimal_campaign_dir,
+        pack_dir=pack_dir,
+        pack_id="with-dry",
+        created_at="2026-04-18T12:00:00Z",
+    )
+    assert pack.artifacts.campaign_dry_run_json == "campaign-dry-run.json"
+    assert (pack_dir / "campaign-dry-run.json").is_file()
+    chk = validate_campaign_result_pack_directory(pack_dir)
+    assert chk.ok(strict_portability=False)
 
 
 def test_assemble_manifest_depth_skips_cells(minimal_campaign_dir: Path, tmp_path: Path) -> None:

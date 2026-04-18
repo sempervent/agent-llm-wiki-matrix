@@ -116,12 +116,12 @@ _Notes:_ MockBrowserRunner: deterministic; no real browser.
 
 | Field | Value |
 | --- | --- |
-| started_at_utc | `2026-04-18T01:12:33Z` |
-| finished_at_utc | `2026-04-18T01:12:34Z` |
-| duration_seconds | 0.355928 |
-| browser_phase_seconds | 0.000523 |
-| provider_completion_seconds | 0.000406 |
-| evaluation_phase_seconds | 0.065842 |
+| started_at_utc | `2026-04-18T01:41:38Z` |
+| finished_at_utc | `2026-04-18T01:41:38Z` |
+| duration_seconds | 0.006481 |
+| browser_phase_seconds | 0.000377 |
+| provider_completion_seconds | 0.000021 |
+| evaluation_phase_seconds | 0.001083 |
 | judge_phase_seconds | 0.000000 |
 
 ### Retry and judge summary

@@ -4,9 +4,11 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
-from typing import Any
+from typing import Any, Literal
 
 from agent_llm_wiki_matrix.models import CampaignExperimentFingerprints
+
+READER_INTERPRETATION_SCHEMA_VERSION = 1
 
 
 def read_json_optional(path: Path) -> dict[str, Any] | None:
@@ -499,3 +501,286 @@ def member_run_ids_diff(left_ids: set[str], right_ids: set[str]) -> dict[str, An
         "run_ids_only_in_right": sorted(right_ids - left_ids),
         "run_ids_in_both": sorted(left_ids & right_ids),
     }
+
+
+def build_reader_interpretation(
+    *,
+    identity: dict[str, Any],
+    comparative_analysis: dict[str, Any],
+    failure_tags: dict[str, Any],
+    semantic_summary_totals: dict[str, Any],
+    member_runs: dict[str, Any],
+    kind: Literal["pack", "campaign_directory"],
+    sweep_dimensions: dict[str, Any] | None = None,
+    fingerprint_insights_diff: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    """Structured, non-causal summary for human readers (additive JSON; Markdown mirrors this).
+
+    Does **not** change scoring — narrative only.
+    """
+    caveats = [
+        "Comparison uses **aggregates** from each side's `campaign-analysis.json` (when present). "
+        "This is **not** a paired statistical test.",
+        "Deltas (right − left) describe **reported** counts and means — not proven causal effects.",
+        "When **evidence_strength** is **weak**, treat narratives as **orientation**, not proof.",
+    ]
+
+    mismatch_axes = [
+        str(r["axis"])
+        for r in (identity.get("campaign_experiment_fingerprints") or [])
+        if not r.get("match")
+    ]
+
+    what_changed: list[str] = []
+    if not identity.get("same_campaign_id", True):
+        what_changed.append(
+            "**Different `campaign_id`** — these are different campaign definitions or outputs.",
+        )
+    pip = identity.get("pack_identity_fingerprint")
+    if isinstance(pip, dict) and pip.get("match") is False:
+        what_changed.append(
+            "**Pack identity fingerprint differs** — pack contents or provenance are not the "
+            "same bundle.",
+        )
+    cdf = identity.get("campaign_definition_fingerprint")
+    if isinstance(cdf, dict) and cdf.get("match") is False:
+        what_changed.append(
+            "**Campaign definition fingerprint differs** — the underlying sweep definition "
+            "changed.",
+        )
+    if mismatch_axes:
+        what_changed.append(
+            "**Experiment fingerprint axes that differ:** "
+            + ", ".join(f"`{a}`" for a in mismatch_axes)
+            + ".",
+        )
+    dsp = identity.get("definition_source_relpath")
+    if isinstance(dsp, dict) and dsp.get("match") is False:
+        what_changed.append("**Campaign definition YAML path** differs between sides.")
+
+    only_l = member_runs.get("run_ids_only_in_left") or []
+    only_r = member_runs.get("run_ids_only_in_right") or []
+    both = member_runs.get("run_ids_in_both") or []
+    if only_l or only_r:
+        what_changed.append(
+            f"**Member runs:** {len(only_l)} only on left, {len(only_r)} only on right, "
+            f"{len(both)} in both — overlap affects how directly you can compare pooled tables.",
+        )
+
+    ca = comparative_analysis
+    lp, rp = ca.get("left_present"), ca.get("right_present")
+    inst_rows = ca.get("semantic_instability_by_scoring_backend") or []
+    inst_parts: list[str] = []
+    for row in inst_rows:
+        sb = row.get("scoring_backend")
+        d = row.get("delta_right_minus_left")
+        lu = row.get("left_unstable_events")
+        ru = row.get("right_unstable_events")
+        if d not in (None, 0) or (lu or 0) > 0 or (ru or 0) > 0:
+            ds = str(d) if d is not None else "—"
+            inst_parts.append(f"`{sb}`: left {lu} → right {ru} (Δ {ds})")
+    if inst_parts:
+        instability_narrative = (
+            "**Semantic instability** (FT-JUDGE-UNSTABLE-class counts by scoring_backend): "
+            + "; ".join(inst_parts) + "."
+        )
+    else:
+        instability_narrative = (
+            "No non-zero **semantic instability** rows to contrast (or analysis missing on a side)."
+        )
+
+    be = ca.get("browser_evidence_comparison") or {}
+    if not be.get("has_any_evidence"):
+        browser_narrative = (
+            "No **`browser_evidence_member_cells`** rows on either side — no structured browser "
+            "trace comparison (members may be non-browser or analysis stripped)."
+        )
+    else:
+        agg = be.get("aggregate") or {}
+        delta_dom = agg.get("delta_dom_excerpts_right_minus_left")
+        delta_shot = agg.get("delta_screenshots_right_minus_left")
+        pr = be.get("paired_rows") or []
+        both_cells = sum(1 for x in pr if x.get("pairing") == "both")
+        lo = len(be.get("keys_only_in_left") or [])
+        ro = len(be.get("keys_only_in_right") or [])
+        lr = be.get("left_row_count", 0)
+        rr = be.get("right_row_count", 0)
+        browser_narrative = (
+            f"Browser rows: left {lr}, right {rr}; "
+            f"Δ DOM excerpts **{delta_dom}**, Δ screenshots **{delta_shot}**. "
+            f"Paired cells (both sides): **{both_cells}**; unpaired keys — left-only: {lo}, "
+            f"right-only: {ro}. "
+            "Differences reflect **fixture/capture** choices, not product quality by themselves."
+        )
+
+    sem = semantic_summary_totals
+    lt, rt = sem.get("left_totals"), sem.get("right_totals")
+    if lt is None and rt is None:
+        semantic_narrative = (
+            "No **`campaign-semantic-summary.json`** totals on both sides (or empty)."
+        )
+    else:
+        nd = sem.get("numeric_deltas_right_minus_left") or {}
+        if not nd:
+            semantic_narrative = (
+                "Semantic summary present but no numeric deltas computed (mixed types)."
+            )
+        else:
+            bits = [f"`{k}` → Δ {v}" for k, v in list(nd.items())[:8]]
+            semantic_narrative = (
+                "**Semantic / judge rollup deltas** (right − left, selected numeric fields): "
+                + "; ".join(bits)
+                + ("…" if len(nd) > 8 else "")
+                + " — interpret with **repeat-judge** context in the semantic summary files."
+            )
+
+    ft = failure_tags
+    ft_codes = ft.get("codes_compared") or []
+    ft_deltas = [
+        row
+        for row in ft_codes
+        if row.get("delta_right_minus_left") not in (None, 0)
+        or (row.get("left_signal_count") or 0) != (row.get("right_signal_count") or 0)
+    ]
+    oil, oir = ft.get("only_in_left") or [], ft.get("only_in_right") or []
+    if ft_deltas or oil or oir:
+        failure_narrative = (
+            f"**FT-* taxonomy:** {len(ft_deltas)} code(s) with count movement; "
+            f"only left: {len(oil)}, only right: {len(oir)} — compare failure atlas sections in "
+            "each campaign report for context."
+        )
+    else:
+        failure_narrative = "No **FT-*** count differences detected (or no signals on either side)."
+
+    sweep_narrative = ""
+    if kind == "campaign_directory" and sweep_dimensions:
+        vdiff = sweep_dimensions.get("varied_flags_differ_on_axes") or []
+        if vdiff:
+            sweep_narrative = (
+                "**Sweep manifest:** `varied` flags differ on "
+                + ", ".join(f"`{a}`" for a in vdiff)
+                + " — the two campaigns **do not expose the same axes** the same way."
+            )
+
+    fp_narrative = ""
+    if kind == "campaign_directory" and fingerprint_insights_diff:
+        rows = fingerprint_insights_diff.get("per_axis_key") or []
+        moved = [
+            r
+            for r in rows
+            if r.get("spread_delta_right_minus_left") not in (None, 0)
+            and r.get("left_varied")
+            and r.get("right_varied")
+        ]
+        if moved:
+            fp_narrative = (
+                "**Fingerprint insight spreads** (pooled mean gap) shifted on: "
+                + ", ".join(f"`{r.get('axis_key')}`" for r in moved[:5])
+                + " — see each `campaign-analysis.json` **fingerprint_axis_insights** for detail."
+            )
+
+    overlap = len(both)
+    evidence_strength = "moderate"
+    if not lp or not rp:
+        evidence_strength = "weak"
+        caveats.append(
+            "One side's **`campaign-analysis.json`** is missing — comparisons are incomplete.",
+        )
+    elif (
+        overlap == 0
+        and (member_runs.get("left_count") or 0) > 0
+        and (member_runs.get("right_count") or 0) > 0
+    ):
+        evidence_strength = "weak"
+        caveats.append(
+            "**No overlapping member run_ids** — pooled backend/instability rows are **not** "
+            "paired runs.",
+        )
+    elif (member_runs.get("left_count") or 0) < 2 and (member_runs.get("right_count") or 0) < 2:
+        evidence_strength = "weak"
+        caveats.append("Very **few member runs** per side — pooled means are **high variance**.")
+
+    return {
+        "schema_version": READER_INTERPRETATION_SCHEMA_VERSION,
+        "comparison_kind": kind,
+        "evidence_strength": evidence_strength,
+        "uncertainty_caveats": caveats,
+        "what_changed": what_changed,
+        "dimensions_fingerprint_mismatch_axes": mismatch_axes,
+        "instability_narrative": instability_narrative,
+        "browser_evidence_narrative": browser_narrative,
+        "semantic_summary_narrative": semantic_narrative,
+        "failure_tags_narrative": failure_narrative,
+        "sweep_dimensions_narrative": sweep_narrative or None,
+        "fingerprint_insights_narrative": fp_narrative or None,
+    }
+
+
+def format_reader_interpretation_markdown(interp: dict[str, Any]) -> str:
+    """Markdown block inserted after the report header (pack or directory compare)."""
+    lines = [
+        "## Reader interpretation",
+        "",
+        "> **Non-causal summary** — use this to orient; confirm in per-campaign reports and "
+        "manifests.",
+        "",
+        f"- **Evidence strength (aggregate):** **{interp.get('evidence_strength', '—')}** "
+        "(heuristic from analysis presence, member overlap, and run counts — not a power "
+        "analysis).",
+        "",
+    ]
+    wc = interp.get("what_changed") or []
+    if wc:
+        lines.append("### What changed")
+        lines.append("")
+        for b in wc:
+            lines.append(f"- {b}")
+        lines.append("")
+    axes = interp.get("dimensions_fingerprint_mismatch_axes") or []
+    if axes:
+        lines.append("### Dimensions (experiment fingerprints)")
+        lines.append("")
+        lines.append(
+            "Axes where digests **differ** (configuration / suite / provider / scoring / "
+            f"registry / browser): {', '.join(f'`{a}`' for a in axes)}.",
+        )
+        lines.append("")
+    sw = interp.get("sweep_dimensions_narrative")
+    if isinstance(sw, str) and sw.strip():
+        lines.append("### Sweep dimensions (manifest)")
+        lines.append("")
+        lines.append(sw.strip())
+        lines.append("")
+    fp = interp.get("fingerprint_insights_narrative")
+    if isinstance(fp, str) and fp.strip():
+        lines.append("### Fingerprint axis spreads (analysis JSON)")
+        lines.append("")
+        lines.append(fp.strip())
+        lines.append("")
+
+    lines.extend(
+        [
+            "### Instability (longitudinal counts)",
+            "",
+            str(interp.get("instability_narrative", "—")),
+            "",
+            "### Browser evidence (structured traces)",
+            "",
+            str(interp.get("browser_evidence_narrative", "—")),
+            "",
+            "### Semantic summary (judge rollup)",
+            "",
+            str(interp.get("semantic_summary_narrative", "—")),
+            "",
+            "### Failure tags (FT-*)",
+            "",
+            str(interp.get("failure_tags_narrative", "—")),
+            "",
+            "### Uncertainty & limits",
+            "",
+        ],
+    )
+    for c in interp.get("uncertainty_caveats") or []:
+        lines.append(f"- {c}")
+    lines.append("")
+    return "\n".join(lines)

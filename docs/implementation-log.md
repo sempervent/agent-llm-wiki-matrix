@@ -2,6 +2,64 @@
 
 Chronological record of repository work. Latest entries first.
 
+## 2026-04-17 — Milestone rollover: v0.2.4 shipped, v0.2.5 active
+
+**Delivered:** **[CHANGELOG.md](../CHANGELOG.md)** — **`[0.2.4]`** section; empty **`[Unreleased]`** for new work. **`docs/roadmap/v0.2.4.md`**, **`docs/tracking/v0.2.4-campaign.md`** — **complete** / **closed** with pointers to **`docs/releases/v0.2.4.md`**. **`docs/roadmap/v0.2.5.md`**, **`docs/tracking/v0.2.5-campaign.md`** — active focus (evidence packs + report readability). **`README.md`**, **`AGENTS.md`** — **Latest shipped** **v0.2.4**, **in-flight** **v0.2.5**. **`mkdocs.yml`**, **`docs/index.md`**, **`docs/workflows/{verification,campaign-result-pack-publication}.md`**, **`docs/releases/v0.2.{2,3}.md`** — milestone pointers. **`pyproject.toml`**, **`agent_llm_wiki_matrix.__init__`** → **0.2.5**; example **`alwm_version`** in **`examples/campaign_result_packs/{minimal_offline,multi_suite}/`** → **0.2.4** (assembler at **v0.2.4** tag).
+
+**Verification:** `uv run alwm version` → **0.2.5**; `uv run just ci`; `uv run --extra docs mkdocs build --strict` (optional).
+
+## 2026-04-19 — MkDocs findings polish (nav dedup, reporting in Publication)
+
+**Delivered:** **`mkdocs.yml`** — **Publication (v0.2.4)** labels clarified; **`workflows/reporting.md`** added to Publication; duplicate **`tracking/v0.2.4-campaign.md`** removed from **Tracking** nav; **`reporting`** removed from generic **Workflows** list (single nav path). **`docs/index.md`** — publication table row for reporting + handbook link in tip; **`docs/workflows/docs-site.md`** — findings updated (CI parity, dedup, reporting cross-links).
+
+**Verification:** `uv run --extra docs mkdocs build --strict` — success (~0.7s).
+
+## 2026-04-19 — MkDocs handbook (`docs-site.md`) and documented verification findings
+
+**Delivered:** Canonical workflow doc **`docs/workflows/docs-site.md`** (local **`just docs`** / **`just docs-build`**, **`mkdocs.yml`** **`nav:`**, CI, **implementation/verification findings**: succeeded vs awkward vs deferred, hard-to-surface pages, **agent conventions**). Removed duplicate **`mkdocs-site.md`**; **`mkdocs.yml`** nav points to **`docs-site.md`**. Updates: **`README.md`**, **`AGENTS.md`** (MkDocs sync bullets), **`docs/roadmap/v0.2.4.md`** (MkDocs status table), **`docs/tracking/v0.2.4-campaign.md`** (findings section), cross-links. **`.gitignore`** comment.
+
+**Verification (recorded in docs-site):** `uv sync --extra dev --extra docs`; `uv run --extra docs mkdocs build --strict` — **success** (~1s); `mkdocs serve` smoke **HTTP 200** on `/`; **`GET /workflows/docs-site/`** **200** after nav update. Material **MkDocs 2.0** banner present (informational). **`uv run just ci`** — success.
+
+## 2026-04-19 — MkDocs nav polish + GitHub Actions docs workflow
+
+**Delivered:** **`mkdocs.yml`** — **Publication (v0.2.4)** nav (checklist first; audit listed once; labels); **Roadmap & milestones** includes **v0.2.4 (active)**. **`docs/index.md`** — tip callout + tables. Cross-links on **`campaign-result-pack-publication.md`**, **`verification.md`**, **`benchmark-campaigns.md`**, **`roadmap/v0.2.4.md`**. Handbook later consolidated as **`docs/workflows/docs-site.md`**. **`.github/workflows/docs.yml`** — `uv sync --frozen --extra docs`, `mkdocs build --strict`, artifact, **`gh-pages`** on **`main`**.
+
+**Verification:** `uv run --extra docs mkdocs build --strict`; `uv run just ci`.
+
+## 2026-04-19 — MkDocs documentation site (v0.2.4)
+
+**Delivered:** **`mkdocs.yml`** (Material theme, **`nav`**: publication block, workflows, roadmaps, releases, architecture, audits, tracking, wiki, ADRs, external links). **`docs/index.md`**, **`docs/contributing.md`**, later **`docs/workflows/docs-site.md`**. **`pyproject.toml`** optional **`[docs]`** extra (`mkdocs>=1.6,<2`, `mkdocs-material`, `pymdown-extensions`); **`just docs`**, **`just docs-build`**. **`.gitignore`**: **`/site/`**. Updates: **`README.md`**, **`AGENTS.md`**, **`docs/workflows/verification.md`**, **`docs/roadmap/v0.2.4.md`**, **`docs/tracking/v0.2.4-campaign.md`**. **`uv.lock`**.
+
+**Verification:** `uv run --extra docs mkdocs build --strict`; `uv run just ci`.
+
+## 2026-04-19 — Campaign / comparison Markdown (publication readability)
+
+**Delivered:** Tighter headings and reader-oriented copy for **`campaign-summary.md`** (**Metadata**, **Snapshot digest**, **Member run index**, **Generated reports**, **Longitudinal follow-up**), **`campaign-semantic-summary.md`** (**Campaign semantic summary**, **Executive snapshot**), **`reports/campaign-report.md`** (**Executive summary**, intro blurb), **`pack-compare-report.md`** / **`campaign-compare-report.md`** (Δ convention upfront). **`campaign_result_pack` `INDEX.md`:** **Pack snapshot** (was “At a glance”). **No scoring math changes.**
+
+**Examples:** Regenerated **`examples/campaign_runs/{minimal_offline,multi_suite,browser_evidence_compare}/`**, **`examples/campaign_result_packs/{minimal_offline,multi_suite}/`**, **`examples/campaign_result_packs/compare_minimal_vs_multi/`**, **`examples/campaign_compares/minimal_offline_vs_multi_suite/`**. Docs **`docs/workflows/benchmark-campaigns.md`**. Tests **`tests/test_benchmark_campaign.py`**, **`tests/test_campaign_reporting.py`**, **`tests/test_report_markdown_readability.py`**, **`tests/test_campaign_directory_compare.py`**, **`tests/test_campaign_result_pack_compare.py`**.
+
+**Verification:** `uv run pytest tests/ --ignore=tests/integration`.
+
+## 2026-04-17 — Pack/campaign compare: reader interpretation JSON + Markdown
+
+**Delivered:** **`campaign_compare_core.py`** — **`build_reader_interpretation`**, **`format_reader_interpretation_markdown`** (non-scoring narratives, cautious **`evidence_strength`**, **`uncertainty_caveats`**). **`campaign_result_pack_compare.py`** / **`campaign_directory_compare.py`** attach **`reader_interpretation`** to compare JSON and prepend the Markdown section. **`CampaignResultPackComparisonV1`** / **`CampaignCompareV1`** optional field; **`schemas/v1/campaign_{result_pack_comparison,compare}.schema.json`** — additive **`reader_interpretation`**. Docs **`docs/workflows/campaign-result-pack-publication.md`**. Regenerated **`examples/campaign_result_packs/compare_minimal_vs_multi/`**, **`examples/campaign_compares/minimal_offline_vs_multi_suite/`**. Tests **`tests/test_campaign_result_pack_compare.py`**, **`tests/test_campaign_directory_compare.py`**.
+
+**Backward compatibility:** **`schema_version`** **1**; older JSON without **`reader_interpretation`** still validates; Markdown skips the section when absent.
+
+**Verification:** `uv run just ci` (or equivalent ruff/mypy/pytest on default suite).
+
+## 2026-04-19 — Campaign result pack: reviewer-first INDEX + optional dry-run path
+
+**Delivered:** **`CampaignResultPackArtifacts.campaign_dry_run_json`** (optional; set when **`campaign-dry-run.json`** is copied into the pack). **`_render_pack_index_md`** — **Start here (cold read)**, **Bundle completeness** table, expanded **Publish-ready checklist**, subset callout; **`INDEX.md`** validate block includes **`campaign-summary.json`**. Docs **`docs/workflows/campaign-result-pack-publication.md`**, **`docs/workflows/benchmark-campaigns.md`**, **`docs/architecture/data-model.md`**, **`examples/campaign_result_packs/README.md`**. Regenerated **`examples/campaign_result_packs/{minimal_offline,multi_suite}/`**. Tests **`tests/test_campaign_result_pack.py`**.
+
+**Verification:** `uv run pytest tests/test_campaign_result_pack.py tests/test_schema_drift_contracts.py`; `uv run ruff check` / `mypy` on touched modules.
+
+## 2026-04-19 — Milestone rollover: v0.2.3 shipped, v0.2.4 active
+
+**Delivered:** **[CHANGELOG.md](../CHANGELOG.md)** — **`[0.2.3]`** section; empty **`[Unreleased]`** for new work. **`docs/releases/v0.2.3.md`**. **`docs/roadmap/v0.2.3.md`**, **`docs/tracking/v0.2.3-campaign.md`** marked **closed** / complete. **`docs/roadmap/v0.2.4.md`**, **`docs/tracking/v0.2.4-campaign.md`** — publication + E2E workflow focus. **`README.md`**, **`AGENTS.md`** — **Latest shipped** **v0.2.3**, **in-flight** **v0.2.4**. **`docs/releases/v0.2.2.md`** next-milestone pointer. **`pyproject.toml`**, **`agent_llm_wiki_matrix.__init__`**, **`uv.lock`** → **0.2.3**; example **`alwm_version`** in **`examples/campaign_result_packs/{minimal_offline,multi_suite}/`** aligned.
+
+**Verification:** docs-only pass; `uv run alwm version` (optional sanity).
+
 ## 2026-04-19 — Pack/directory compare: browser evidence pairing
 
 **Delivered:** **`campaign_compare_core.py`** — **`build_browser_evidence_member_cells_comparison_block`**, **`render_browser_evidence_member_cells_comparison_markdown`**; merged into **`build_analysis_comparison_block`** as **`browser_evidence_comparison`**. **`campaign_result_pack_compare.py`** / **`campaign_directory_compare.py`** render the Markdown section after semantic instability (directory: **`top_heading_level=2`**); directory report drops the older duplicate browser bullets in favor of the paired table. Example **`examples/campaign_result_packs/compare_minimal_vs_multi/`** regenerated. Schema note on **`browser_evidence_comparison`**; docs **`docs/workflows/benchmark-campaigns.md`**, **`docs/architecture/data-model.md`**. Tests **`tests/test_campaign_result_pack_compare.py`**, **`tests/test_campaign_directory_compare.py`**.

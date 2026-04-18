@@ -12,8 +12,10 @@ from agent_llm_wiki_matrix.benchmark.campaign_compare_core import (
     build_analysis_comparison_block,
     build_browser_evidence_member_cells_comparison_block,
     build_failure_tag_comparison_block,
+    build_reader_interpretation,
     build_semantic_comparison_block,
     experiment_fingerprint_axes,
+    format_reader_interpretation_markdown,
     member_run_ids_diff,
     read_json_optional,
     render_browser_evidence_member_cells_comparison_markdown,
@@ -220,6 +222,40 @@ def build_campaign_directory_comparison(
     r_run_ids = {r.run_id for r in rm.runs}
 
     ts = created_at or _utc_iso()
+    analysis_block = build_analysis_comparison_block(ls.analysis, rs.analysis)
+    semantic_block = build_semantic_comparison_block(ls.semantic, rs.semantic)
+    tags_block = build_failure_tag_comparison_block(ls.analysis, rs.analysis)
+    browser_block = build_browser_evidence_member_cells_comparison_block(ls.analysis, rs.analysis)
+    members_block = member_run_ids_diff(l_run_ids, r_run_ids)
+
+    identity_block = {
+        "same_campaign_id": lm.campaign_id == rm.campaign_id,
+        "left_campaign_id": lm.campaign_id,
+        "right_campaign_id": rm.campaign_id,
+        "campaign_definition_fingerprint": {
+            "left": lm.campaign_definition_fingerprint,
+            "right": rm.campaign_definition_fingerprint,
+            "match": lm.campaign_definition_fingerprint == rm.campaign_definition_fingerprint,
+        },
+        "campaign_experiment_fingerprints": fp_rows,
+        "definition_source_relpath": {
+            "left": lm.definition_source_relpath,
+            "right": rm.definition_source_relpath,
+            "match": lm.definition_source_relpath == rm.definition_source_relpath,
+        },
+    }
+
+    reader_interpretation = build_reader_interpretation(
+        identity=identity_block,
+        comparative_analysis=analysis_block,
+        failure_tags=tags_block,
+        semantic_summary_totals=semantic_block,
+        member_runs=members_block,
+        kind="campaign_directory",
+        sweep_dimensions=sweep,
+        fingerprint_insights_diff=fp_insights,
+    )
+
     return {
         "schema_version": 1,
         "created_at": ts,
@@ -237,37 +273,20 @@ def build_campaign_directory_comparison(
             "title": rm.title,
             "definition_source_relpath": rm.definition_source_relpath,
         },
-        "identity": {
-            "same_campaign_id": lm.campaign_id == rm.campaign_id,
-            "left_campaign_id": lm.campaign_id,
-            "right_campaign_id": rm.campaign_id,
-            "campaign_definition_fingerprint": {
-                "left": lm.campaign_definition_fingerprint,
-                "right": rm.campaign_definition_fingerprint,
-                "match": lm.campaign_definition_fingerprint == rm.campaign_definition_fingerprint,
-            },
-            "campaign_experiment_fingerprints": fp_rows,
-            "definition_source_relpath": {
-                "left": lm.definition_source_relpath,
-                "right": rm.definition_source_relpath,
-                "match": lm.definition_source_relpath == rm.definition_source_relpath,
-            },
-        },
+        "identity": identity_block,
         "sweep_dimensions": sweep,
         "fingerprint_axis_insights": fp_insights,
         "artifacts": {"entries": artifact_entries},
-        "comparative_analysis": build_analysis_comparison_block(ls.analysis, rs.analysis),
-        "semantic_summary_totals": build_semantic_comparison_block(ls.semantic, rs.semantic),
-        "failure_tags": build_failure_tag_comparison_block(ls.analysis, rs.analysis),
-        "browser_evidence": build_browser_evidence_member_cells_comparison_block(
-            ls.analysis,
-            rs.analysis,
-        ),
-        "member_runs": member_run_ids_diff(l_run_ids, r_run_ids),
+        "comparative_analysis": analysis_block,
+        "semantic_summary_totals": semantic_block,
+        "failure_tags": tags_block,
+        "browser_evidence": browser_block,
+        "member_runs": members_block,
         "run_health": {
             "left": {"dry_run": lm.dry_run, "manifest_run_count": lm.run_count},
             "right": {"dry_run": rm.dry_run, "manifest_run_count": rm.run_count},
         },
+        "reader_interpretation": reader_interpretation,
     }
 
 
@@ -277,18 +296,30 @@ def render_campaign_compare_markdown(data: dict[str, Any]) -> str:
     right = data["right"]
     ident = data["identity"]
     lines = [
-        "# Campaign comparison (directories)",
+        "# Campaign directory comparison",
+        "",
+        "Compares two completed **campaign output directories** (manifest + standard artifacts). "
+        "**Δ** columns use **right − left** when both sides are numeric. "
+        "Structured mirror: **`campaign-compare.json`**.",
         "",
         f"- **Left:** `{left['label']}` — `{left['path']}`",
         f"- **Right:** `{right['label']}` — `{right['path']}`",
         f"- **Generated:** `{data['created_at']}`",
         "",
-        "## Campaign identity & fingerprints",
-        "",
-        "| Check | Value |",
-        "| --- | --- |",
-        f"| Same **campaign_id** | {'yes' if ident['same_campaign_id'] else '**no**'} |",
     ]
+    ri = data.get("reader_interpretation")
+    if isinstance(ri, dict) and ri:
+        lines.append(format_reader_interpretation_markdown(ri).rstrip())
+        lines.append("")
+    lines.extend(
+        [
+            "## Identity & fingerprints",
+            "",
+            "| Check | Value |",
+            "| --- | --- |",
+            f"| Same **campaign_id** | {'yes' if ident['same_campaign_id'] else '**no**'} |",
+        ],
+    )
     cdf = ident["campaign_definition_fingerprint"]
     lines.append(
         f"| **campaign_definition_fingerprint** match | "

@@ -15,8 +15,8 @@
   "dry_run": false,
   "failures": [],
   "fixture_mode_force_mock": true,
-  "git_commit_sha": "148517589c625e7fc468c35311d0bcd6939462bd",
-  "git_describe": "v0.2.2-dirty",
+  "git_commit_sha": "1d6cbf5bc0c399ea757e6b38add5f4db5f10d102",
+  "git_describe": "v0.2.3-dirty",
   "run_count": 2,
   "run_status_summary": {
     "failed": 0,
@@ -35,7 +35,7 @@
         "scoring_config": "sha256:f958bcbda76ceda7438ca44922ecf99f6ef81948463ec797c7b454a29b249496",
         "suite_definition": "sha256:c42296d7793f46e3d63e40015894250a95e6923553c47f9fef0f81c9337ba2db"
       },
-      "duration_seconds": 0.377009,
+      "duration_seconds": 0.003366,
       "eval_scoring_label": "suite_default",
       "manifest_relpath": "runs/run0000/manifest.json",
       "mean_total_weighted_score": 0.667276,
@@ -57,7 +57,7 @@
         "scoring_config": "sha256:f958bcbda76ceda7438ca44922ecf99f6ef81948463ec797c7b454a29b249496",
         "suite_definition": "sha256:52bf51382310147547bbcf152c5c4eab362af0f2595fad08226395a5ce9c9996"
       },
-      "duration_seconds": 0.364317,
+      "duration_seconds": 0.008417,
       "eval_scoring_label": "suite_default",
       "manifest_relpath": "runs/run0001/manifest.json",
       "mean_total_weighted_score": 0.36725116666666663,

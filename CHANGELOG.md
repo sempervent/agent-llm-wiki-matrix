@@ -7,11 +7,40 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.4] — 2026-04-17
+
+**End-to-end publication workflow, MkDocs site, and compare readability** — **publication-ready** campaign paths, **navigable docs** (`mkdocs.yml`, **`just docs`**), **GitHub Actions** docs builds, **reader interpretation** on pack and campaign compares, and **report / INDEX** polish while **default CI** stays **offline**.
+
+### Highlights
+
+- **E2E publication** — operator checklist **[docs/workflows/campaign-result-pack-publication.md](docs/workflows/campaign-result-pack-publication.md)**; cross-links with **benchmark-campaigns** and **verification**.
+- **MkDocs** — Material theme, **Publication** nav block, **`docs/index.md`**, **`[docs]`** extra, **`.github/workflows/docs.yml`**; handbook **[docs/workflows/docs-site.md](docs/workflows/docs-site.md)**.
+- **Compare reader interpretation** — optional **`reader_interpretation`** on **`campaign_result_pack_comparison`** and **`campaign_compare`** JSON (non-scoring narratives, **`evidence_strength`**, **`uncertainty_caveats`**) and **Reader interpretation** sections in compare Markdown.
+- **Campaign & compare Markdown** — tighter headings, digests, and cold-read **INDEX** for result packs (see **implementation log**).
+
+Narrative notes: [docs/releases/v0.2.4.md](docs/releases/v0.2.4.md). Next milestone: [docs/roadmap/v0.2.5.md](docs/roadmap/v0.2.5.md).
+
+## [0.2.3] — 2026-04-19
+
+**Publishable campaign packs, fingerprint-informed reporting, drift guards, and comparison tooling** — strengthens **campaign outputs** for **git** and **review**, keeps **default CI offline**, and documents **verification** and **capability** boundaries clearly.
+
+### Highlights
+
+- **Result packs** — `alwm benchmark campaign pack` / `pack-check`; `campaign_result_pack`; examples under `examples/campaign_result_packs/`.
+- **Comparisons** — `alwm benchmark campaign compare-packs` (`campaign_result_pack_comparison`); `alwm benchmark campaign compare` on raw campaign directories (`campaign_compare`).
+- **Fingerprint interpretation** — richer analysis JSON and Markdown for comparative and longitudinal outputs.
+- **Drift prevention** — `tests/test_schema_drift_contracts.py`, `just validate-artifacts`, inventory in `docs/audits/schema-drift-contracts-inventory.md`.
+- **Verification matrix** — canonical commands in `docs/workflows/verification.md`.
+
+Narrative notes: [docs/releases/v0.2.3.md](docs/releases/v0.2.3.md). Later milestones: [v0.2.4](docs/releases/v0.2.4.md) (shipped); current [v0.2.5](docs/roadmap/v0.2.5.md).
+
 ### Added
 
 - **Campaign result pack comparison** — `CampaignResultPackComparisonV1` + `schemas/v1/campaign_result_pack_comparison.schema.json`; `alwm benchmark campaign compare-packs` writes `pack-compare.json` and `pack-compare-report.md` (fingerprints, artifact paths, `campaign-analysis.json` deltas, FT-\*, semantic totals, member runs, portability). Optional `--repo-root` for git-friendly relative paths. Example: `examples/campaign_result_packs/compare_minimal_vs_multi/`. Kind `campaign_result_pack_comparison` in `artifacts.py`.
 
 - **Campaign result packs** — `CampaignResultPackV1` + `schemas/v1/campaign_result_pack.schema.json`; `alwm benchmark campaign pack` assembles a git-friendly directory (`campaign-result-pack.json`, `INDEX.md`, mirrored campaign layout). Example: `examples/campaign_result_packs/minimal_offline/`. Kind `campaign_result_pack` registered in `artifacts.py`.
+
+- **Campaign directory comparison** — `CampaignCompareV1` + `schemas/v1/campaign_compare.schema.json`; `alwm benchmark campaign compare` writes `campaign-compare.json` and Markdown report for two campaign output directories. Kind `campaign_compare` in `artifacts.py`. Example: `examples/campaign_compares/minimal_offline_vs_multi_suite/`.
 
 - **MCP stdio (protocol) path** — `MCPBrowserRunner` uses the `mcp` client for a **local** stdio server when `ALWM_MCP_BROWSER_COMMAND` is set and no fixture ids are passed; `alwm browser run-mcp --stdio`; fixture server `fixtures/mcp_servers/stdio_browser_evidence_server.py`. `mcp>=1.27` is in **`dev`** optional extras. **Not** a v0.2.0 exit criterion for IDE-hosted MCP (`docs/roadmap/v0.2.0.md`).
 
@@ -86,3 +115,5 @@ First tagged release: offline-first CLI, pipelines, benchmark harness, prompt re
 [0.1.0]: https://github.com/sempervent/agent-llm-wiki-matrix/releases/tag/v0.1.0
 [0.2.0]: https://github.com/sempervent/agent-llm-wiki-matrix/releases/tag/v0.2.0
 [0.2.1]: https://github.com/sempervent/agent-llm-wiki-matrix/releases/tag/v0.2.1
+[0.2.3]: https://github.com/sempervent/agent-llm-wiki-matrix/releases/tag/v0.2.3
+[0.2.4]: https://github.com/sempervent/agent-llm-wiki-matrix/releases/tag/v0.2.4

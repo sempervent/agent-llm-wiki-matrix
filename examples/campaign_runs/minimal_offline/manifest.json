@@ -4,10 +4,10 @@
     "member_runs_timed": 1,
     "schema_version": 1,
     "total_browser_phase_seconds": 0.0,
-    "total_evaluation_phase_seconds": 0.002095,
+    "total_evaluation_phase_seconds": 0.00076,
     "total_judge_invocations": 0,
     "total_judge_phase_seconds": 0.0,
-    "total_provider_completion_seconds": 3.1e-05
+    "total_provider_completion_seconds": 1e-05
   },
   "campaign_definition_fingerprint": "sha256:340780556158635e0b33298b726f530cbc86f7dcfdd8923934bbb14a0734e47b",
   "campaign_experiment_fingerprints": {
@@ -22,10 +22,10 @@
   "created_at": "1970-01-01T00:00:00Z",
   "definition_source_relpath": "examples/campaigns/v1/minimal_offline.v1.yaml",
   "dry_run": false,
-  "duration_seconds": 0.304918,
+  "duration_seconds": 0.053454,
   "expected_artifact_kinds": [],
   "failures": [],
-  "finished_at_utc": "2026-04-18T00:54:13Z",
+  "finished_at_utc": "2026-04-18T01:41:36Z",
   "fixture_mode_force_mock": true,
   "generated_report_paths": {
     "campaign_analysis_json": "reports/campaign-analysis.json",
@@ -36,8 +36,8 @@
     "campaign_summary_json": "campaign-summary.json",
     "campaign_summary_md": "campaign-summary.md"
   },
-  "git_commit_sha": "148517589c625e7fc468c35311d0bcd6939462bd",
-  "git_describe": "v0.2.2-dirty",
+  "git_commit_sha": "1d6cbf5bc0c399ea757e6b38add5f4db5f10d102",
+  "git_describe": "v0.2.3-dirty",
   "inputs_snapshot": {
     "browser_configs": [
       null
@@ -72,7 +72,7 @@
         "scoring_config": "sha256:f958bcbda76ceda7438ca44922ecf99f6ef81948463ec797c7b454a29b249496",
         "suite_definition": "sha256:a772457f2824d25d4b0e6c9219772ecc45fe305e20596091b81fac9db218308a"
       },
-      "duration_seconds": 0.019731,
+      "duration_seconds": 0.004744,
       "eval_scoring_label": "suite_default",
       "manifest_relpath": "runs/run0000/manifest.json",
       "mean_total_weighted_score": 0.667276,
@@ -84,7 +84,7 @@
     }
   ],
   "schema_version": 1,
-  "started_at_utc": "2026-04-18T00:54:13Z",
+  "started_at_utc": "2026-04-18T01:41:36Z",
   "tags": [
     "example:campaign"
   ],

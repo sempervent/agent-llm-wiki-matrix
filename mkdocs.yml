@@ -1,0 +1,126 @@
+# MkDocs — navigable documentation site (source files remain markdown-first under docs/).
+# Local: `just docs` · Build: `just docs-build` · CI: .github/workflows/docs.yml
+
+site_name: agent-llm-wiki-matrix
+site_description: Markdown-first LLM wiki, comparison matrices, benchmarks, and campaign publication tooling
+site_author: Joshua Grant
+
+repo_url: https://github.com/sempervent/agent-llm-wiki-matrix
+edit_uri: edit/main/docs/
+
+docs_dir: docs
+site_dir: site
+
+strict: true
+
+# Repo markdown often links to ../../README.md, ../../examples/, ../../tests/ (valid on GitHub; not bundled under docs/).
+validation:
+  links:
+    not_found: ignore
+  not_found: warn
+
+theme:
+  name: material
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - toc.follow
+  palette:
+    - scheme: default
+      primary: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      primary: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+
+markdown_extensions:
+  - tables
+  - toc:
+      permalink: true
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+
+# Nav: "Publication (v0.2.5)" = campaign/pack/compare + matrix reporting + verification. Do not list the same .md twice (v0.2.5 tracking lives only here; audit only here).
+nav:
+  - Home: index.md
+  - Publication (v0.2.5):
+    - "Checklist: run → pack → publish": workflows/campaign-result-pack-publication.md
+    - "Tracking v0.2.5 (merge order)": tracking/v0.2.5-campaign.md
+    - Benchmark campaigns (CLI & outputs): workflows/benchmark-campaigns.md
+    - Campaign walkthrough (examples): workflows/campaign-walkthrough.md
+    - "Reporting pipeline (matrices, alwm report)": workflows/reporting.md
+    - "CI & drift (verification matrix)": workflows/verification.md
+    - "Longitudinal & regression reporting": workflows/longitudinal-reporting.md
+    - Evidence audit (publication gaps): audits/v0.2.4-publication-workflow-audit.md
+  - Workflows:
+    - Agentic benchmark pack: workflows/agentic-benchmark-pack.md
+    - Benchmarking: workflows/benchmarking.md
+    - Live verification: workflows/live-verification.md
+    - Local development: workflows/local-dev.md
+    - Multi-agent parallel: workflows/multi-agent-parallel.md
+    - Smoke tests: workflows/smoke.md
+    - Walkthrough v0.1.0: workflows/walkthrough-v0.1.0.md
+    - Documentation site (handbook): workflows/docs-site.md
+  - Roadmap & milestones:
+    - v0.2.5 (active): roadmap/v0.2.5.md
+    - v0.2.4: roadmap/v0.2.4.md
+    - v0.2.3: roadmap/v0.2.3.md
+    - v0.2.0: roadmap/v0.2.0.md
+  - Releases:
+    - v0.2.4: releases/v0.2.4.md
+    - v0.2.3: releases/v0.2.3.md
+    - v0.2.2: releases/v0.2.2.md
+    - v0.2.1: releases/v0.2.1.md
+    - v0.1.0: releases/v0.1.0.md
+  - Architecture:
+    - Current state: architecture/current-state.md
+    - Data model: architecture/data-model.md
+    - Evaluation pipeline: architecture/evaluation-pipeline.md
+    - Browser: architecture/browser.md
+    - Runtime: architecture/runtime.md
+    - Target state: architecture/target-state.md
+    - ADR 0001 (benchmark campaigns): architecture/adr/0001-benchmark-campaign-orchestration.md
+  - Audits:
+    - Capability classification: audits/capability-classification.md
+    - Current capability status: audits/current-capability-status.md
+    - Mission gap: audits/mission-gap-audit.md
+    - Release readiness audit: audits/release-readiness-audit.md
+    - Schema drift inventory: audits/schema-drift-contracts-inventory.md
+    - Schema/runtime hardening notes: audits/schema-runtime-hardening-2026-04-18.md
+  - Tracking:
+    - Campaign orchestration: tracking/campaign-orchestration.md
+    - Benchmark campaign orchestration (legacy): tracking/benchmark-campaign-orchestration.md
+    - v0.2.4 tracking (closed): tracking/v0.2.4-campaign.md
+    - v0.2.3 tracking (closed): tracking/v0.2.3-campaign.md
+  - Wiki:
+    - "Index: benchmark campaigns": wiki/benchmark-campaigns.md
+    - "Index: campaign orchestration": wiki/campaign-orchestration.md
+  - ADRs:
+    - ADR 0001 (alternate path under docs/adr): adr/0001-campaign-orchestration.md
+  - Examples index: examples/README.md
+  - Project:
+    - Release readiness: release-readiness.md
+    - Implementation log: implementation-log.md
+    - Contributing: contributing.md
+  - Repository on GitHub:
+    - Changelog: https://github.com/sempervent/agent-llm-wiki-matrix/blob/main/CHANGELOG.md
+    - README: https://github.com/sempervent/agent-llm-wiki-matrix/blob/main/README.md
+    - AGENTS: https://github.com/sempervent/agent-llm-wiki-matrix/blob/main/AGENTS.md
+
+plugins:
+  - search
+
+extra:
+  generator: false

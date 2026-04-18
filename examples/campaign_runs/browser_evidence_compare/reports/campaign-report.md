@@ -1,8 +1,10 @@
 # Campaign comparative report: `campaign.examples.browser_evidence_compare.v1`
 
-Succeeded member runs only. **`FT-*`** taxonomy matches longitudinal analysis (manifest run order). Mode gaps and judge instability are per snapshot.
+Analysis uses **succeeded** member benchmark runs only. **`FT-*`** codes follow the longitudinal taxonomy (see `docs/workflows/longitudinal-reporting.md`). **Mode gaps** and **semantic instability** counts are derived from the same longitudinal pass as `reports/campaign-analysis.json`.
 
-## At a glance
+## Executive summary
+
+Skim this block first, then use the sections below for full tables and the failure atlas.
 
 - **Varied sweep axes:** `suite_ref`.
 - _Note:_ `suite_ref` and `benchmark_id` sweep together — member scores by benchmark are the same grouping as by suite.
@@ -32,9 +34,9 @@ _No mode-gap rows above threshold (or modes not comparable in member runs)._
 
 - `FT-ABS-LOW`×1
 
-## Judge variance (semantic / hybrid)
+## Semantic judge variance
 
-From **evaluation.json**, **evaluation_judge_provenance.json**, and **repeat_aggregation** when N>1. Deterministic cells have no judge spread.
+Sourced from **evaluation.json**, **evaluation_judge_provenance.json**, and **repeat_aggregation** when **N>1**. Deterministic-only cells have no judge spread.
 
 | Signal | Count |
 | --- | ---: |
@@ -90,30 +92,42 @@ Each row is the mean of **mean_total_weighted_score** for member runs at that sw
 
 Each **succeeded** member run is grouped using the same keys as ``group_snapshots_by`` in ``pipelines/longitudinal`` (``provider_config_fingerprint``, ``scoring_config_fingerprint``, ``execution_mode``, ``prompt_registry_state_fingerprint``, ``browser_config_fingerprint``). **Pooled mean** is the mean of all cell **total_weighted_score** values in that group. **Unstable** counts longitudinal **FT-JUDGE-UNSTABLE**-class rows for runs in the group. **Regressions→** counts **to_run** edges (score dropped vs the prior run for the same benchmark cell) whose destination run lies in this group.
 
+_Axis interpretation below states **evidence strength** (aggregate cell counts) and **uncertainty** explicitly — small buckets or few cells mean labels are **tentative**._
+
 ### Axis interpretation (why buckets differ)
 
-These rows summarize **aggregate** differences across fingerprint buckets (same keys as ``group_snapshots_by``). They help triage **configuration / path** effects vs **judge-instability** effects — they are **not** causal claims.
+These rows summarize **aggregate** differences across fingerprint buckets (same keys as ``group_snapshots_by``). Labels distinguish **likely configuration-driven** vs **likely instability-driven** vs **mixed** vs **inconclusive** patterns — they are **not** causal claims and can be wrong when cell counts are small.
+
+**Reading the categories:** **configuration-dominant** = spread with little instability signal; **instability-dominant** = instability without strong mean separation; **mixed** = spread and instability overlap; **inconclusive** = weak/borderline evidence.
 
 > **Uncertainty & limits:**
 > - Attribution labels describe **aggregate bucket patterns**, not proven causation.
-> - Confidence is **low** when few member runs or few cells fall in each bucket.
+> - Confidence and **evidence_strength** are heuristics from cell/run counts — **not** statistical significance.
+> - Confidence is **low** when few member runs, few cells per bucket, or **evidence_strength** is **weak**.
 > - Compare `comparison_fingerprints` on each member `manifest.json` before trusting cross-run score deltas.
+> - **inconclusive** / **mixed** are expected when sample sizes are small or instability co-occurs with spread.
 
 #### Summary
 
-**Configuration / path:** aggregate patterns on `provider_config_fingerprint`, `browser_config_fingerprint` are consistent with **stable** score gaps between fingerprint buckets (weak judge-instability signal). This remains a **heuristic** — confirm with manifests and per-cell evaluations.
+**Evidence is limited on** `provider_config_fingerprint`, `browser_config_fingerprint` (small cell counts and/or thin buckets) — treat all labels below as **triage only**, not confirmation. **Likely configuration / path (heuristic):** `provider_config_fingerprint`, `browser_config_fingerprint` show the clearest **mean separation** with **low** judge-instability signal in aggregate — consistent with **stable** config/path differences, still **not** proven causation.
 
 #### Per-axis attribution (heuristic)
 
-| Axis | Slice | Attribution | Confidence |
-| --- | --- | --- | --- |
-| `provider_config_fingerprint` | `config_fingerprint` | Likely **configuration / path** | low |
-| `browser_config_fingerprint` | `config_fingerprint` | Likely **configuration / path** | low |
+| Axis | Kind | Pattern | Evidence | Conf. | Cells (min bucket) |
+| --- | --- | --- | --- | --- | ---: |
+| `provider_config_fingerprint` | `config_fingerprint` | **Config-driven** (heuristic) | weak | low | 1 |
+| `browser_config_fingerprint` | `config_fingerprint` | **Config-driven** (heuristic) | weak | low | 1 |
 
-**Rationale (per axis):**
+**Rationale & sample limits (per axis):**
 
-- `provider_config_fingerprint`: Meaningful pooled mean spread across manifest fingerprint slices (resolved provider/scoring/registry/browser config) with no judge-instability rows in those member runs — differences are plausibly **stable** and configuration/path-related rather than judge noise at this granularity.
-- `browser_config_fingerprint`: Meaningful pooled mean spread across manifest fingerprint slices (resolved provider/scoring/registry/browser config) with no judge-instability rows in those member runs — differences are plausibly **stable** and configuration/path-related rather than judge noise at this granularity.
+- **`provider_config_fingerprint`:** **Likely configuration / path-driven:** meaningful pooled mean spread across manifest fingerprint slices (resolved provider/scoring/registry/browser config) with **no** judge-instability rows in these buckets — gaps are **plausibly stable** vs config/path at this granularity (still not causal).
+  - _Limit:_ Total pooled cells (2) is below 4 — aggregate means are **easily swayed** by a few cells.
+  - _Limit:_ Smallest bucket has only 1 cell(s) — **high variance** in that bucket mean.
+  - _Limit:_ Only two buckets and modest cell totals — treat spread as **directional**, not firm.
+- **`browser_config_fingerprint`:** **Likely configuration / path-driven:** meaningful pooled mean spread across manifest fingerprint slices (resolved provider/scoring/registry/browser config) with **no** judge-instability rows in these buckets — gaps are **plausibly stable** vs config/path at this granularity (still not causal).
+  - _Limit:_ Total pooled cells (2) is below 4 — aggregate means are **easily swayed** by a few cells.
+  - _Limit:_ Smallest bucket has only 1 cell(s) — **high variance** in that bucket mean.
+  - _Limit:_ Only two buckets and modest cell totals — treat spread as **directional**, not firm.
 
 #### Score spread (ranked by pooled mean gap across buckets)
 
@@ -184,7 +198,18 @@ _Cross-checks beyond the attribution table — grouped by **signal_class** (conf
 
 ### Cross-run contrast (deterministic fixtures)
 
-Compare **signals** (navigation / console / DOM / screenshots) and **extension digests** across members. Multi-step flows often show **network** + **performance** bars; single-page traces may emphasize **accessibility** without network churn. **Playwright** remains optional; **MCP stdio** is a **local** subprocess bridge when used without `fixture_relpath` (see `docs/architecture/browser.md`).
+**Aggregate coverage** (sums across **browser_mock** cells in that member run). **Screenshot metadata** uses the first capture’s viewport when present. **Extensions** may include **network** / **accessibility** / **performance** summaries and a **trace_digest**; when **`extensions.runner`** is **`mcp_stdio`**, the trace came through the **local MCP stdio** JSON bridge (not a remote browser session). **Playwright** remains optional for live capture. See `docs/architecture/browser.md`.
+
+#### Coverage by member run
+
+| run_id | suite_ref | Cells | Σ DOM excerpts | Σ screenshots | Primary viewport | | Ext. keys (union) |
+| --- | --- | ---: | ---: | ---: | --- | ---: |
+| `campaign.examples.browser_evidence_compare.v1__0000` | `fixtures/benchmarks/browser_checkout.v1.yaml` | 1 | 2 | 2 | `390×844 (viewport)` | 5 |
+| `campaign.examples.browser_evidence_compare.v1__0001` | `fixtures/benchmarks/browser_form.v1.yaml` | 1 | 2 | 1 | `1280×720 (viewport)` | 3 |
+
+#### Signals & extension digest (first cell per run)
+
+Quick read on **navigation/console/DOM/screenshot counts** and compact **extensions**.
 
 | run_id | suite_ref | Signals | Extension digest |
 | --- | --- | --- | --- |

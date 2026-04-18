@@ -1,8 +1,10 @@
 # Campaign comparative report: `campaign.examples.minimal_offline.v1`
 
-Succeeded member runs only. **`FT-*`** taxonomy matches longitudinal analysis (manifest run order). Mode gaps and judge instability are per snapshot.
+Analysis uses **succeeded** member benchmark runs only. **`FT-*`** codes follow the longitudinal taxonomy (see `docs/workflows/longitudinal-reporting.md`). **Mode gaps** and **semantic instability** counts are derived from the same longitudinal pass as `reports/campaign-analysis.json`.
 
-## At a glance
+## Executive summary
+
+Skim this block first, then use the sections below for full tables and the failure atlas.
 
 - **Varied sweep axes:** _none — single configuration path in this campaign._
 
@@ -27,9 +29,9 @@ _No mode-gap rows above threshold (or modes not comparable in member runs)._
 
 _No FT-* signals in this pass._
 
-## Judge variance (semantic / hybrid)
+## Semantic judge variance
 
-From **evaluation.json**, **evaluation_judge_provenance.json**, and **repeat_aggregation** when N>1. Deterministic cells have no judge spread.
+Sourced from **evaluation.json**, **evaluation_judge_provenance.json**, and **repeat_aggregation** when **N>1**. Deterministic-only cells have no judge spread.
 
 | Signal | Count |
 | --- | ---: |
@@ -80,14 +82,20 @@ _No axis had more than one distinct value among runs with scores._
 
 Each **succeeded** member run is grouped using the same keys as ``group_snapshots_by`` in ``pipelines/longitudinal`` (``provider_config_fingerprint``, ``scoring_config_fingerprint``, ``execution_mode``, ``prompt_registry_state_fingerprint``, ``browser_config_fingerprint``). **Pooled mean** is the mean of all cell **total_weighted_score** values in that group. **Unstable** counts longitudinal **FT-JUDGE-UNSTABLE**-class rows for runs in the group. **Regressions→** counts **to_run** edges (score dropped vs the prior run for the same benchmark cell) whose destination run lies in this group.
 
+_Axis interpretation below states **evidence strength** (aggregate cell counts) and **uncertainty** explicitly — small buckets or few cells mean labels are **tentative**._
+
 ### Axis interpretation (why buckets differ)
 
-These rows summarize **aggregate** differences across fingerprint buckets (same keys as ``group_snapshots_by``). They help triage **configuration / path** effects vs **judge-instability** effects — they are **not** causal claims.
+These rows summarize **aggregate** differences across fingerprint buckets (same keys as ``group_snapshots_by``). Labels distinguish **likely configuration-driven** vs **likely instability-driven** vs **mixed** vs **inconclusive** patterns — they are **not** causal claims and can be wrong when cell counts are small.
+
+**Reading the categories:** **configuration-dominant** = spread with little instability signal; **instability-dominant** = instability without strong mean separation; **mixed** = spread and instability overlap; **inconclusive** = weak/borderline evidence.
 
 > **Uncertainty & limits:**
 > - Attribution labels describe **aggregate bucket patterns**, not proven causation.
-> - Confidence is **low** when few member runs or few cells fall in each bucket.
+> - Confidence and **evidence_strength** are heuristics from cell/run counts — **not** statistical significance.
+> - Confidence is **low** when few member runs, few cells per bucket, or **evidence_strength** is **weak**.
 > - Compare `comparison_fingerprints` on each member `manifest.json` before trusting cross-run score deltas.
+> - **inconclusive** / **mixed** are expected when sample sizes are small or instability co-occurs with spread.
 
 #### Summary
 

@@ -126,6 +126,7 @@
           "mode_gap_events": 0,
           "pooled_mean_score": 0.571024,
           "regressions_targeting_group": 0,
+          "run_count": 1,
           "unstable_cell_events": 0
         },
         {
@@ -135,6 +136,7 @@
           "mode_gap_events": 0,
           "pooled_mean_score": 0.36131,
           "regressions_targeting_group": 0,
+          "run_count": 1,
           "unstable_cell_events": 0
         }
       ],
@@ -188,6 +190,7 @@
           "mode_gap_events": 0,
           "pooled_mean_score": 0.36131,
           "regressions_targeting_group": 0,
+          "run_count": 1,
           "unstable_cell_events": 0
         },
         {
@@ -197,6 +200,7 @@
           "mode_gap_events": 0,
           "pooled_mean_score": 0.571024,
           "regressions_targeting_group": 0,
+          "run_count": 1,
           "unstable_cell_events": 0
         }
       ],
@@ -219,34 +223,52 @@
     "attribution_by_axis": [
       {
         "attribution": "likely_configuration",
+        "attribution_label": "configuration-dominant",
         "axis_key": "provider_config_fingerprint",
         "axis_kind": "config_fingerprint",
         "axis_title": "Provider config",
         "confidence": "low",
+        "evidence_strength": "weak",
         "metrics": {
+          "distinct_bucket_count": 2,
           "max_instability_rate_across_buckets": 0.0,
+          "min_bucket_cell_count": 1,
           "pooled_mean_score_spread": 0.209714,
           "total_cells_in_axis": 2,
           "total_unstable_cell_events": 0
         },
-        "rationale": "Meaningful pooled mean spread across manifest fingerprint slices (resolved provider/scoring/registry/browser config) with no judge-instability rows in those member runs \u2014 differences are plausibly **stable** and configuration/path-related rather than judge noise at this granularity."
+        "rationale": "**Likely configuration / path-driven:** meaningful pooled mean spread across manifest fingerprint slices (resolved provider/scoring/registry/browser config) with **no** judge-instability rows in these buckets \u2014 gaps are **plausibly stable** vs config/path at this granularity (still not causal).",
+        "uncertainty_notes": [
+          "Total pooled cells (2) is below 4 \u2014 aggregate means are **easily swayed** by a few cells.",
+          "Smallest bucket has only 1 cell(s) \u2014 **high variance** in that bucket mean.",
+          "Only two buckets and modest cell totals \u2014 treat spread as **directional**, not firm."
+        ]
       },
       {
         "attribution": "likely_configuration",
+        "attribution_label": "configuration-dominant",
         "axis_key": "browser_config_fingerprint",
         "axis_kind": "config_fingerprint",
         "axis_title": "Browser config",
         "confidence": "low",
+        "evidence_strength": "weak",
         "metrics": {
+          "distinct_bucket_count": 2,
           "max_instability_rate_across_buckets": 0.0,
+          "min_bucket_cell_count": 1,
           "pooled_mean_score_spread": 0.209714,
           "total_cells_in_axis": 2,
           "total_unstable_cell_events": 0
         },
-        "rationale": "Meaningful pooled mean spread across manifest fingerprint slices (resolved provider/scoring/registry/browser config) with no judge-instability rows in those member runs \u2014 differences are plausibly **stable** and configuration/path-related rather than judge noise at this granularity."
+        "rationale": "**Likely configuration / path-driven:** meaningful pooled mean spread across manifest fingerprint slices (resolved provider/scoring/registry/browser config) with **no** judge-instability rows in these buckets \u2014 gaps are **plausibly stable** vs config/path at this granularity (still not causal).",
+        "uncertainty_notes": [
+          "Total pooled cells (2) is below 4 \u2014 aggregate means are **easily swayed** by a few cells.",
+          "Smallest bucket has only 1 cell(s) \u2014 **high variance** in that bucket mean.",
+          "Only two buckets and modest cell totals \u2014 treat spread as **directional**, not firm."
+        ]
       }
     ],
-    "differentiation_overview": "**Configuration / path:** aggregate patterns on `provider_config_fingerprint`, `browser_config_fingerprint` are consistent with **stable** score gaps between fingerprint buckets (weak judge-instability signal). This remains a **heuristic** \u2014 confirm with manifests and per-cell evaluations.",
+    "differentiation_overview": "**Evidence is limited on** `provider_config_fingerprint`, `browser_config_fingerprint` (small cell counts and/or thin buckets) \u2014 treat all labels below as **triage only**, not confirmation. **Likely configuration / path (heuristic):** `provider_config_fingerprint`, `browser_config_fingerprint` show the clearest **mean separation** with **low** judge-instability signal in aggregate \u2014 consistent with **stable** config/path differences, still **not** proven causation.",
     "drift_correlation_hints": [
       {
         "axis_key": "provider_config_fingerprint",
@@ -305,14 +327,17 @@
     ],
     "interpretation_caveats": [
       "Attribution labels describe **aggregate bucket patterns**, not proven causation.",
-      "Confidence is **low** when few member runs or few cells fall in each bucket.",
-      "Compare `comparison_fingerprints` on each member `manifest.json` before trusting cross-run score deltas."
+      "Confidence and **evidence_strength** are heuristics from cell/run counts \u2014 **not** statistical significance.",
+      "Confidence is **low** when few member runs, few cells per bucket, or **evidence_strength** is **weak**.",
+      "Compare `comparison_fingerprints` on each member `manifest.json` before trusting cross-run score deltas.",
+      "**inconclusive** / **mixed** are expected when sample sizes are small or instability co-occurs with spread."
     ],
     "notes": [
       "Pooled mean is over all cell total_weighted_score values in each fingerprint bucket.",
       "Judge instability counts FT-JUDGE-UNSTABLE-class rows whose run is in the bucket.",
       "Hints are heuristic; confirm with member manifests and evaluation.json.",
-      "attribution / signal_class fields are non-causal heuristics for triage only."
+      "attribution / signal_class fields are non-causal heuristics for triage only.",
+      "attribution_label categorizes likely_configuration / likely_instability / mixed / inconclusive for display; evidence_strength reflects aggregate cell counts only."
     ],
     "schema_version": 1,
     "score_spread_ranking": [

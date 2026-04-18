@@ -12,8 +12,8 @@ uv run alwm benchmark campaign run \
 
 **Read first**
 
-- `campaign-summary.md` — **At a glance** (mean-score spreads, backends, instability, mode gaps, FT-* tags) plus run index.
-- `reports/campaign-report.md` — comparative narrative with **At a glance** at the top, member mean tables, fingerprint axes, and full failure atlas.
+- `campaign-summary.md` — **Snapshot digest** (mean-score spreads, backends, instability, mode gaps, FT-* tags) plus **Member run index**.
+- `reports/campaign-report.md` — comparative narrative with **Executive summary** at the top, member mean tables, fingerprint axes, and full failure atlas.
 - `reports/campaign-analysis.json` — machine-readable mirror (`mean_score_extremes_by_sweep_axis`, thresholds, fingerprint blocks).
 - `campaign-semantic-summary.{md,json}` — judge-variance rollups (deterministic-only runs show totals with empty hotspots).
 

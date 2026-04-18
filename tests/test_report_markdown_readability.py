@@ -291,8 +291,9 @@ def test_semantic_summary_markdown_snapshot_shape() -> None:
         cells=[],
     )
     md = render_campaign_semantic_summary_markdown(summary)
-    assert md.startswith("# Judge variance — `camp`")
-    assert "## Snapshot" in md
+    assert md.startswith("# Campaign semantic summary")
+    assert "- **Campaign:** `camp`" in md
+    assert "## Executive snapshot" in md
     assert "## Instability hotspots" in md
     assert "## Totals" not in md
     assert "| Runs scanned | 1 |" in md

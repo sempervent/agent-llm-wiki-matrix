@@ -1,6 +1,6 @@
 # Campaign walkthrough (committed examples only)
 
-This walkthrough uses **only paths that exist in the repository**. You can validate artifacts and read fingerprints without regenerating anything. To reproduce a full sweep locally, use the same commands with a fresh `--output-dir` (see [benchmark-campaigns.md](benchmark-campaigns.md)).
+This walkthrough uses **only paths that exist in the repository**. You can validate artifacts and read fingerprints without regenerating anything. To reproduce a full sweep locally, use the same commands with a fresh `--output-dir` (see [benchmark-campaigns.md](benchmark-campaigns.md)). For the **full operator path** from **run → validate → pack → compare → publish**, see **[campaign-result-pack-publication.md](campaign-result-pack-publication.md)**.
 
 ## What you get from a campaign
 

@@ -1,9 +1,11 @@
 # Campaign comparisons (directory vs directory)
 
+This example sits in the broader **publication workflow** — **[docs/workflows/campaign-result-pack-publication.md](../../docs/workflows/campaign-result-pack-publication.md)** (§5b) — alongside **pack** assembly and **`compare-packs`**.
+
 Use **`alwm benchmark campaign compare`** to diff two **completed campaign output directories** (each has **`manifest.json`** at the root plus optional **`reports/campaign-analysis.json`**, **`campaign-semantic-summary.json`**, etc.). The command writes:
 
-- **`campaign-compare.json`** — artifact kind **`campaign_compare`** (`schemas/v1/campaign_compare.schema.json`)
-- **`campaign-compare-report.md`** — Markdown summary
+- **`campaign-compare.json`** — artifact kind **`campaign_compare`** (`schemas/v1/campaign_compare.schema.json`); includes optional **`reader_interpretation`** (non-causal summary for humans)
+- **`campaign-compare-report.md`** — Markdown summary (starts with **Reader interpretation** when present)
 
 This is complementary to **`alwm benchmark campaign compare-packs`**, which compares **result packs** (`pack-compare.json`). Compare **raw campaigns** when you have two harness output trees and want a report without assembling packs.
 

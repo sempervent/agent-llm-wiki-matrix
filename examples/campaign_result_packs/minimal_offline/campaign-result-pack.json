@@ -1,5 +1,5 @@
 {
-  "alwm_version": "0.2.1",
+  "alwm_version": "0.2.4",
   "artifacts": {
     "campaign_analysis_json": "reports/campaign-analysis.json",
     "campaign_comparative_report_md": "reports/campaign-report.md",
@@ -26,8 +26,8 @@
   "created_at": "1970-01-01T00:00:00Z",
   "definition_source_relpath": "examples/campaigns/v1/minimal_offline.v1.yaml",
   "fixture_mode_force_mock": true,
-  "git_commit_sha": "148517589c625e7fc468c35311d0bcd6939462bd",
-  "git_describe": "v0.2.2-dirty",
+  "git_commit_sha": "1d6cbf5bc0c399ea757e6b38add5f4db5f10d102",
+  "git_describe": "v0.2.4-dirty",
   "included_member_count": 1,
   "layout_version": 1,
   "longitudinal_member_glob": "runs/*/manifest.json",
@@ -43,7 +43,7 @@
     }
   ],
   "pack_id": "minimal-offline",
-  "pack_identity_fingerprint": "sha256:f782397a3e504b901a59618f86536e77cc0446e40dba7434d0bdded16ff75293",
+  "pack_identity_fingerprint": "sha256:9d6c228714d1809323eabae490bbb18b6aad06f6d328cb17b96f3f70178a3820",
   "schema_version": 1,
   "source_campaign_relpath": "examples/campaign_runs/minimal_offline",
   "title": "Minimal offline campaign (single suite, deterministic)"

@@ -44,6 +44,13 @@ typecheck:
 
 ci: lint typecheck test
 
+# MkDocs documentation site (`uv` installs the `docs` extra for the command)
+docs:
+    uv run --extra docs mkdocs serve -a 127.0.0.1:8000
+
+docs-build:
+    uv run --extra docs mkdocs build --strict
+
 # Opt-in: pytest integration/ (Ollama + OpenAI-compatible benchmarks); skips unless env set / reachable
 verify-live-providers:
     uv run pytest tests/integration/test_live_benchmark_providers.py -v -m integration --strict-markers

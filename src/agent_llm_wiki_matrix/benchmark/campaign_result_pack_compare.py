@@ -13,8 +13,10 @@ from agent_llm_wiki_matrix.benchmark.campaign_compare_core import (
     build_analysis_comparison_block,
     build_browser_evidence_member_cells_comparison_block,
     build_failure_tag_comparison_block,
+    build_reader_interpretation,
     build_semantic_comparison_block,
     experiment_fingerprint_axes,
+    format_reader_interpretation_markdown,
     member_run_ids_diff,
     read_json_optional,
     render_browser_evidence_member_cells_comparison_markdown,
@@ -152,27 +154,38 @@ def build_campaign_result_pack_comparison(
         "right": _portability_slice(rp, rs),
     }
 
+    identity_block = {
+        "same_campaign_id": lp.campaign_id == rp.campaign_id,
+        "left_campaign_id": lp.campaign_id,
+        "right_campaign_id": rp.campaign_id,
+        "pack_identity_fingerprint": {
+            "left": lp.pack_identity_fingerprint,
+            "right": rp.pack_identity_fingerprint,
+            "match": lp.pack_identity_fingerprint == rp.pack_identity_fingerprint,
+        },
+        "campaign_definition_fingerprint": {
+            "left": lp.campaign_definition_fingerprint,
+            "right": rp.campaign_definition_fingerprint,
+            "match": lp.campaign_definition_fingerprint == rp.campaign_definition_fingerprint,
+        },
+        "campaign_experiment_fingerprints": fp_rows,
+    }
+
+    reader_interpretation = build_reader_interpretation(
+        identity=identity_block,
+        comparative_analysis=analysis_block,
+        failure_tags=tags_block,
+        semantic_summary_totals=semantic_block,
+        member_runs=members_block,
+        kind="pack",
+    )
+
     return {
         "schema_version": 1,
         "created_at": _utc_iso(),
         "left": _side_header(ls, repo_root=repo_root),
         "right": _side_header(rs, repo_root=repo_root),
-        "identity": {
-            "same_campaign_id": lp.campaign_id == rp.campaign_id,
-            "left_campaign_id": lp.campaign_id,
-            "right_campaign_id": rp.campaign_id,
-            "pack_identity_fingerprint": {
-                "left": lp.pack_identity_fingerprint,
-                "right": rp.pack_identity_fingerprint,
-                "match": lp.pack_identity_fingerprint == rp.pack_identity_fingerprint,
-            },
-            "campaign_definition_fingerprint": {
-                "left": lp.campaign_definition_fingerprint,
-                "right": rp.campaign_definition_fingerprint,
-                "match": lp.campaign_definition_fingerprint == rp.campaign_definition_fingerprint,
-            },
-            "campaign_experiment_fingerprints": fp_rows,
-        },
+        "identity": identity_block,
         "artifacts": {
             "entries": artifact_diffs,
         },
@@ -181,6 +194,7 @@ def build_campaign_result_pack_comparison(
         "failure_tags": tags_block,
         "member_runs": members_block,
         "portability": portability,
+        "reader_interpretation": reader_interpretation,
     }
 
 
@@ -226,16 +240,28 @@ def render_campaign_result_pack_compare_markdown(data: dict[str, Any]) -> str:
     lines = [
         "# Campaign result pack comparison",
         "",
+        "Side-by-side view of two **`campaign_result_pack`** trees (published bundles). "
+        "**Δ** columns use **right − left** when both sides are numeric. "
+        "See **`pack-compare.json`** for the full structured diff.",
+        "",
         f"- **Left:** `{left['label']}` — `{left['path']}` (`pack_id`: `{left['pack_id']}`)",
         f"- **Right:** `{right['label']}` — `{right['path']}` (`pack_id`: `{right['pack_id']}`)",
         f"- **Generated:** `{data['created_at']}`",
         "",
-        "## Campaign identity & fingerprints",
-        "",
-        "| Check | Value |",
-        "| --- | --- |",
-        f"| Same **campaign_id** | {'yes' if ident['same_campaign_id'] else '**no**'} |",
     ]
+    ri = data.get("reader_interpretation")
+    if isinstance(ri, dict) and ri:
+        lines.append(format_reader_interpretation_markdown(ri).rstrip())
+        lines.append("")
+    lines.extend(
+        [
+            "## Identity & fingerprints",
+            "",
+            "| Check | Value |",
+            "| --- | --- |",
+            f"| Same **campaign_id** | {'yes' if ident['same_campaign_id'] else '**no**'} |",
+        ],
+    )
     pip = ident["pack_identity_fingerprint"]
     match_s = "yes" if pip["match"] else "**no**"
     lines.append(f"| **pack_identity_fingerprint** match | {match_s} |")

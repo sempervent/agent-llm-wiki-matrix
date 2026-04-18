@@ -3,13 +3,17 @@
 Markdown-first, git-native **LLM wiki + comparison matrix** system for capturing ideas, experiments, evaluations, prompts, and reports as structured files. It supports reproducible benchmarking of multiple agent stacks and model backends (including local models via **Ollama** or switchable **OpenAI-compatible / llama.cpp** HTTP servers).
 
 **Repository:** [github.com/sempervent/agent-llm-wiki-matrix](https://github.com/sempervent/agent-llm-wiki-matrix)  
-**Changelog:** [CHANGELOG.md](CHANGELOG.md) · **v0.2.3 (milestone, in-tree):** [docs/roadmap/v0.2.3.md](docs/roadmap/v0.2.3.md) · [docs/tracking/v0.2.3-campaign.md](docs/tracking/v0.2.3-campaign.md) · **v0.2.2 notes:** [docs/releases/v0.2.2.md](docs/releases/v0.2.2.md) · **v0.2.1 notes:** [docs/releases/v0.2.1.md](docs/releases/v0.2.1.md) · **v0.1.0 notes:** [docs/releases/v0.1.0.md](docs/releases/v0.1.0.md) · **Release scope:** [docs/release-readiness.md](docs/release-readiness.md)
+**Changelog:** [CHANGELOG.md](CHANGELOG.md) · **Current milestone (v0.2.5):** [docs/roadmap/v0.2.5.md](docs/roadmap/v0.2.5.md) · [docs/tracking/v0.2.5-campaign.md](docs/tracking/v0.2.5-campaign.md) · **v0.2.4 notes:** [docs/releases/v0.2.4.md](docs/releases/v0.2.4.md) · **v0.2.3 notes:** [docs/releases/v0.2.3.md](docs/releases/v0.2.3.md) · **v0.2.2 notes:** [docs/releases/v0.2.2.md](docs/releases/v0.2.2.md) · **v0.2.1 notes:** [docs/releases/v0.2.1.md](docs/releases/v0.2.1.md) · **v0.1.0 notes:** [docs/releases/v0.1.0.md](docs/releases/v0.1.0.md) · **Release scope:** [docs/release-readiness.md](docs/release-readiness.md)
 
 Contributors and coding agents should follow **`AGENTS.md`** for the full operating manual (contribution loop, decision rules, prompt registry policy, verification expectations, **multi-agent parallel work**, capability labels). **Verification commands** (canonical **`just`** recipes vs **`uv run`** fallbacks vs optional live): **`docs/workflows/verification.md`**. Parallel agents: see **`docs/workflows/multi-agent-parallel.md`**.
 
-## Current milestone (v0.2.3)
+**Documentation site (MkDocs):** browse `docs/` as a navigable site with **`just docs`** (local preview; default **http://127.0.0.1:8000/**) or **`just docs-build`** (static output under **`site/`**, gitignored). **Navigation and config:** **`mkdocs.yml`** at the repo root (the **`nav:`** block is the sidebar). **Handbook** (commands, findings, agent conventions): **`docs/workflows/docs-site.md`**. Install **`uv pip install -e ".[docs]"`** (or **`.[dev,docs]`**) so **`mkdocs`** is available. **CI:** **`.github/workflows/docs.yml`** builds on changes to **`docs/**`** or **`mkdocs.yml`** (**`mkdocs build --strict`**; optional **`gh-pages`** deploy on **`main`**).
 
-**State:** **[v0.2.3](docs/roadmap/v0.2.3.md)** **substantive goals are delivered** in the repo (result packs, fingerprint interpretation in comparative/longitudinal outputs, readability passes, **drift** tests + **`validate-artifacts`**, browser/report realism within fixture CI, **`compare-packs`**). **Release closure** (git tag, **`CHANGELOG.md` [0.2.3]**, **`docs/releases/v0.2.3.md`**, README/AGENTS “latest shipped”) is tracked in **[docs/tracking/v0.2.3-campaign.md](docs/tracking/v0.2.3-campaign.md)**.
+## Current milestone (v0.2.5)
+
+**Mission:** **Publication-quality evidence packs and final report readability** — stronger **presentation** of **result packs** and **reports**, **comparison** workflow refinement, **deduplication** and polish in generated Markdown, **drift / validation** ergonomics, and **MkDocs** **navigation** quality—without changing **default offline CI**.
+
+**Roadmap / tracking:** **[docs/roadmap/v0.2.5.md](docs/roadmap/v0.2.5.md)** · **[docs/tracking/v0.2.5-campaign.md](docs/tracking/v0.2.5-campaign.md)**. **Prior release:** **[v0.2.4](docs/releases/v0.2.4.md)** (E2E publication workflow, MkDocs site, compare **reader interpretation**, report readability).
 
 **Canonical verification (host):**
 
@@ -17,13 +21,13 @@ Contributors and coding agents should follow **`AGENTS.md`** for the full operat
 | --- | --- | --- |
 | Default CI parity | **`uv run just ci`** (or **`just ci`** with an activated `.venv`) | ruff, mypy, pytest (`tests/`, excluding `tests/integration/`) |
 | Committed artifact contracts | **`just validate-artifacts`** (or `uv run pytest tests/test_schema_drift_contracts.py`) | JSON Schema + Pydantic on swept `examples/` / `fixtures/`; see **[docs/workflows/verification.md](docs/workflows/verification.md)** |
-| Campaign packs | **`alwm benchmark campaign pack`**, **`alwm benchmark campaign pack-check`**, **`alwm benchmark campaign compare-packs`**, **`alwm benchmark campaign compare`** | Publish / validate packs; diff **packs** or **raw campaign dirs** (`pack-compare` / `campaign-compare`); walkthrough **[docs/workflows/campaign-result-pack-publication.md](docs/workflows/campaign-result-pack-publication.md)** · **[docs/workflows/benchmark-campaigns.md](docs/workflows/benchmark-campaigns.md)** |
+| Campaign packs | **`alwm benchmark campaign pack`**, **`alwm benchmark campaign pack-check`**, **`alwm benchmark campaign compare-packs`**, **`alwm benchmark campaign compare`** | **E2E checklist:** **[docs/workflows/campaign-result-pack-publication.md](docs/workflows/campaign-result-pack-publication.md)** · CLI reference **[docs/workflows/benchmark-campaigns.md](docs/workflows/benchmark-campaigns.md)** · examples **[examples/campaign_result_packs/README.md](examples/campaign_result_packs/README.md)**, **[examples/campaign_compares/README.md](examples/campaign_compares/README.md)** |
 
-Prior release notes: **[v0.2.2](docs/releases/v0.2.2.md)**. Arc context: **[docs/roadmap/v0.2.0.md](docs/roadmap/v0.2.0.md)**.
+Arc context: **[docs/roadmap/v0.2.0.md](docs/roadmap/v0.2.0.md)**.
 
-### What shipped in v0.2.1 / v0.2.2
+### What shipped in v0.2.1 / v0.2.2 / v0.2.3 / v0.2.4
 
-**v0.2.0** established **six-axis fingerprints** and **longitudinal** reporting columns. **v0.2.1** added **campaign doc consolidation**, **`campaign_semantic_summary`** rollups, **runtime observability**, **fixture-backed MCP** (`alwm browser run-mcp`), and **richer `BrowserEvidence`**. **v0.2.2** deepens **campaign reporting**, **semantic summaries**, **observability**, **browser evidence**, and a **minimal MCP stdio** path—see **[docs/releases/v0.2.2.md](docs/releases/v0.2.2.md)**.
+**v0.2.0** established **six-axis fingerprints** and **longitudinal** reporting columns. **v0.2.1** added **campaign doc consolidation**, **`campaign_semantic_summary`** rollups, **runtime observability**, **fixture-backed MCP** (`alwm browser run-mcp`), and **richer `BrowserEvidence`**. **v0.2.2** deepens **campaign reporting**, **semantic summaries**, **observability**, **browser evidence**, and a **minimal MCP stdio** path—see **[docs/releases/v0.2.2.md](docs/releases/v0.2.2.md)**. **v0.2.3** adds **result packs**, **pack and directory comparison**, **fingerprint interpretation**, **drift** tests, and **verification** matrix hardening—see **[docs/releases/v0.2.3.md](docs/releases/v0.2.3.md)**. **v0.2.4** delivers the **end-to-end publication** checklist, **MkDocs** site + CI, **compare reader interpretation**, and **campaign / compare Markdown** polish—see **[docs/releases/v0.2.4.md](docs/releases/v0.2.4.md)**.
 
 ## Goals
 

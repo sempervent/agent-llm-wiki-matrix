@@ -26,26 +26,28 @@ Use this section as the **single place** in `AGENTS.md` that ties **what shipped
 
 | | |
 | --- | --- |
-| **Version** | **v0.2.2** (narrative: **[docs/releases/v0.2.2.md](docs/releases/v0.2.2.md)**) |
-| **Objectives** | Deepen **comparative campaigns**: reporting quality, **campaign semantic summaries**, **runtime observability**, richer **browser evidence** and rubrics, **minimal real MCP** via stdio—without changing default offline CI. |
-| **Exit bar** | Aligned campaign docs; comparative + semantic artifacts validate; browser evidence validates; MCP stdio path tested and documented as partial; **`uv run just ci`** passes (see release notes for commands). |
-| **Changelog** | **[CHANGELOG.md](CHANGELOG.md)** — version sections appear at tag time; **`[Unreleased]`** holds changes until the next **`[x.y.z]`** cut (see **Remaining (closure)** for **v0.2.3**). |
+| **Version** | **v0.2.4** (narrative: **[docs/releases/v0.2.4.md](docs/releases/v0.2.4.md)**) |
+| **Objectives** | **End-to-end publication** workflow, **MkDocs** site + docs CI, **compare reader interpretation**, **campaign / compare / INDEX** readability, **operator rituals** aligned—**default CI** stays **offline**. |
+| **Exit bar** | **`uv run just ci`**, **`just validate-artifacts`**, **`mkdocs build --strict`** (with **`[docs]`** extra); verification matrix and checklists—see release notes. |
+| **Changelog** | **[CHANGELOG.md](CHANGELOG.md)** — **[0.2.4]**; new work accrues under **`[Unreleased]`** until the next tagged section. |
 
-Older milestones for context: **[docs/roadmap/v0.2.0.md](docs/roadmap/v0.2.0.md)** (fingerprints + campaigns arc), **[docs/releases/v0.2.1.md](docs/releases/v0.2.1.md)**.
+Older milestones for context: **[docs/releases/v0.2.2.md](docs/releases/v0.2.2.md)**, **[docs/roadmap/v0.2.0.md](docs/roadmap/v0.2.0.md)** (fingerprints + campaigns arc), **[docs/releases/v0.2.1.md](docs/releases/v0.2.1.md)**.
 
-### In-flight milestone (v0.2.3 — substantive work landed)
+### In-flight milestone (v0.2.5 — evidence packs + report readability)
 
 | | |
 | --- | --- |
-| **Version** | **v0.2.3** (implementation **complete** in tree; **tag/changelog** pending) |
-| **Roadmap** | **[docs/roadmap/v0.2.3.md](docs/roadmap/v0.2.3.md)** (**Delivered** table) |
-| **Tracking** | **[docs/tracking/v0.2.3-campaign.md](docs/tracking/v0.2.3-campaign.md)** — **completed vs remaining**, open questions, **merge order for follow-ups** |
-| **Shipped themes** | **Verification** matrix (**[docs/workflows/verification.md](docs/workflows/verification.md)**); **drift** checks + **`just validate-artifacts`**; **result packs** + **`compare-packs`**; **fingerprint interpretation** in analysis/reports; **browser/report** realism under offline CI; readability passes |
-| **Remaining (closure)** | **`CHANGELOG` [0.2.3]**, **`docs/releases/v0.2.3.md`**, then update **Latest shipped release** (below) to **v0.2.3** |
+| **Version** | **v0.2.5** (active) |
+| **Roadmap** | **[docs/roadmap/v0.2.5.md](docs/roadmap/v0.2.5.md)** |
+| **Tracking** | **[docs/tracking/v0.2.5-campaign.md](docs/tracking/v0.2.5-campaign.md)** — workstreams, merge order, open questions |
+| **Mission** | **Publication-quality evidence packs and final report readability**: **presentation** of packs and reports, **comparison** workflow refinement, **deduplication** in generated Markdown, **drift / validation** ergonomics, **MkDocs** **nav** quality (**`mkdocs.yml`**, **`just docs`**, **[docs/workflows/docs-site.md](docs/workflows/docs-site.md)**). |
+| **Non-goals** | Dashboards, cloud deployment, remote/IDE MCP, replacing offline default CI with live defaults. |
 
 **Canonical verification:** **`uv run just ci`** (default merge bar); **`just validate-artifacts`** (or **`uv run pytest tests/test_schema_drift_contracts.py`**) for committed JSON contracts—see **[docs/workflows/verification.md](docs/workflows/verification.md)** for the full matrix and **`uv run`** fallbacks.
 
-**Prefer next:** release-closure docs, or small follow-ups listed in tracking (**post–v0.2.3 candidates**). **Avoid** unrelated feature surface.
+**Prefer next:** **[docs/tracking/v0.2.5-campaign.md](docs/tracking/v0.2.5-campaign.md)** priorities. **Avoid** unrelated feature surface.
+
+**MkDocs (keep in sync):** When you add or rename **user-facing** docs under **`docs/`**, update **`mkdocs.yml`** **`nav:`** so the site sidebar matches (see **[docs/workflows/docs-site.md](docs/workflows/docs-site.md)**). Run **`just docs-build`** before merging doc-only changes that touch **`nav`**. Do not duplicate long workflow text in **`docs/index.md`** — link to the publication checklist instead. **`README.md`** / **`AGENTS.md`** / **`CHANGELOG.md`** stay at repo root; the site links them under **Repository on GitHub**.
 
 ### Maintenance checklist (on each release or milestone shift)
 
@@ -186,7 +188,7 @@ Campaign-related changes must update:
 | **Full-stack smoke** | Optional pre-release: `just smoke` (`scripts/smoke.sh`) — pytest `-m smoke`, host `alwm` benchmark + campaign, Docker Compose + offline benchmark; failure recovery analysis on errors. `SMOKE_SKIP_DOCKER=1` if Docker unavailable. See `docs/workflows/smoke.md`. |
 | **CLI** | Smoke the commands you changed (`alwm … --help`, one happy path). |
 | **Benchmarks** | Offline: `alwm benchmark run --definition fixtures/benchmarks/…` or `benchmarks/v1/offline`-style defs; outputs under `--output-dir` validate as artifacts (`benchmark_manifest` for `manifest.json`, per-cell kinds as today). |
-| **Campaigns (offline)** | `uv run alwm benchmark campaign run` or `plan` (or `run --dry-run`) to a temp dir; validate **`campaign_manifest`** / **`campaign_summary`**; **`campaign_semantic_summary`** when the run emits it (deterministic-only campaigns may still produce the file with zero semantic cells). **`alwm benchmark campaign pack`** builds a **`campaign_result_pack`** + **`INDEX.md`** for publishing; **`alwm benchmark campaign compare-packs`** emits **`pack-compare.json`** / **`pack-compare-report.md`** (kind **`campaign_result_pack_comparison`**); **`alwm benchmark campaign compare`** emits **`campaign-compare.json`** / **`campaign-compare-report.md`** (kind **`campaign_compare`**) for two finished campaign directories. See **`docs/workflows/benchmark-campaigns.md`**. |
+| **Campaigns (offline)** | `uv run alwm benchmark campaign run` or `plan` (or `run --dry-run`) to a temp dir; validate **`campaign_manifest`** / **`campaign_summary`**; **`campaign_semantic_summary`** when the run emits it (deterministic-only campaigns may still produce the file with zero semantic cells). **`alwm benchmark campaign pack`** builds a **`campaign_result_pack`** + **`INDEX.md`** for publishing; **`alwm benchmark campaign compare-packs`** emits **`pack-compare.json`** / **`pack-compare-report.md`** (kind **`campaign_result_pack_comparison`**); **`alwm benchmark campaign compare`** emits **`campaign-compare.json`** / **`campaign-compare-report.md`** (kind **`campaign_compare`**) for two finished campaign directories. **Full publication checklist:** **`docs/workflows/campaign-result-pack-publication.md`**. Field reference: **`docs/workflows/benchmark-campaigns.md`**. |
 | **Live backends** | Optional: `just ollama-gptoss-setup` (Compose Ollama + **gpt-oss:20b** + probe), `just smoke-ollama-live` (minimal benchmark); `alwm benchmark probe`; `just test-integration` with `ALWM_LIVE_BENCHMARK_OLLAMA` / `ALWM_LIVE_BENCHMARK_LLAMACPP`—never required for merge by default. See `docs/workflows/benchmarking.md`. |
 | **Browser (offline)** | `alwm validate … browser_evidence`; `alwm browser prompt-block` / `run-mock` / `run-mcp` on fixtures—no browser binary. |
 | **Browser (Playwright)** | Optional extra `[browser]`; not part of default `just ci`. |
@@ -203,7 +205,7 @@ Campaign-related changes must update:
 | Local Python setup / install commands | `README.md`, **Python environment (uv — required on the host)** in this file, and `docs/workflows/local-dev.md` — always **`uv`** (`uv venv`, `uv pip`, `uv run`), not `python -m venv` or bare `pip` |
 | New schema or artifact kind | `docs/architecture/data-model.md` (if entities change), `docs/implementation-log.md` |
 | New Compose profile or recipe | `docs/workflows/local-dev.md` or `benchmarking.md`, `justfile` comment if needed |
-| Behavioral milestone | **`README.md`** + **Releases and milestones** (this file), `docs/roadmap/`, `docs/tracking/`, `docs/releases/` as applicable; `docs/architecture/current-state.md`, `docs/implementation-log.md` |
+| Behavioral milestone | **`README.md`** + **Releases and milestones** (this file), `docs/roadmap/`, `docs/tracking/`, `docs/releases/` as applicable; `docs/architecture/current-state.md`, `docs/implementation-log.md`; MkDocs nav (`mkdocs.yml`) when adding top-level doc areas |
 | Audit or gap analysis | `docs/audits/`; log pointer in `docs/implementation-log.md` |
 | Capability labels (complete / partial / stub / …) | `docs/audits/capability-classification.md` — keep README/AGENTS aligned |
 
@@ -287,10 +289,10 @@ The **prompt registry** (`prompts/registry.yaml` + `prompts/versions/*.txt`, sch
 | --- | --- |
 | `docs/` | Architecture, workflows, implementation log, audits |
 | `docs/audits/` | Capability taxonomy, mission/gap audits |
-| `docs/workflows/` | How-to including **verification.md** (canonical / fallback / live checks), **multi-agent-parallel.md** |
+| `docs/workflows/` | How-to including **verification.md** (canonical / fallback / live checks), **multi-agent-parallel.md**, **docs-site.md** (MkDocs handbook: serve/build, **nav**, findings) |
 | `docs/examples/` | Pointer doc for repo-root **`examples/`** |
 | `docs/wiki/` | Short topic indexes (e.g. **`benchmark-campaigns.md`**, **`campaign-orchestration.md`**) |
-| `docs/tracking/` | Contract and milestone tracking (**`campaign-orchestration.md`**, **`v0.2.3-campaign.md`**, etc.) |
+| `docs/tracking/` | Contract and milestone tracking (**`campaign-orchestration.md`**, **`v0.2.4-campaign.md`**, etc.) |
 | `schemas/` | JSON Schema (`schemas/v1/`) |
 | `templates/` | Markdown report templates |
 | `prompts/` | Versioned prompts + `registry.yaml` |
@@ -305,7 +307,7 @@ The **prompt registry** (`prompts/registry.yaml` + `prompts/versions/*.txt`, sch
 ## Commands (quick reference)
 
 - Install: see **Python environment (uv — required on the host)** — e.g. `uv pip install -e ".[dev]"` (Python 3.11+; matches `Dockerfile`). Optional Playwright: `uv pip install -e ".[browser]"` then `uv run playwright install chromium` (not required for `just ci`).
-- CI parity: **`uv run just ci`** (ruff, mypy, pytest; excludes **`tests/integration/`**). Fallback **`uv run`** commands: **`docs/workflows/verification.md`**. Focused artifact contracts: **`uv run just validate-artifacts`** (does not replace full CI).
+- CI parity: **`uv run just ci`** (ruff, mypy, pytest; excludes **`tests/integration/`**). Fallback **`uv run`** commands: **`docs/workflows/verification.md`**. Focused artifact contracts: **`uv run just validate-artifacts`** (does not replace full CI). Documentation site (opt-in): **`just docs`** / **`just docs-build`** after **`uv pip install -e ".[docs]"`** — **`docs/workflows/docs-site.md`**.
 - CLI: `uv run alwm …` (or `alwm` after `source .venv/bin/activate`) — see `alwm --help`; registry **`alwm prompts …`**; pipelines **`ingest`**, **`evaluate`**, **`compare`**, **`report`**; benchmarks **`alwm benchmark run`**, **`probe`**, **`longitudinal`**, **`campaign run`** (optional **`--dry-run`**), **`campaign plan`**; providers **`alwm providers show`**; browser **`alwm browser prompt-block`**, **`run-mock`**, **`run-mcp`** (fixtures and/or **local stdio** MCP client—**remote / IDE-hosted MCP** not implemented), **`run-playwright`** (requires **`[browser]`** + browsers). Campaign / observability / semantic summaries: **`docs/workflows/benchmark-campaigns.md`**, **`docs/workflows/benchmarking.md`** (do not imply remote MCP or live browser is “complete” without the evidence in **`docs/audits/capability-classification.md`**).
 - Images: `just docker-build` / `just docker-bake` (host **`just`** is separate from **`uv`**; recipes call **`uv run`** internally).
 

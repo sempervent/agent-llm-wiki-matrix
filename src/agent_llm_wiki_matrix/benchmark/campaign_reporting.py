@@ -361,7 +361,9 @@ def render_comparative_executive_markdown(
     varied_md = _markdown_sweep_axis_keys(varied, manifest)
     ext = mean_score_extremes_by_sweep_axis(manifest)
     lines = [
-        "## At a glance",
+        "## Executive summary",
+        "",
+        "Skim this block first, then use the sections below for full tables and the failure atlas.",
         "",
     ]
     if varied_md:
@@ -540,11 +542,15 @@ def render_campaign_at_a_glance_markdown(
 ) -> str:
     """Readable digest for campaign-summary.md: spreads, hotspots, gaps, tags."""
     lines = [
-        "## At a glance",
+        "## Snapshot digest",
         "",
-        "Mean-score spreads, backends, semantic instability, mode gaps, and **FT-*** tags. "
-        "Details: **`reports/campaign-report.md`**; judge variance: "
-        "**`campaign-semantic-summary.md`**.",
+        "Condensed signals from this campaign: best/worst **mean member scores** by sweep axis, "
+        "**backend** means across cells, **longitudinal** semantic instability and mode gaps, "
+        "recurring **FT-*** tags, and (when present) **judge** confidence / repeat-disagreement "
+        "rollups.",
+        "",
+        "- **Full comparative narrative:** `reports/campaign-report.md`",
+        "- **Repeat-judge & confidence tables:** `campaign-semantic-summary.md`",
         "",
     ]
     if manifest.dry_run:
@@ -907,8 +913,10 @@ def render_campaign_comparative_markdown(
     lines = [
         f"# Campaign comparative report: `{manifest.campaign_id}`",
         "",
-        "Succeeded member runs only. **`FT-*`** taxonomy matches longitudinal analysis "
-        "(manifest run order). Mode gaps and judge instability are per snapshot.",
+        "Analysis uses **succeeded** member benchmark runs only. **`FT-*`** codes follow the "
+        "longitudinal taxonomy (see `docs/workflows/longitudinal-reporting.md`). "
+        "**Mode gaps** and **semantic instability** counts are derived from the same longitudinal "
+        "pass as `reports/campaign-analysis.json`.",
         "",
         render_comparative_executive_markdown(manifest, snapshots, analysis),
     ]

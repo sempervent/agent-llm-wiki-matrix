@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "agent-llm-wiki-matrix"
-version = "0.2.1"
+version = "0.2.5"
 description = "Markdown-first, git-native LLM wiki and agent comparison matrix tooling"
 readme = "README.md"
 requires-python = ">=3.11"
@@ -33,10 +33,16 @@ dev = [
 browser = [
     "playwright>=1.40",
 ]
+docs = [
+    "mkdocs>=1.6,<2",
+    "mkdocs-material>=9.5",
+    "pymdown-extensions>=10",
+]
 
 [project.urls]
 Repository = "https://github.com/sempervent/agent-llm-wiki-matrix"
 Changelog = "https://github.com/sempervent/agent-llm-wiki-matrix/blob/main/CHANGELOG.md"
+Documentation = "https://github.com/sempervent/agent-llm-wiki-matrix/blob/main/docs/workflows/docs-site.md"
 
 [project.scripts]
 alwm = "agent_llm_wiki_matrix.cli:main"

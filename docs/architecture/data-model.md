@@ -1,6 +1,6 @@
 # Data model
 
-_Last updated: 2026-04-18 (campaign result packs for publishing)._
+_Last updated: 2026-04-19 (campaign result pack optional dry-run path + INDEX completeness)._
 
 ## Principles
 
@@ -29,9 +29,9 @@ _Last updated: 2026-04-18 (campaign result packs for publishing)._
 | `schemas/v1/benchmark_campaign.schema.json` | `BenchmarkCampaignDefinitionV1` | Campaign sweep definition (YAML/JSON): **`suite_refs`**, sweep axes, optional **`prompt_registry_ref`**; see **`load_benchmark_campaign_definition`** |
 | `schemas/v1/benchmark_campaign_manifest.schema.json` | `BenchmarkCampaignManifest` | Campaign index (`manifest.json` at campaign root): member **`runs[]`**, optional **`campaign_definition_fingerprint`**, optional **`campaign_experiment_fingerprints`** (per-axis suite/provider/scoring/browser/registry hashes); member runs may include **`comparison_fingerprints`** copied from each child run’s `manifest.json` |
 | `schemas/v1/campaign_summary.schema.json` | `CampaignSummaryV1` | Rollup JSON (`campaign-summary.json`) aligned with the campaign manifest for dashboards |
-| `schemas/v1/campaign_result_pack.schema.json` | `CampaignResultPackV1` | Result pack index (`campaign-result-pack.json`): mirrors campaign layout (manifest, summaries, semantic + comparative artifacts, selected member runs); optional **`source_campaign_relpath`** / **`source_campaign_dir`**; **`assemble_campaign_result_pack`**, **`alwm benchmark campaign pack`** |
-| `schemas/v1/campaign_result_pack_comparison.schema.json` | `CampaignResultPackComparisonV1` | Two-pack diff (`pack-compare.json`): identity/fingerprints, artifact paths, **`comparative_analysis.browser_evidence_comparison`** (paired **`browser_evidence_member_cells`**), FT-\*, portability; **`alwm benchmark campaign compare-packs`** |
-| `schemas/v1/campaign_compare.schema.json` | `CampaignCompareV1` | Two **campaign directory** diff (`campaign-compare.json`): sweep dimensions, fingerprints, analysis deltas, **`browser_evidence`** rollups + **`browser_evidence_comparison`** in **`comparative_analysis`**; **`alwm benchmark campaign compare`** |
+| `schemas/v1/campaign_result_pack.schema.json` | `CampaignResultPackV1` | Result pack index (`campaign-result-pack.json`): mirrors campaign layout (manifest, summaries, semantic + comparative artifacts, optional **`campaign_dry_run_json`** when `campaign-dry-run.json` is packed, selected member runs); optional **`source_campaign_relpath`** / **`source_campaign_dir`**; **`assemble_campaign_result_pack`**, **`alwm benchmark campaign pack`** |
+| `schemas/v1/campaign_result_pack_comparison.schema.json` | `CampaignResultPackComparisonV1` | Two-pack diff (`pack-compare.json`): identity/fingerprints, artifact paths, **`comparative_analysis.browser_evidence_comparison`** (paired **`browser_evidence_member_cells`**), FT-\*, portability, optional **`reader_interpretation`** (human-oriented summary); **`alwm benchmark campaign compare-packs`** |
+| `schemas/v1/campaign_compare.schema.json` | `CampaignCompareV1` | Two **campaign directory** diff (`campaign-compare.json`): sweep dimensions, fingerprints, analysis deltas, **`browser_evidence`** rollups + **`browser_evidence_comparison`** in **`comparative_analysis`**, optional **`reader_interpretation`**; **`alwm benchmark campaign compare`** |
 
 Committed campaign output example (validate + fingerprint fields): **`docs/workflows/campaign-walkthrough.md`**.
 

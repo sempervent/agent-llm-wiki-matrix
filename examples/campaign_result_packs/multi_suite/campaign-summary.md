@@ -1,13 +1,17 @@
 # Campaign summary: `campaign.examples.multi_suite.v1`
 
-- **title:** Example — multi-suite sweep (two fixtures)
-- **created_at:** `1970-01-01T00:00:00Z`
-- **definition:** `examples/campaigns/v1/multi_suite.v1.yaml`
-- **definition_fingerprint:** `sha256:98d0b9852fa277dc5b164fe14a3711b50be2a72ea5f5fca5ed0dd09fe8072566`
+Single-page index for this campaign: **metadata**, a **snapshot digest** (spreads, backends, instability, tags), the **member run table**, and links to comparative artifacts when generated.
 
-## Experiment fingerprints (axes)
+## Metadata
 
-Stable per-axis hashes for longitudinal grouping and comparability checks.
+- **Title:** Example — multi-suite sweep (two fixtures)
+- **Created:** `1970-01-01T00:00:00Z`
+- **Definition:** `examples/campaigns/v1/multi_suite.v1.yaml`
+- **Definition fingerprint:** `sha256:98d0b9852fa277dc5b164fe14a3711b50be2a72ea5f5fca5ed0dd09fe8072566`
+
+## Experiment fingerprints (six axes)
+
+Stable per-axis hashes for longitudinal grouping and comparability checks (see `docs/workflows/longitudinal-reporting.md`).
 
 - **campaign_definition:** `sha256:98d0b9852fa277dc5b164fe14a3711b50be2a72ea5f5fca5ed0dd09fe8072566`
 - **suite_definitions:** `sha256:d2b3773206bf3494af78922b52603f56a48e60aea74a7f40998fc98adbafbeca`
@@ -15,12 +19,15 @@ Stable per-axis hashes for longitudinal grouping and comparability checks.
 - **scoring_configs:** `sha256:2c7f1b6d79305cde67076936152d80992802d413157de43143bac86c13c21fc8`
 - **browser_configs:** `sha256:591cbc3aa572200862e2f336261f05849fe93c17d226a939565815d0cb075961`
 - **prompt_registry_state:** `sha256:d409ed75b3cb355ac6727f09877d7ef98c40adce16e3e8284c6dcfe9c5c3db21`
+
+## Execution context
+
 - **fixture_mode_force_mock:** `True`
 - **dry_run:** `False`
-- **runs:** 2
-- **succeeded / failed:** 2 / 0
-- **git_commit:** `148517589c625e7fc468c35311d0bcd6939462bd`
-- **git_describe:** `v0.2.2-dirty`
+- **Planned runs:** 2
+- **Succeeded / failed:** 2 / 0
+- **git_commit:** `1d6cbf5bc0c399ea757e6b38add5f4db5f10d102`
+- **git_describe:** `v0.2.4-dirty`
 
 ## Aggregated runtime (member manifests)
 
@@ -29,17 +36,20 @@ Sums of per-run `runtime_summary` fields for successful member runs that recorde
 | Metric | Value |
 | --- | --- |
 | member_runs_timed | 2 |
-| total_browser_phase_seconds | 0.000523 |
-| total_provider_completion_seconds | 0.000418 |
-| total_evaluation_phase_seconds | 0.195920 |
+| total_browser_phase_seconds | 0.000377 |
+| total_provider_completion_seconds | 0.000027 |
+| total_evaluation_phase_seconds | 0.001483 |
 | total_judge_phase_seconds | 0.000000 |
 | total_judge_invocations | 0 |
 | cells_with_judge_parse_fallback | 0 |
 
 
-## At a glance
+## Snapshot digest
 
-Mean-score spreads, backends, semantic instability, mode gaps, and **FT-*** tags. Details: **`reports/campaign-report.md`**; judge variance: **`campaign-semantic-summary.md`**.
+Condensed signals from this campaign: best/worst **mean member scores** by sweep axis, **backend** means across cells, **longitudinal** semantic instability and mode gaps, recurring **FT-*** tags, and (when present) **judge** confidence / repeat-disagreement rollups.
+
+- **Full comparative narrative:** `reports/campaign-report.md`
+- **Repeat-judge & confidence tables:** `campaign-semantic-summary.md`
 
 ### Mean score — best / worst by sweep axis
 
@@ -78,12 +88,17 @@ _No cells flagged as semantically unstable at configured thresholds._
 
 _All cells used deterministic scoring — no judge variance rollups._
 ---
+
+## Member run index
+
+One row per planned member benchmark run (including failures). **Mean score** is the run-level mean of total weighted cell scores when present.
+
 | # | run_id | suite | benchmark_id | eval axis | modes filter | status | mean score | cells |
 | ---: | --- | --- | --- | --- | --- | --- | ---: | ---: |
 | 0 | `campaign.examples.multi_suite.v1__0000` | `fixtures/benchmarks/campaign_micro.v1.yaml` | `bench.fixtures.campaign.micro.v1` | suite_default | — | succeeded | 0.667276 | 1 |
 | 1 | `campaign.examples.multi_suite.v1__0001` | `fixtures/benchmarks/offline.v1.yaml` | `bench.offline.v1` | suite_default | — | succeeded | 0.367251 | 6 |
 
-## Comparative reports
+## Generated reports
 
 - **Markdown:** `reports/campaign-report.md` (dimensions, backends, scoring instability, mode gaps, failure tags)
 - **JSON:** `reports/campaign-analysis.json` (machine-readable mirror)
@@ -93,6 +108,6 @@ _All cells used deterministic scoring — no judge variance rollups._
 - **Markdown:** `campaign-semantic-summary.md` (repeat-judge disagreement, low-confidence cells; variance by suite / provider / mode)
 - **JSON:** `campaign-semantic-summary.json` (structured aggregates)
 
-## Longitudinal analysis
+## Longitudinal follow-up
 
-Each successful row is a standard benchmark run directory. Point longitudinal tooling at ``runs/*/manifest.json`` under this campaign root (see ``docs/workflows/longitudinal-reporting.md``).
+Each **succeeded** row is a standard benchmark tree under `runs/runNNNN/`. Point **`alwm benchmark longitudinal`** (or other tooling) at `runs/*/manifest.json` under this campaign root. See **`docs/workflows/longitudinal-reporting.md`**.

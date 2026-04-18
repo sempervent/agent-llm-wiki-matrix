@@ -109,14 +109,17 @@
     "instability_hotspots": [],
     "interpretation_caveats": [
       "Attribution labels describe **aggregate bucket patterns**, not proven causation.",
-      "Confidence is **low** when few member runs or few cells fall in each bucket.",
-      "Compare `comparison_fingerprints` on each member `manifest.json` before trusting cross-run score deltas."
+      "Confidence and **evidence_strength** are heuristics from cell/run counts \u2014 **not** statistical significance.",
+      "Confidence is **low** when few member runs, few cells per bucket, or **evidence_strength** is **weak**.",
+      "Compare `comparison_fingerprints` on each member `manifest.json` before trusting cross-run score deltas.",
+      "**inconclusive** / **mixed** are expected when sample sizes are small or instability co-occurs with spread."
     ],
     "notes": [
       "Pooled mean is over all cell total_weighted_score values in each fingerprint bucket.",
       "Judge instability counts FT-JUDGE-UNSTABLE-class rows whose run is in the bucket.",
       "Hints are heuristic; confirm with member manifests and evaluation.json.",
-      "attribution / signal_class fields are non-causal heuristics for triage only."
+      "attribution / signal_class fields are non-causal heuristics for triage only.",
+      "attribution_label categorizes likely_configuration / likely_instability / mixed / inconclusive for display; evidence_strength reflects aggregate cell counts only."
     ],
     "schema_version": 1,
     "score_spread_ranking": []

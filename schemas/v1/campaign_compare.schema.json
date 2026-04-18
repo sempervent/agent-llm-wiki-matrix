@@ -34,6 +34,11 @@
     "failure_tags": { "type": "object", "additionalProperties": true },
     "browser_evidence": { "type": "object", "additionalProperties": true },
     "member_runs": { "type": "object", "additionalProperties": true },
-    "run_health": { "type": "object", "additionalProperties": true }
+    "run_health": { "type": "object", "additionalProperties": true },
+    "reader_interpretation": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "Optional human-oriented summary (non-scoring narrative; schema_version inside object)."
+    }
   }
 }

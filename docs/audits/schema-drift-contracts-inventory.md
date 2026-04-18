@@ -55,5 +55,6 @@ Unclassified manifests under **`examples/`** / **`fixtures/`** fail the test (fo
 
 ## See also
 
+- **[v0.2.4-publication-workflow-audit.md](v0.2.4-publication-workflow-audit.md)** — end-to-end publication readiness; prioritizes **`campaign-analysis.json`** contract options vs this inventory.
 - **[schema-runtime-hardening-2026-04-18.md](schema-runtime-hardening-2026-04-18.md)** — earlier hardening notes.
 - **`docs/implementation-log.md`** — changelog of contract tests.

@@ -3,9 +3,21 @@
 - **campaign_id:** `campaign.examples.multi_suite.v1`
 - **title:** Example — multi-suite sweep (two fixtures)
 
-_This directory is the **canonical outward-facing bundle** for a completed campaign: same layout as a campaign tree, plus **`campaign-result-pack.json`** (machine index) and this **`INDEX.md`** (human overview). Cite or archive the pack, not only the raw campaign directory._
+_This directory is the **canonical outward-facing bundle** for a completed campaign: same layout as a campaign tree, plus **`campaign-result-pack.json`** (machine index) and this **`INDEX.md`** (human overview). **Cite, archive, or attach this pack**—not only the raw campaign output directory._
 
-## At a glance
+## Start here (reviewing this bundle cold)
+
+You are looking at a **self-contained publication slice**: campaign-level artifacts plus copied **`runs/runNNNN/`** member trees (or manifest-only stubs). The machine index is **`campaign-result-pack.json`** (`pack_identity_fingerprint`, artifact paths, member inventory).
+
+**Suggested reading order**
+
+1. **`campaign-summary.md`** — Rollup table, sweep overview, headline scores.
+2. **`reports/campaign-report.md`** (if present) — Narrative comparative report, fingerprint-axis interpretation, FT-* tags.
+3. **`campaign-semantic-summary.md`** (if present) — Hybrid / judge semantic instability and confidence rollups.
+4. **`reports/campaign-analysis.json`** (if present) — Machine mirror of analysis (not an `alwm validate` kind; schema version 1). 
+5. **`runs/runNNNN/`** — Per-run benchmark manifests, cells, matrices, reports.
+
+## Pack snapshot
 
 - **Pack assembled at:** `1970-01-01T00:00:00Z`
 - **Campaign manifest (created_at):** `1970-01-01T00:00:00Z`
@@ -15,8 +27,23 @@ _This directory is the **canonical outward-facing bundle** for a completed campa
 - **Member runs in this pack:** 2
 - **member_depth:** `full`
 
-- **pack_identity_fingerprint:** `sha256:46d10a886eefd7bac9439281c45998affea9c227fa16ed17839717bf6b305093`
-- **alwm_version (pack tool):** `0.2.1`
+- **pack_identity_fingerprint:** `sha256:d5f8361795b1218944a51eab111174aad02d1348d917bf8d5af2ae65697739de`
+- **alwm_version (pack tool):** `0.2.4`
+
+## Bundle completeness
+
+Which layers are present in **this** directory (paths are relative to the pack root).
+
+| Layer | Path(s) | In this pack | Role |
+| --- | --- | ---: | --- |
+| Campaign manifest | `manifest.json` | yes | Sweep definition, fingerprints, member rows |
+| Campaign summary | `campaign-summary.json`, `campaign-summary.md` | yes | Rollup; validate `campaign_summary` |
+| Semantic summary | `campaign-semantic-summary.json`, `.md` | yes | Hybrid / judge instability rollups |
+| Comparative report | `reports/campaign-report.md` | yes | Narrative report + fingerprint sections |
+| Comparative analysis | `reports/campaign-analysis.json` | yes | Structured analysis mirror |
+| Dry-run plan | `campaign-dry-run.json` | **no** | Only when the source campaign was a `--dry-run` plan |
+| Pack manifest | `campaign-result-pack.json` | yes | This bundle’s machine index (`campaign_result_pack`) |
+| Human index | `INDEX.md` | yes | You are reading it |
 
 ## Publication workflow
 
@@ -35,10 +62,13 @@ Before sharing outside the repo (or locking a release artifact):
 
 - [ ] `alwm validate campaign-result-pack.json campaign_result_pack` passes
 - [ ] `alwm validate manifest.json campaign_manifest` passes
+- [ ] `alwm validate campaign-summary.json campaign_summary` passes
 - [ ] `alwm benchmark campaign pack-check .` passes (add `--strict` for CI gates)
+- [ ] **Optional kinds:** when semantic files are present, `alwm validate campaign-semantic-summary.json campaign_semantic_summary` passes
 - [ ] **Portability:** `source_campaign_dir` is absent unless you intentionally record absolute paths (`--record-source-abspath`)
 - [ ] **Member depth:** `member_depth` is **full** unless reviewers only need manifests (longitudinal cell loads need full trees)
-- [ ] **Completeness:** comparative + semantic files you expect are listed under **Artifact inventory** and present on disk
+- [ ] **Completeness:** comparative + semantic layers you expect show **yes** in **Bundle completeness** above
+- [ ] **Subset:** if this is a filtered pack, `notes` or PR text explains why runs were omitted
 - [ ] **Secrets:** spot-check `cells/`, `request.json`, `browser_evidence.json` for tokens or private paths
 
 ## Provenance
@@ -46,8 +76,8 @@ Before sharing outside the repo (or locking a release artifact):
 Summary of where this bundle came from and how it was stamped:
 
 - **Source label (repo-relative):** `examples/campaign_runs/multi_suite`
-- **git_commit:** `148517589c625e7fc468c35311d0bcd6939462bd`
-- **git_describe:** `v0.2.2-dirty`
+- **git_commit:** `1d6cbf5bc0c399ea757e6b38add5f4db5f10d102`
+- **git_describe:** `v0.2.4-dirty`
 - **definition_fingerprint:** `sha256:98d0b9852fa277dc5b164fe14a3711b50be2a72ea5f5fca5ed0dd09fe8072566`
 
 ## Fingerprints (experiment axes)
@@ -92,6 +122,7 @@ Schema validation (JSON Schema + registered kinds):
 ```bash
 alwm validate campaign-result-pack.json campaign_result_pack
 alwm validate manifest.json campaign_manifest
+alwm validate campaign-summary.json campaign_summary
 ```
 
 Structural check (paths, manifest/summary consistency, portability hints):

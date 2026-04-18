@@ -3,11 +3,11 @@
     "cells_with_judge_parse_fallback": 0,
     "member_runs_timed": 2,
     "schema_version": 1,
-    "total_browser_phase_seconds": 0.012476999999999999,
-    "total_evaluation_phase_seconds": 0.0045520000000000005,
+    "total_browser_phase_seconds": 0.001803,
+    "total_evaluation_phase_seconds": 0.0007340000000000001,
     "total_judge_invocations": 0,
     "total_judge_phase_seconds": 0.0,
-    "total_provider_completion_seconds": 3.9999999999999996e-05
+    "total_provider_completion_seconds": 2.1000000000000002e-05
   },
   "campaign_definition_fingerprint": "sha256:781642c343722637e819c84c11296d4fab2cd91be75102df3f1f743211ae6b76",
   "campaign_experiment_fingerprints": {
@@ -24,10 +24,10 @@
   "definition_source_relpath": "examples/campaigns/v1/browser_evidence_compare.v1.yaml",
   "description": "Member runs differ by suite_ref; browser evidence section compares traces without live browsers.",
   "dry_run": false,
-  "duration_seconds": 0.269969,
+  "duration_seconds": 0.047511,
   "expected_artifact_kinds": [],
   "failures": [],
-  "finished_at_utc": "2026-04-18T01:11:09Z",
+  "finished_at_utc": "2026-04-18T01:41:39Z",
   "fixture_mode_force_mock": true,
   "generated_report_paths": {
     "campaign_analysis_json": "reports/campaign-analysis.json",
@@ -38,8 +38,8 @@
     "campaign_summary_json": "campaign-summary.json",
     "campaign_summary_md": "campaign-summary.md"
   },
-  "git_commit_sha": "148517589c625e7fc468c35311d0bcd6939462bd",
-  "git_describe": "v0.2.2-dirty",
+  "git_commit_sha": "1d6cbf5bc0c399ea757e6b38add5f4db5f10d102",
+  "git_describe": "v0.2.3-dirty",
   "inputs_snapshot": {
     "browser_configs": [
       null
@@ -75,7 +75,7 @@
         "scoring_config": "sha256:f958bcbda76ceda7438ca44922ecf99f6ef81948463ec797c7b454a29b249496",
         "suite_definition": "sha256:dfb8f3d095b1ec61cdc9993c8d8933d4928855cff904106f25b1c7c1d41d352a"
       },
-      "duration_seconds": 0.029195,
+      "duration_seconds": 0.005448,
       "eval_scoring_label": "suite_default",
       "manifest_relpath": "runs/run0000/manifest.json",
       "mean_total_weighted_score": 0.571024,
@@ -97,7 +97,7 @@
         "scoring_config": "sha256:f958bcbda76ceda7438ca44922ecf99f6ef81948463ec797c7b454a29b249496",
         "suite_definition": "sha256:e6adf3e31a08495bb6b896ac69161e98f5cf4f0a05b74b960468f4f91ef4e3c2"
       },
-      "duration_seconds": 0.017932,
+      "duration_seconds": 0.003243,
       "eval_scoring_label": "suite_default",
       "manifest_relpath": "runs/run0001/manifest.json",
       "mean_total_weighted_score": 0.36131,
@@ -109,7 +109,7 @@
     }
   ],
   "schema_version": 1,
-  "started_at_utc": "2026-04-18T01:11:09Z",
+  "started_at_utc": "2026-04-18T01:41:39Z",
   "tags": [
     "example:campaign",
     "axis:browser_evidence"
