@@ -1,0 +1,73 @@
+{
+  "benchmark_id": "bench.fixtures.browser.form.v1",
+  "cells": [
+    {
+      "aggregate_response_relpath": "cells/v-form__p-one/benchmark_response.json",
+      "browser_evidence_relpath": "cells/v-form__p-one/browser_evidence.json",
+      "cell_id": "v-form__p-one",
+      "evaluation_relpath": "cells/v-form__p-one/evaluation.json",
+      "normalized_response_relpath": "cells/v-form__p-one/response.normalized.txt",
+      "raw_response_relpath": "cells/v-form__p-one/response.raw.txt",
+      "request_relpath": "cells/v-form__p-one/request.json",
+      "runtime": {
+        "browser_seconds": 0.001869,
+        "evaluation_seconds": 0.002902,
+        "judge_repeat_count": 1,
+        "provider_seconds": 1.6e-05,
+        "schema_version": 1
+      }
+    }
+  ],
+  "comparison_fingerprints": {
+    "browser_config": "sha256:bc42b4965253463647d7cea2d176bb320017c0c21ec6c795e804a48d5eb7e576",
+    "prompt_registry_state": "sha256:9604a174787655177b3c8c0e634e5a80348399f090bc741cac5825a8a5b128f2",
+    "prompt_set": "sha256:02fe65d39ff3924b2421d9d4b8f5c7aeee174ab22a3aeead64b3c33e57052575",
+    "provider_config": "sha256:b5f7c632636d4760febd533304cbbe6f61de3ee5a7629ad12003023495b0d873",
+    "scoring_config": "sha256:f958bcbda76ceda7438ca44922ecf99f6ef81948463ec797c7b454a29b249496",
+    "suite_definition": "sha256:e6adf3e31a08495bb6b896ac69161e98f5cf4f0a05b74b960468f4f91ef4e3c2"
+  },
+  "created_at": "1970-01-01T00:00:00Z",
+  "definition_source_relpath": "fixtures/benchmarks/browser_form.v1.yaml",
+  "expected_artifact_kinds": [],
+  "failure_taxonomy_hints": [],
+  "matrix_grid_md_path": "markdown/matrix.grid.md",
+  "matrix_grid_path": "matrices/grid.json",
+  "matrix_grid_row_inputs_path": "matrices/grid.row_inputs.json",
+  "matrix_pairwise_md_path": "markdown/matrix.pairwise.md",
+  "matrix_pairwise_path": "matrices/pairwise.json",
+  "matrix_pairwise_row_inputs_path": "matrices/pairwise.row_inputs.json",
+  "prompt_ids": [
+    "p-one"
+  ],
+  "report_json_path": "reports/report.json",
+  "report_md_path": "reports/report.md",
+  "retry_summary": {
+    "cells_with_judge_parse_fallback": 0,
+    "schema_version": 1,
+    "total_judge_invocations": 0
+  },
+  "rubric_ref": "examples/dataset/rubrics/browser_realism.v1.json",
+  "run_id": "campaign.examples.browser_evidence_compare.v1__0001",
+  "runtime_summary": {
+    "browser_phase_seconds": 0.001869,
+    "duration_seconds": 0.013046,
+    "evaluation_phase_seconds": 0.002902,
+    "finished_at_utc": "2026-04-18T01:11:09Z",
+    "judge_phase_seconds": 0.0,
+    "provider_completion_seconds": 1.6e-05,
+    "schema_version": 1,
+    "started_at_utc": "2026-04-18T01:11:09Z"
+  },
+  "schema_version": 1,
+  "success_criteria": [],
+  "tags": [
+    "campaign:campaign.examples.browser_evidence_compare.v1",
+    "campaign_run:0001",
+    "example:campaign",
+    "axis:browser_evidence"
+  ],
+  "title": "Browser file-runner benchmark (form validation fixture)",
+  "variant_ids": [
+    "v-form"
+  ]
+}

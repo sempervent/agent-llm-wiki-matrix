@@ -20,6 +20,10 @@ install-dev:
 test:
     uv run pytest tests/ --ignore=tests/integration
 
+# Deterministic: committed examples/, fixtures/, and emitted campaign trees vs JSON Schema + Pydantic
+validate-artifacts:
+    uv run pytest tests/test_schema_drift_contracts.py -v
+
 # Live Ollama / llama.cpp benchmark verification (opt-in env vars; skips if unreachable)
 test-integration:
     uv run pytest tests/integration/ -v -m integration

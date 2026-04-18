@@ -10,6 +10,8 @@ from agent_llm_wiki_matrix.benchmark.campaign_fingerprint_compare import (
     FINGERPRINT_COMPARE_AXES,
     build_fingerprint_axis_groups,
     build_fingerprint_axis_insights,
+    build_fingerprint_axis_interpretation,
+    render_fingerprint_axis_interpretation_markdown,
 )
 from agent_llm_wiki_matrix.benchmark.campaign_reporting import (
     aggregate_backend_performance,
@@ -134,6 +136,27 @@ def test_build_fingerprint_groups_matches_group_snapshots_by() -> None:
     prov_ins = next(i for i in insights if i["axis_key"] == "provider_config_fingerprint")
     assert prov_ins["varied"] is True
     assert prov_ins["pooled_mean_score_spread"] == 0.0
+    interp = build_fingerprint_axis_interpretation(snaps, analysis, insights)
+    assert interp["schema_version"] == 1
+    assert "score_spread_ranking" in interp
+    assert "instability_hotspots" in interp
+    assert "drift_correlation_hints" in interp
+    attr_pf = next(
+        a for a in interp["attribution_by_axis"] if a["axis_key"] == "provider_config_fingerprint"
+    )
+    assert "evidence_strength" in attr_pf
+    assert "uncertainty_notes" in attr_pf
+    assert "attribution_label" in attr_pf
+    assert attr_pf["metrics"].get("min_bucket_cell_count") is not None
+    rank_pf = next(
+        r
+        for r in interp["score_spread_ranking"]
+        if r["axis_key"] == "provider_config_fingerprint"
+    )
+    assert rank_pf["pooled_mean_score_spread"] == 0.0
+    md = render_fingerprint_axis_interpretation_markdown(interp)
+    assert "| Pattern |" in md
+    assert "Limit:_" in md or "weak" in md.lower()
 
 
 def test_build_campaign_analysis_includes_fingerprint_blocks() -> None:
@@ -192,6 +215,12 @@ def test_build_campaign_analysis_includes_fingerprint_blocks() -> None:
     d = build_campaign_analysis_dict(m, [snap], analysis)
     assert "fingerprint_compare_axes" in d
     assert "fingerprint_axis_insights" in d
+    assert "fingerprint_axis_interpretation" in d
+    fi = d["fingerprint_axis_interpretation"]
+    assert fi["schema_version"] == 1
+    assert "attribution_by_axis" in fi
+    assert "differentiation_overview" in fi
+    assert "interpretation_caveats" in fi
     assert len(d["fingerprint_compare_axes"]) >= 5
     assert "mean_score_extremes_by_sweep_axis" in d
     assert "member_mean_score_by_dimension" in d
@@ -334,9 +363,12 @@ def test_fingerprint_axes_probe_campaign_two_scoring_config_buckets(tmp_path: Pa
         if i["axis_key"] == "scoring_config_fingerprint"
     )
     assert sc_ins["varied"] is True
-    assert (out / "reports" / "campaign-report.md").read_text(encoding="utf-8").find(
-        "Fingerprint axes (longitudinal grouping keys)",
-    ) >= 0
+    assert "fingerprint_axis_interpretation" in data
+    assert data["fingerprint_axis_interpretation"]["schema_version"] == 1
+    cr = (out / "reports" / "campaign-report.md").read_text(encoding="utf-8")
+    assert "Fingerprint axes (longitudinal grouping keys)" in cr
+    assert "Axis interpretation (why buckets differ)" in cr
+    assert "Per-axis attribution (heuristic)" in cr
 
 
 def test_campaign_run_writes_comparative_report(tmp_path: Path) -> None:

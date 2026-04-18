@@ -1,0 +1,669 @@
+{
+  "backend_performance": [
+    {
+      "backend_kind": "mock",
+      "cell_count": 2,
+      "mean_score": 0.466167
+    }
+  ],
+  "browser_evidence_member_cells": [
+    {
+      "benchmark_id": "bench.fixtures.browser.checkout.v1",
+      "browser_runner": "file",
+      "cell_id": "v-checkout__p-one",
+      "dom_excerpt_count": 2,
+      "evidence_id": "evidence.checkout_flow.v1",
+      "evidence_title": "Abstract trace: Cart \u2192 Checkout \u2192 Confirm",
+      "extension_digest": "checkout_flow.v1 \u00b7 net 14 req/1 fail \u00b7 a11y 1v \u00b7 LCP 890ms",
+      "extension_keys": [
+        "accessibility",
+        "fixture_profile",
+        "network",
+        "performance",
+        "structured_capture_version"
+      ],
+      "has_dom_snapshot_ref": true,
+      "run_id": "campaign.examples.browser_evidence_compare.v1__0000",
+      "screenshot_count": 2,
+      "signals_digest": "nav\u00d73 \u00b7 console\u00d72 \u00b7 dom\u00d72 \u00b7 shot\u00d72 \u00b7 snap",
+      "suite_ref": "fixtures/benchmarks/browser_checkout.v1.yaml"
+    },
+    {
+      "benchmark_id": "bench.fixtures.browser.form.v1",
+      "browser_runner": "file",
+      "cell_id": "v-form__p-one",
+      "dom_excerpt_count": 2,
+      "evidence_id": "evidence.form_validation.v1",
+      "evidence_title": "Abstract trace: signup form with validation errors",
+      "extension_digest": "form_validation.v1 \u00b7 a11y 2v",
+      "extension_keys": [
+        "accessibility",
+        "fixture_profile",
+        "structured_capture_version"
+      ],
+      "has_dom_snapshot_ref": false,
+      "run_id": "campaign.examples.browser_evidence_compare.v1__0001",
+      "screenshot_count": 1,
+      "signals_digest": "nav\u00d71 \u00b7 console\u00d71 \u00b7 dom\u00d72 \u00b7 shot\u00d71",
+      "suite_ref": "fixtures/benchmarks/browser_form.v1.yaml"
+    }
+  ],
+  "campaign_id": "campaign.examples.browser_evidence_compare.v1",
+  "dimensions": {
+    "benchmark_id": {
+      "axis": "benchmark_id",
+      "distinct_count": 2,
+      "values": [
+        "bench.fixtures.browser.checkout.v1",
+        "bench.fixtures.browser.form.v1"
+      ],
+      "varied": true
+    },
+    "browser_config_applied": {
+      "axis": "browser_config_applied",
+      "distinct_count": 1,
+      "values": [
+        "False"
+      ],
+      "varied": false
+    },
+    "eval_scoring_label": {
+      "axis": "eval_scoring_label",
+      "distinct_count": 1,
+      "values": [
+        "suite_default"
+      ],
+      "varied": false
+    },
+    "execution_modes_filter": {
+      "axis": "execution_modes_filter",
+      "distinct_count": 1,
+      "values": [
+        "\u2014"
+      ],
+      "varied": false
+    },
+    "provider_config_ref": {
+      "axis": "provider_config_ref",
+      "distinct_count": 1,
+      "values": [
+        "null (harness default)"
+      ],
+      "varied": false
+    },
+    "suite_ref": {
+      "axis": "suite_ref",
+      "distinct_count": 2,
+      "values": [
+        "fixtures/benchmarks/browser_checkout.v1.yaml",
+        "fixtures/benchmarks/browser_form.v1.yaml"
+      ],
+      "varied": true
+    }
+  },
+  "execution_mode_gaps_top": [],
+  "failure_tag_counts": [
+    {
+      "code": "FT-ABS-LOW",
+      "signal_count": 1
+    }
+  ],
+  "failure_tags_detail": {
+    "FT-ABS-LOW": [
+      "bench.fixtures.browser.form.v1::v-form__p-one"
+    ]
+  },
+  "fingerprint_axis_insights": [
+    {
+      "axis_key": "provider_config_fingerprint",
+      "axis_title": "Provider config",
+      "distinct_groups": 2,
+      "groups": [
+        {
+          "cell_count": 1,
+          "group_label": "sha256:a21f9f3dfa8d97e31e7fda04965e51bb8a25f8e5ca454efcafaba0ad229e3d9a",
+          "label_display": "sha256:a21f9f3dfa8d97e31e7f\u2026",
+          "mode_gap_events": 0,
+          "pooled_mean_score": 0.571024,
+          "regressions_targeting_group": 0,
+          "unstable_cell_events": 0
+        },
+        {
+          "cell_count": 1,
+          "group_label": "sha256:b5f7c632636d4760febd533304cbbe6f61de3ee5a7629ad12003023495b0d873",
+          "label_display": "sha256:b5f7c632636d4760febd\u2026",
+          "mode_gap_events": 0,
+          "pooled_mean_score": 0.36131,
+          "regressions_targeting_group": 0,
+          "unstable_cell_events": 0
+        }
+      ],
+      "highest_mean_group": {
+        "label": "sha256:a21f9f3dfa8d97e31e7fda04965e51bb8a25f8e5ca454efcafaba0ad229e3d9a",
+        "label_display": "sha256:a21f9f3dfa8d97e31e7f\u2026",
+        "pooled_mean_score": 0.571024
+      },
+      "lowest_mean_group": {
+        "label": "sha256:b5f7c632636d4760febd533304cbbe6f61de3ee5a7629ad12003023495b0d873",
+        "label_display": "sha256:b5f7c632636d4760febd\u2026",
+        "pooled_mean_score": 0.36131
+      },
+      "note": "pooled mean score spread 0.209714 (lowest `sha256:b5f7c632636d4760febd\u2026` 0.361310 vs highest `sha256:a21f9f3dfa8d97e31e7f\u2026` 0.571024).",
+      "pooled_mean_score_spread": 0.209714,
+      "varied": true
+    },
+    {
+      "axis_key": "scoring_config_fingerprint",
+      "axis_title": "Scoring config",
+      "distinct_groups": 1,
+      "note": "Single group on this axis \u2014 no cross-group spread.",
+      "pooled_mean_score_spread": null,
+      "varied": false
+    },
+    {
+      "axis_key": "execution_mode",
+      "axis_title": "Execution mode",
+      "distinct_groups": 1,
+      "note": "Single group on this axis \u2014 no cross-group spread.",
+      "pooled_mean_score_spread": null,
+      "varied": false
+    },
+    {
+      "axis_key": "prompt_registry_state_fingerprint",
+      "axis_title": "Prompt registry state",
+      "distinct_groups": 1,
+      "note": "Single group on this axis \u2014 no cross-group spread.",
+      "pooled_mean_score_spread": null,
+      "varied": false
+    },
+    {
+      "axis_key": "browser_config_fingerprint",
+      "axis_title": "Browser config",
+      "distinct_groups": 2,
+      "groups": [
+        {
+          "cell_count": 1,
+          "group_label": "sha256:bc42b4965253463647d7cea2d176bb320017c0c21ec6c795e804a48d5eb7e576",
+          "label_display": "sha256:bc42b4965253463647d7\u2026",
+          "mode_gap_events": 0,
+          "pooled_mean_score": 0.36131,
+          "regressions_targeting_group": 0,
+          "unstable_cell_events": 0
+        },
+        {
+          "cell_count": 1,
+          "group_label": "sha256:dda4aeabb9afaebafd877fa47366f98b75cfb4b85e82c5284907c1c50a63a730",
+          "label_display": "sha256:dda4aeabb9afaebafd87\u2026",
+          "mode_gap_events": 0,
+          "pooled_mean_score": 0.571024,
+          "regressions_targeting_group": 0,
+          "unstable_cell_events": 0
+        }
+      ],
+      "highest_mean_group": {
+        "label": "sha256:dda4aeabb9afaebafd877fa47366f98b75cfb4b85e82c5284907c1c50a63a730",
+        "label_display": "sha256:dda4aeabb9afaebafd87\u2026",
+        "pooled_mean_score": 0.571024
+      },
+      "lowest_mean_group": {
+        "label": "sha256:bc42b4965253463647d7cea2d176bb320017c0c21ec6c795e804a48d5eb7e576",
+        "label_display": "sha256:bc42b4965253463647d7\u2026",
+        "pooled_mean_score": 0.36131
+      },
+      "note": "pooled mean score spread 0.209714 (lowest `sha256:bc42b4965253463647d7\u2026` 0.361310 vs highest `sha256:dda4aeabb9afaebafd87\u2026` 0.571024).",
+      "pooled_mean_score_spread": 0.209714,
+      "varied": true
+    }
+  ],
+  "fingerprint_axis_interpretation": {
+    "attribution_by_axis": [
+      {
+        "attribution": "likely_configuration",
+        "axis_key": "provider_config_fingerprint",
+        "axis_kind": "config_fingerprint",
+        "axis_title": "Provider config",
+        "confidence": "low",
+        "metrics": {
+          "max_instability_rate_across_buckets": 0.0,
+          "pooled_mean_score_spread": 0.209714,
+          "total_cells_in_axis": 2,
+          "total_unstable_cell_events": 0
+        },
+        "rationale": "Meaningful pooled mean spread across manifest fingerprint slices (resolved provider/scoring/registry/browser config) with no judge-instability rows in those member runs \u2014 differences are plausibly **stable** and configuration/path-related rather than judge noise at this granularity."
+      },
+      {
+        "attribution": "likely_configuration",
+        "axis_key": "browser_config_fingerprint",
+        "axis_kind": "config_fingerprint",
+        "axis_title": "Browser config",
+        "confidence": "low",
+        "metrics": {
+          "max_instability_rate_across_buckets": 0.0,
+          "pooled_mean_score_spread": 0.209714,
+          "total_cells_in_axis": 2,
+          "total_unstable_cell_events": 0
+        },
+        "rationale": "Meaningful pooled mean spread across manifest fingerprint slices (resolved provider/scoring/registry/browser config) with no judge-instability rows in those member runs \u2014 differences are plausibly **stable** and configuration/path-related rather than judge noise at this granularity."
+      }
+    ],
+    "differentiation_overview": "**Configuration / path:** aggregate patterns on `provider_config_fingerprint`, `browser_config_fingerprint` are consistent with **stable** score gaps between fingerprint buckets (weak judge-instability signal). This remains a **heuristic** \u2014 confirm with manifests and per-cell evaluations.",
+    "drift_correlation_hints": [
+      {
+        "axis_key": "provider_config_fingerprint",
+        "kind": "config_fingerprint_axis_in_top_score_spread",
+        "rank_in_spread": 1,
+        "severity": "note",
+        "signal_class": "configuration",
+        "summary": "This experiment-config fingerprint axis is among the top score-spread drivers \u2014 compare manifest comparison_fingerprints and member manifests."
+      },
+      {
+        "axis_key": "browser_config_fingerprint",
+        "kind": "config_fingerprint_axis_in_top_score_spread",
+        "rank_in_spread": 2,
+        "severity": "note",
+        "signal_class": "configuration",
+        "summary": "This experiment-config fingerprint axis is among the top score-spread drivers \u2014 compare manifest comparison_fingerprints and member manifests."
+      }
+    ],
+    "instability_hotspots": [
+      {
+        "axis_key": "provider_config_fingerprint",
+        "axis_title": "Provider config",
+        "highest_instability_rate": {
+          "cell_count": 1,
+          "group_label": "sha256:a21f9f3dfa8d97e31e7fda04965e51bb8a25f8e5ca454efcafaba0ad229e3d9a",
+          "instability_rate": 0.0,
+          "label_display": "sha256:a21f9f3dfa8d97e31e7f\u2026",
+          "unstable_cell_events": 0
+        },
+        "most_unstable_events": {
+          "cell_count": 1,
+          "group_label": "sha256:a21f9f3dfa8d97e31e7fda04965e51bb8a25f8e5ca454efcafaba0ad229e3d9a",
+          "instability_rate": 0.0,
+          "label_display": "sha256:a21f9f3dfa8d97e31e7f\u2026",
+          "unstable_cell_events": 0
+        }
+      },
+      {
+        "axis_key": "browser_config_fingerprint",
+        "axis_title": "Browser config",
+        "highest_instability_rate": {
+          "cell_count": 1,
+          "group_label": "sha256:bc42b4965253463647d7cea2d176bb320017c0c21ec6c795e804a48d5eb7e576",
+          "instability_rate": 0.0,
+          "label_display": "sha256:bc42b4965253463647d7\u2026",
+          "unstable_cell_events": 0
+        },
+        "most_unstable_events": {
+          "cell_count": 1,
+          "group_label": "sha256:bc42b4965253463647d7cea2d176bb320017c0c21ec6c795e804a48d5eb7e576",
+          "instability_rate": 0.0,
+          "label_display": "sha256:bc42b4965253463647d7\u2026",
+          "unstable_cell_events": 0
+        }
+      }
+    ],
+    "interpretation_caveats": [
+      "Attribution labels describe **aggregate bucket patterns**, not proven causation.",
+      "Confidence is **low** when few member runs or few cells fall in each bucket.",
+      "Compare `comparison_fingerprints` on each member `manifest.json` before trusting cross-run score deltas."
+    ],
+    "notes": [
+      "Pooled mean is over all cell total_weighted_score values in each fingerprint bucket.",
+      "Judge instability counts FT-JUDGE-UNSTABLE-class rows whose run is in the bucket.",
+      "Hints are heuristic; confirm with member manifests and evaluation.json.",
+      "attribution / signal_class fields are non-causal heuristics for triage only."
+    ],
+    "schema_version": 1,
+    "score_spread_ranking": [
+      {
+        "axis_key": "provider_config_fingerprint",
+        "axis_title": "Provider config",
+        "distinct_groups": 2,
+        "highest_mean_group": {
+          "label": "sha256:a21f9f3dfa8d97e31e7fda04965e51bb8a25f8e5ca454efcafaba0ad229e3d9a",
+          "label_display": "sha256:a21f9f3dfa8d97e31e7f\u2026",
+          "pooled_mean_score": 0.571024
+        },
+        "lowest_mean_group": {
+          "label": "sha256:b5f7c632636d4760febd533304cbbe6f61de3ee5a7629ad12003023495b0d873",
+          "label_display": "sha256:b5f7c632636d4760febd\u2026",
+          "pooled_mean_score": 0.36131
+        },
+        "pooled_mean_score_spread": 0.209714,
+        "rank": 1
+      },
+      {
+        "axis_key": "browser_config_fingerprint",
+        "axis_title": "Browser config",
+        "distinct_groups": 2,
+        "highest_mean_group": {
+          "label": "sha256:dda4aeabb9afaebafd877fa47366f98b75cfb4b85e82c5284907c1c50a63a730",
+          "label_display": "sha256:dda4aeabb9afaebafd87\u2026",
+          "pooled_mean_score": 0.571024
+        },
+        "lowest_mean_group": {
+          "label": "sha256:bc42b4965253463647d7cea2d176bb320017c0c21ec6c795e804a48d5eb7e576",
+          "label_display": "sha256:bc42b4965253463647d7\u2026",
+          "pooled_mean_score": 0.36131
+        },
+        "pooled_mean_score_spread": 0.209714,
+        "rank": 2
+      }
+    ]
+  },
+  "fingerprint_compare_axes": [
+    {
+      "axis_key": "provider_config_fingerprint",
+      "axis_title": "Provider config",
+      "cell_count": 1,
+      "group_label": "sha256:a21f9f3dfa8d97e31e7fda04965e51bb8a25f8e5ca454efcafaba0ad229e3d9a",
+      "label_display": "sha256:a21f9f3dfa8d97e31e7f\u2026",
+      "mode_gap_events": 0,
+      "pooled_mean_score": 0.571024,
+      "regressions_targeting_group": 0,
+      "run_ids": [
+        "campaign.examples.browser_evidence_compare.v1__0000"
+      ],
+      "unstable_cell_events": 0
+    },
+    {
+      "axis_key": "provider_config_fingerprint",
+      "axis_title": "Provider config",
+      "cell_count": 1,
+      "group_label": "sha256:b5f7c632636d4760febd533304cbbe6f61de3ee5a7629ad12003023495b0d873",
+      "label_display": "sha256:b5f7c632636d4760febd\u2026",
+      "mode_gap_events": 0,
+      "pooled_mean_score": 0.36131,
+      "regressions_targeting_group": 0,
+      "run_ids": [
+        "campaign.examples.browser_evidence_compare.v1__0001"
+      ],
+      "unstable_cell_events": 0
+    },
+    {
+      "axis_key": "scoring_config_fingerprint",
+      "axis_title": "Scoring config",
+      "cell_count": 2,
+      "group_label": "sha256:f958bcbda76ceda7438ca44922ecf99f6ef81948463ec797c7b454a29b249496",
+      "label_display": "sha256:f958bcbda76ceda7438c\u2026",
+      "mode_gap_events": 0,
+      "pooled_mean_score": 0.466167,
+      "regressions_targeting_group": 0,
+      "run_ids": [
+        "campaign.examples.browser_evidence_compare.v1__0000",
+        "campaign.examples.browser_evidence_compare.v1__0001"
+      ],
+      "unstable_cell_events": 0
+    },
+    {
+      "axis_key": "execution_mode",
+      "axis_title": "Execution mode",
+      "cell_count": 2,
+      "group_label": "browser_mock",
+      "label_display": "browser_mock",
+      "mode_gap_events": 0,
+      "pooled_mean_score": 0.466167,
+      "regressions_targeting_group": 0,
+      "run_ids": [
+        "campaign.examples.browser_evidence_compare.v1__0000",
+        "campaign.examples.browser_evidence_compare.v1__0001"
+      ],
+      "unstable_cell_events": 0
+    },
+    {
+      "axis_key": "prompt_registry_state_fingerprint",
+      "axis_title": "Prompt registry state",
+      "cell_count": 2,
+      "group_label": "sha256:9604a174787655177b3c8c0e634e5a80348399f090bc741cac5825a8a5b128f2",
+      "label_display": "sha256:9604a174787655177b3c\u2026",
+      "mode_gap_events": 0,
+      "pooled_mean_score": 0.466167,
+      "regressions_targeting_group": 0,
+      "run_ids": [
+        "campaign.examples.browser_evidence_compare.v1__0000",
+        "campaign.examples.browser_evidence_compare.v1__0001"
+      ],
+      "unstable_cell_events": 0
+    },
+    {
+      "axis_key": "browser_config_fingerprint",
+      "axis_title": "Browser config",
+      "cell_count": 1,
+      "group_label": "sha256:bc42b4965253463647d7cea2d176bb320017c0c21ec6c795e804a48d5eb7e576",
+      "label_display": "sha256:bc42b4965253463647d7\u2026",
+      "mode_gap_events": 0,
+      "pooled_mean_score": 0.36131,
+      "regressions_targeting_group": 0,
+      "run_ids": [
+        "campaign.examples.browser_evidence_compare.v1__0001"
+      ],
+      "unstable_cell_events": 0
+    },
+    {
+      "axis_key": "browser_config_fingerprint",
+      "axis_title": "Browser config",
+      "cell_count": 1,
+      "group_label": "sha256:dda4aeabb9afaebafd877fa47366f98b75cfb4b85e82c5284907c1c50a63a730",
+      "label_display": "sha256:dda4aeabb9afaebafd87\u2026",
+      "mode_gap_events": 0,
+      "pooled_mean_score": 0.571024,
+      "regressions_targeting_group": 0,
+      "run_ids": [
+        "campaign.examples.browser_evidence_compare.v1__0000"
+      ],
+      "unstable_cell_events": 0
+    }
+  ],
+  "judge_campaign_semantic": {
+    "confidence_flag_counts": {},
+    "criterion_instability_top": [],
+    "totals": {
+      "cells_flagged_judge_low_confidence": 0,
+      "cells_flagged_repeat_confidence_low": 0,
+      "cells_with_repeat_judge": 0,
+      "low_confidence_cells": 0,
+      "max_range_across_campaign": null,
+      "mean_range_repeat_cells": null,
+      "mean_total_weighted_stdev_repeat": null
+    },
+    "unstable_execution_modes": [
+      {
+        "axis_value": "browser_mock",
+        "instability_score": -1.0,
+        "low_confidence_cells": 0,
+        "rank": 1,
+        "repeat_judge_cells": 0
+      }
+    ],
+    "unstable_providers": [
+      {
+        "axis_value": "(default)",
+        "instability_score": -1.0,
+        "low_confidence_cells": 0,
+        "rank": 1,
+        "repeat_judge_cells": 0
+      }
+    ],
+    "unstable_suites": [
+      {
+        "axis_value": "fixtures/benchmarks/browser_form.v1.yaml",
+        "instability_score": -1.0,
+        "low_confidence_cells": 0,
+        "rank": 1,
+        "repeat_judge_cells": 0
+      },
+      {
+        "axis_value": "fixtures/benchmarks/browser_checkout.v1.yaml",
+        "instability_score": -1.0,
+        "low_confidence_cells": 0,
+        "rank": 2,
+        "repeat_judge_cells": 0
+      }
+    ]
+  },
+  "longitudinal_thresholds": {
+    "low_score": 0.55,
+    "min_recurring": 2,
+    "min_runs_for_swing": 3,
+    "mode_gap_threshold": 0.12,
+    "regression_delta": 0.03,
+    "semantic_range_threshold": 0.22,
+    "semantic_stdev_threshold": 0.12,
+    "series_swing_threshold": 0.06
+  },
+  "mean_score_extremes_by_sweep_axis": {
+    "axes": {
+      "benchmark_id": {
+        "best": {
+          "label": "bench.fixtures.browser.checkout.v1",
+          "mean_score": 0.571024,
+          "run_count": 1
+        },
+        "distinct_values": 2,
+        "spread": 0.209714,
+        "varied": true,
+        "worst": {
+          "label": "bench.fixtures.browser.form.v1",
+          "mean_score": 0.36131,
+          "run_count": 1
+        }
+      },
+      "browser_config_applied": {
+        "distinct_values": 1,
+        "note": "Single distinct value on this axis \u2014 no best/worst spread.",
+        "varied": false
+      },
+      "eval_scoring_label": {
+        "distinct_values": 1,
+        "note": "Single distinct value on this axis \u2014 no best/worst spread.",
+        "varied": false
+      },
+      "execution_modes_filter": {
+        "distinct_values": 1,
+        "note": "Single distinct value on this axis \u2014 no best/worst spread.",
+        "varied": false
+      },
+      "provider_config_ref": {
+        "distinct_values": 1,
+        "note": "Single distinct value on this axis \u2014 no best/worst spread.",
+        "varied": false
+      },
+      "suite_ref": {
+        "best": {
+          "label": "fixtures/benchmarks/browser_checkout.v1.yaml",
+          "mean_score": 0.571024,
+          "run_count": 1
+        },
+        "distinct_values": 2,
+        "spread": 0.209714,
+        "varied": true,
+        "worst": {
+          "label": "fixtures/benchmarks/browser_form.v1.yaml",
+          "mean_score": 0.36131,
+          "run_count": 1
+        }
+      }
+    },
+    "comparable": true,
+    "member_runs_with_scores": 2
+  },
+  "member_mean_score_by_dimension": {
+    "benchmark_id": {
+      "best": {
+        "label": "bench.fixtures.browser.checkout.v1",
+        "mean_score": 0.571024,
+        "run_count": 1
+      },
+      "spread": 0.209714,
+      "values": [
+        {
+          "axis_value": "bench.fixtures.browser.checkout.v1",
+          "mean_member_score": 0.571024,
+          "run_count": 1
+        },
+        {
+          "axis_value": "bench.fixtures.browser.form.v1",
+          "mean_member_score": 0.36131,
+          "run_count": 1
+        }
+      ],
+      "worst": {
+        "label": "bench.fixtures.browser.form.v1",
+        "mean_score": 0.36131,
+        "run_count": 1
+      }
+    },
+    "browser_config_applied": {
+      "comparable_across_values": false,
+      "values": [
+        {
+          "axis_value": "false",
+          "mean_member_score": 0.466167,
+          "run_count": 2
+        }
+      ]
+    },
+    "eval_scoring_label": {
+      "comparable_across_values": false,
+      "values": [
+        {
+          "axis_value": "suite_default",
+          "mean_member_score": 0.466167,
+          "run_count": 2
+        }
+      ]
+    },
+    "execution_modes_filter": {
+      "comparable_across_values": false,
+      "values": [
+        {
+          "axis_value": "\u2014",
+          "mean_member_score": 0.466167,
+          "run_count": 2
+        }
+      ]
+    },
+    "provider_config_ref": {
+      "comparable_across_values": false,
+      "values": [
+        {
+          "axis_value": "null (harness default)",
+          "mean_member_score": 0.466167,
+          "run_count": 2
+        }
+      ]
+    },
+    "suite_ref": {
+      "best": {
+        "label": "fixtures/benchmarks/browser_checkout.v1.yaml",
+        "mean_score": 0.571024,
+        "run_count": 1
+      },
+      "spread": 0.209714,
+      "values": [
+        {
+          "axis_value": "fixtures/benchmarks/browser_checkout.v1.yaml",
+          "mean_member_score": 0.571024,
+          "run_count": 1
+        },
+        {
+          "axis_value": "fixtures/benchmarks/browser_form.v1.yaml",
+          "mean_member_score": 0.36131,
+          "run_count": 1
+        }
+      ],
+      "worst": {
+        "label": "fixtures/benchmarks/browser_form.v1.yaml",
+        "mean_score": 0.36131,
+        "run_count": 1
+      }
+    }
+  },
+  "schema_version": 1,
+  "semantic_instability_by_scoring_backend": [],
+  "varied_axes": [
+    "benchmark_id",
+    "suite_ref"
+  ]
+}

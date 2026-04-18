@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 from pathlib import Path
 
 from agent_llm_wiki_matrix.artifacts import load_artifact_file
@@ -107,6 +108,12 @@ def test_campaign_semantic_repeats_offline_rollups(tmp_path: Path) -> None:
     suite_axis = {a.axis_value: a for a in sem.by_suite}
     assert "examples/benchmarks/v1/semantic_repeats.v1.yaml" in suite_axis
     assert suite_axis["examples/benchmarks/v1/semantic_repeats.v1.yaml"].repeat_judge_cells >= 1
+    assert len(sem.criterion_instability) >= 1
+    assert sem.instability_highlights.unstable_suites
+    assert sem.totals.cells_flagged_judge_low_confidence >= 1
+    assert "judge_campaign_semantic" in json.loads(
+        (out / "reports" / "campaign-analysis.json").read_text(encoding="utf-8"),
+    )
 
 
 def test_multi_suite_campaign_at_a_glance_compare_suites(tmp_path: Path) -> None:

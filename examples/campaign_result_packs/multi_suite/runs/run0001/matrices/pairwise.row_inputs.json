@@ -1,0 +1,109 @@
+{
+  "benchmark_id": "bench.offline.v1",
+  "created_at": "1970-01-01T00:00:00Z",
+  "entries": [
+    {
+      "col_label": "v-cli",
+      "mean_abs_score_delta": 0.0,
+      "prompt_ids": [
+        "p-one",
+        "p-two"
+      ],
+      "row_label": "v-cli",
+      "variant_i": "v-cli",
+      "variant_j": "v-cli"
+    },
+    {
+      "col_label": "v-browser",
+      "mean_abs_score_delta": 0.5417675,
+      "prompt_ids": [
+        "p-one",
+        "p-two"
+      ],
+      "row_label": "v-cli",
+      "variant_i": "v-cli",
+      "variant_j": "v-browser"
+    },
+    {
+      "col_label": "v-repo",
+      "mean_abs_score_delta": 0.4507095,
+      "prompt_ids": [
+        "p-one",
+        "p-two"
+      ],
+      "row_label": "v-cli",
+      "variant_i": "v-cli",
+      "variant_j": "v-repo"
+    },
+    {
+      "col_label": "v-cli",
+      "mean_abs_score_delta": 0.5417675,
+      "prompt_ids": [
+        "p-one",
+        "p-two"
+      ],
+      "row_label": "v-browser",
+      "variant_i": "v-browser",
+      "variant_j": "v-cli"
+    },
+    {
+      "col_label": "v-browser",
+      "mean_abs_score_delta": 0.0,
+      "prompt_ids": [
+        "p-one",
+        "p-two"
+      ],
+      "row_label": "v-browser",
+      "variant_i": "v-browser",
+      "variant_j": "v-browser"
+    },
+    {
+      "col_label": "v-repo",
+      "mean_abs_score_delta": 0.331566,
+      "prompt_ids": [
+        "p-one",
+        "p-two"
+      ],
+      "row_label": "v-browser",
+      "variant_i": "v-browser",
+      "variant_j": "v-repo"
+    },
+    {
+      "col_label": "v-cli",
+      "mean_abs_score_delta": 0.4507095,
+      "prompt_ids": [
+        "p-one",
+        "p-two"
+      ],
+      "row_label": "v-repo",
+      "variant_i": "v-repo",
+      "variant_j": "v-cli"
+    },
+    {
+      "col_label": "v-browser",
+      "mean_abs_score_delta": 0.331566,
+      "prompt_ids": [
+        "p-one",
+        "p-two"
+      ],
+      "row_label": "v-repo",
+      "variant_i": "v-repo",
+      "variant_j": "v-browser"
+    },
+    {
+      "col_label": "v-repo",
+      "mean_abs_score_delta": 0.0,
+      "prompt_ids": [
+        "p-one",
+        "p-two"
+      ],
+      "row_label": "v-repo",
+      "variant_i": "v-repo",
+      "variant_j": "v-repo"
+    }
+  ],
+  "matrix_id": "campaign.examples.multi_suite.v1__0001-pairwise",
+  "metric": "mean_abs_total_score_delta",
+  "run_id": "campaign.examples.multi_suite.v1__0001",
+  "schema_version": 1
+}

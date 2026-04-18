@@ -1,0 +1,96 @@
+{
+  "console_messages": [
+    {
+      "level": "log",
+      "text": "payment tokenization: ok"
+    },
+    {
+      "level": "warn",
+      "text": "third-party analytics blocked in fixture profile"
+    }
+  ],
+  "dom_excerpts": [
+    {
+      "accessibility_name": "Pay now",
+      "aria_role": "button",
+      "dom_order": 0,
+      "html_snippet": "<button type=\"submit\" id=\"pay\">Pay now</button>",
+      "label": "Pay now",
+      "selector": "button#pay",
+      "visible_text": "Pay now"
+    },
+    {
+      "accessibility_name": "Order total",
+      "aria_role": "statictext",
+      "dom_order": 1,
+      "label": "Order total",
+      "selector": "[data-testid='order-total']",
+      "visible_text": "$42.00"
+    }
+  ],
+  "dom_snapshot_ref": "snapshot.checkout.v1",
+  "extensions": {
+    "accessibility": {
+      "notes": "One color-contrast issue on secondary link (fixture).",
+      "rules_checked": 24,
+      "violations_count": 1
+    },
+    "fixture_profile": "checkout_flow.v1",
+    "network": {
+      "failed_requests": 1,
+      "last_status_code": 200,
+      "last_url": "https://example.test/checkout/confirm",
+      "requests_total": 14
+    },
+    "performance": {
+      "dom_content_loaded_ms": 420.5,
+      "largest_contentful_paint_ms": 890.0
+    },
+    "structured_capture_version": 1
+  },
+  "id": "evidence.checkout_flow.v1",
+  "navigation_sequence": [
+    {
+      "action": "navigate",
+      "title": "Cart",
+      "url": "https://example.test/cart"
+    },
+    {
+      "action": "navigate",
+      "title": "Checkout",
+      "url": "https://example.test/checkout"
+    },
+    {
+      "action": "submit",
+      "title": "Order confirmed",
+      "url": "https://example.test/checkout/confirm"
+    }
+  ],
+  "notes": "Deterministic checkout narrative for browser benchmark realism (no PII, no binaries).",
+  "schema_version": 1,
+  "screenshots": [
+    {
+      "caption": "Fixture: mobile viewport before submit.",
+      "capture_scope": "viewport",
+      "captured_at": "1970-01-01T00:00:01Z",
+      "content_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "device_pixel_ratio": 2.0,
+      "mime_type": "image/png",
+      "sequence": 0,
+      "viewport_height": 844,
+      "viewport_width": 390
+    },
+    {
+      "caption": "Fixture: focused element capture (metadata only).",
+      "capture_scope": "element",
+      "captured_at": "1970-01-01T00:00:02Z",
+      "content_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "mime_type": "image/png",
+      "sequence": 1,
+      "target_selector": "button#pay",
+      "viewport_height": 844,
+      "viewport_width": 390
+    }
+  ],
+  "title": "Abstract trace: Cart \u2192 Checkout \u2192 Confirm"
+}

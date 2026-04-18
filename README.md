@@ -3,17 +3,27 @@
 Markdown-first, git-native **LLM wiki + comparison matrix** system for capturing ideas, experiments, evaluations, prompts, and reports as structured files. It supports reproducible benchmarking of multiple agent stacks and model backends (including local models via **Ollama** or switchable **OpenAI-compatible / llama.cpp** HTTP servers).
 
 **Repository:** [github.com/sempervent/agent-llm-wiki-matrix](https://github.com/sempervent/agent-llm-wiki-matrix)  
-**Changelog:** [CHANGELOG.md](CHANGELOG.md) (includes **[0.2.1]**) · **v0.2.1 notes:** [docs/releases/v0.2.1.md](docs/releases/v0.2.1.md) · **v0.1.0 notes:** [docs/releases/v0.1.0.md](docs/releases/v0.1.0.md) · **Release scope:** [docs/release-readiness.md](docs/release-readiness.md)
+**Changelog:** [CHANGELOG.md](CHANGELOG.md) · **v0.2.3 (milestone, in-tree):** [docs/roadmap/v0.2.3.md](docs/roadmap/v0.2.3.md) · [docs/tracking/v0.2.3-campaign.md](docs/tracking/v0.2.3-campaign.md) · **v0.2.2 notes:** [docs/releases/v0.2.2.md](docs/releases/v0.2.2.md) · **v0.2.1 notes:** [docs/releases/v0.2.1.md](docs/releases/v0.2.1.md) · **v0.1.0 notes:** [docs/releases/v0.1.0.md](docs/releases/v0.1.0.md) · **Release scope:** [docs/release-readiness.md](docs/release-readiness.md)
 
-Contributors and coding agents should follow **`AGENTS.md`** for the full operating manual (contribution loop, decision rules, prompt registry policy, verification expectations, **multi-agent parallel work**, capability labels). Parallel agents: see **`docs/workflows/multi-agent-parallel.md`**.
+Contributors and coding agents should follow **`AGENTS.md`** for the full operating manual (contribution loop, decision rules, prompt registry policy, verification expectations, **multi-agent parallel work**, capability labels). **Verification commands** (canonical **`just`** recipes vs **`uv run`** fallbacks vs optional live): **`docs/workflows/verification.md`**. Parallel agents: see **`docs/workflows/multi-agent-parallel.md`**.
 
-## Current milestone (v0.2.1)
+## Current milestone (v0.2.3)
 
-**Comparative campaigns and longitudinal evaluation:** v0.2.1 tightens **campaign docs and walkthroughs**, **campaign semantic summaries**, **runtime observability** on benchmark and campaign runs, **truthful MCP (fixture-only) classification** with **`alwm browser run-mcp`**, and **richer browser evidence** plus a **browser realism** rubric—while keeping **default CI offline** and **opt-in** live or Playwright paths. Release notes: **[docs/releases/v0.2.1.md](docs/releases/v0.2.1.md)** · changelog: **[CHANGELOG.md](CHANGELOG.md)**. Roadmap context: **[docs/roadmap/v0.2.0.md](docs/roadmap/v0.2.0.md)**. Dashboard and cloud features remain out of scope for this pass.
+**State:** **[v0.2.3](docs/roadmap/v0.2.3.md)** **substantive goals are delivered** in the repo (result packs, fingerprint interpretation in comparative/longitudinal outputs, readability passes, **drift** tests + **`validate-artifacts`**, browser/report realism within fixture CI, **`compare-packs`**). **Release closure** (git tag, **`CHANGELOG.md` [0.2.3]**, **`docs/releases/v0.2.3.md`**, README/AGENTS “latest shipped”) is tracked in **[docs/tracking/v0.2.3-campaign.md](docs/tracking/v0.2.3-campaign.md)**.
 
-### What changed since v0.2.0
+**Canonical verification (host):**
 
-v0.2.0 established **six-axis fingerprints** (`comparison_fingerprints` / `campaign_experiment_fingerprints`) and **longitudinal** reporting columns. **v0.2.1** adds on top: **campaign documentation consolidation** (walkthrough, wiki, tracking, ADR), **`campaign-semantic-summary.*`** rollups (artifact kind **`campaign_semantic_summary`**; deterministic-only campaigns may still show **zero semantic cells**), **runtime / retry / judge-phase observability** in manifests and Markdown, **truthful MCP scope** (**`alwm browser run-mcp`** = fixture bridge only), and **richer `BrowserEvidence`** plus **`browser_realism.v1`** rubric dimensions—without changing the **offline default CI** contract.
+| Step | Command | Role |
+| --- | --- | --- |
+| Default CI parity | **`uv run just ci`** (or **`just ci`** with an activated `.venv`) | ruff, mypy, pytest (`tests/`, excluding `tests/integration/`) |
+| Committed artifact contracts | **`just validate-artifacts`** (or `uv run pytest tests/test_schema_drift_contracts.py`) | JSON Schema + Pydantic on swept `examples/` / `fixtures/`; see **[docs/workflows/verification.md](docs/workflows/verification.md)** |
+| Campaign packs | **`alwm benchmark campaign pack`**, **`alwm benchmark campaign pack-check`**, **`alwm benchmark campaign compare-packs`**, **`alwm benchmark campaign compare`** | Publish / validate packs; diff **packs** or **raw campaign dirs** (`pack-compare` / `campaign-compare`); walkthrough **[docs/workflows/campaign-result-pack-publication.md](docs/workflows/campaign-result-pack-publication.md)** · **[docs/workflows/benchmark-campaigns.md](docs/workflows/benchmark-campaigns.md)** |
+
+Prior release notes: **[v0.2.2](docs/releases/v0.2.2.md)**. Arc context: **[docs/roadmap/v0.2.0.md](docs/roadmap/v0.2.0.md)**.
+
+### What shipped in v0.2.1 / v0.2.2
+
+**v0.2.0** established **six-axis fingerprints** and **longitudinal** reporting columns. **v0.2.1** added **campaign doc consolidation**, **`campaign_semantic_summary`** rollups, **runtime observability**, **fixture-backed MCP** (`alwm browser run-mcp`), and **richer `BrowserEvidence`**. **v0.2.2** deepens **campaign reporting**, **semantic summaries**, **observability**, **browser evidence**, and a **minimal MCP stdio** path—see **[docs/releases/v0.2.2.md](docs/releases/v0.2.2.md)**.
 
 ## Goals
 
@@ -26,7 +36,7 @@ v0.2.0 established **six-axis fingerprints** (`comparison_fingerprints` / `campa
 ## Prerequisites
 
 - **[uv](https://docs.astral.sh/uv/)** — **required** for local virtualenv creation, installs, and running Python tools (`uv pip`, `uv run`). See **`AGENTS.md`** (Python environment — uv).
-- [just](https://github.com/casey/just) for project tasks (`brew install just` or see upstream install options)
+- **[just](https://github.com/casey/just)** — **recommended** for **`just ci`**, **`just validate-artifacts`**, and other recipes (`brew install just` or see upstream). If **`just`** is unavailable, use the equivalent **`uv run …`** commands in **`docs/workflows/verification.md`**.
 - Docker with Buildx, Docker Compose v2 (for container workflows)
 - Python **3.11+** (see `pyproject.toml` `requires-python`; the `Dockerfile` uses 3.11). On the host, Python is normally provided via **`uv`** (e.g. `uv python install 3.11` or the interpreter implied by `uv venv --python 3.11`).
 
@@ -56,7 +66,9 @@ uv run alwm providers show
 uv run just ci
 ```
 
-With an activated `.venv`, you can run `alwm …` and `just ci` without the `uv run` prefix.
+With an activated `.venv`, you can run `alwm …` and `just ci` without the `uv run` prefix. **Without `just`:** run **`uv run ruff check src tests`**, **`uv run mypy src`**, and **`uv run pytest tests/ --ignore=tests/integration`** (same as **`just ci`** — see **`docs/workflows/verification.md`**).
+
+For **committed `examples/` / `fixtures/` contract drift** only, **`uv run just validate-artifacts`** (or **`uv run pytest tests/test_schema_drift_contracts.py -v`**) is a fast supplement; it does **not** replace the full **`just ci`** suite.
 
 Optional Playwright-based browser capture (not required for `just ci`):
 
@@ -64,6 +76,8 @@ Optional Playwright-based browser capture (not required for `just ci`):
 # uv pip install -e ".[browser]" && uv run playwright install chromium
 # uv run alwm browser run-playwright …
 ```
+
+**MCP stdio (optional, local protocol):** with **`uv pip install -e ".[dev]"`** (includes the `mcp` package), set **`ALWM_MCP_BROWSER_COMMAND`** to launch **`fixtures/mcp_servers/stdio_browser_evidence_server.py`**, then run **`alwm browser run-mcp --stdio`**. That is a **real** MCP client over stdio to a **local** subprocess; the shipped server still serves **committed** `BrowserEvidence` JSON (multi-scenario selection is documented in **`docs/architecture/browser.md`**). **Remote or IDE-hosted MCP** is not implemented here. The **`browser_realism.v1`** rubric judges whether answers **ground in that JSON**—it does not prove live DOM automation unless you pair it with Playwright-produced evidence.
 
 ---
 
@@ -113,6 +127,9 @@ uv run alwm benchmark campaign plan \
 uv run alwm validate examples/campaign_runs/minimal_offline/manifest.json campaign_manifest
 uv run alwm validate examples/campaign_runs/minimal_offline/campaign-summary.json campaign_summary
 # when present: uv run alwm validate …/campaign-semantic-summary.json campaign_semantic_summary
+# Canonical outward-facing bundle (pack manifest + INDEX + mirrored layout): pack a finished campaign:
+#   uv run alwm benchmark campaign pack examples/campaign_runs/minimal_offline --output-dir /tmp/pack --pack-id my-pack --source-label examples/campaign_runs/minimal_offline
+#   uv run alwm benchmark campaign pack-check /tmp/pack
 ```
 
 **Step-by-step (committed paths):** **`docs/workflows/campaign-walkthrough.md`**. Full field reference: **`docs/workflows/benchmark-campaigns.md`**. Index / tracking: **`docs/wiki/benchmark-campaigns.md`**, **`docs/wiki/campaign-orchestration.md`**, **`docs/tracking/benchmark-campaign-orchestration.md`**, **`docs/tracking/campaign-orchestration.md`**, ADR **`docs/architecture/adr/0001-benchmark-campaign-orchestration.md`**.
@@ -238,18 +255,19 @@ Detailed diagrams and data flow: `docs/architecture/runtime.md`, `docs/architect
 
 ## Commands (just and CLI)
 
-Run `just` with no arguments to list recipes. Common tasks:
+Run `just` with no arguments to list recipes. **Canonical vs fallback vs optional live verification:** **`docs/workflows/verification.md`**.
 
 | Command | Description |
 | --- | --- |
 | `just install-dev` | `uv pip install -e ".[dev]"` — editable install with dev dependencies (see **`AGENTS.md`**) |
-| `just test` | `uv run pytest` (excludes `tests/integration/` live provider tests) |
+| `just test` | `uv run pytest tests/ --ignore=tests/integration` (same as fallback **`uv run pytest …`** in **`verification.md`**) |
 | `just test-integration` | Opt-in live Ollama / OpenAI-compatible benchmark checks (`ALWM_LIVE_BENCHMARK_*`) |
 | `just smoke` | Full-stack smoke (`scripts/smoke.sh`): pytest `-m smoke`, host `alwm` benchmark + campaign, Docker Compose + offline benchmark; recovery analysis on failure — see `docs/workflows/smoke.md` |
 | `just lint` | Ruff check |
 | `just fmt` | Ruff format |
 | `just typecheck` | Mypy |
-| `just ci` | Lint + typecheck + tests |
+| `just ci` | **Ruff** + **mypy** + **`just test`** — default merge-quality bar (see **`verification.md`**) |
+| `just validate-artifacts` | **Only** `tests/test_schema_drift_contracts.py` (fast committed JSON contract sweep); also runs inside full **`pytest tests/`**; does **not** replace **`just ci`** — **`docs/audits/schema-drift-contracts-inventory.md`** |
 | `just docker-build` | Build local image (`runtime` target) |
 | `just docker-bake` | Multi-arch bake via `docker-bake.hcl` |
 | `just compose-help` | Validate Compose for dev/test/benchmark + benchmark-offline/ollama/llamacpp |
@@ -271,7 +289,7 @@ Run `just` with no arguments to list recipes. Common tasks:
 | `alwm providers show` | Print resolved provider config (API keys redacted) |
 | `alwm benchmark probe` | Check Ollama + OpenAI-compatible HTTP APIs (for live runs) |
 | `alwm benchmark run --definition … --output-dir … [--prompt-registry PATH]` | Full harness: responses → evals → matrices + report; manifests may include **timing / retry / judge-phase** summaries; `browser_mock` variants run the browser phase and write **`browser_evidence.json`** (fixtures by default); Playwright requires `ALWM_BENCHMARK_PLAYWRIGHT=1` + `[browser]` extra |
-| `alwm benchmark campaign run` / `alwm benchmark campaign plan` | Multi-suite campaign sweep; **`plan`** or **`run --dry-run`** plans without member **`runs/`**; see **`docs/workflows/benchmark-campaigns.md`** |
+| `alwm benchmark campaign run` / `plan` / `pack` / `compare-packs` / `compare` | Campaign sweep, dry-run planning, **result pack** assembly, **two-pack** comparison (`pack-compare.json`), or **two campaign directory** comparison (`campaign-compare.json`); see **`docs/workflows/benchmark-campaigns.md`** |
 | `alwm benchmark longitudinal --runs-glob … --out-dir …` | Longitudinal Markdown + `summary.json` from benchmark manifests (glob relative to repo root) |
 | `alwm prompts check` / `list` / `show <id>` | Validate and read `prompts/registry.yaml` (paths relative to repo root) |
 

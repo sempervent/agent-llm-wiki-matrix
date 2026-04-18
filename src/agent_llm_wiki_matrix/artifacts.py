@@ -16,6 +16,9 @@ from agent_llm_wiki_matrix.models import (
     BenchmarkRequestRecord,
     BenchmarkResponse,
     BenchmarkRunManifest,
+    CampaignCompareV1,
+    CampaignResultPackComparisonV1,
+    CampaignResultPackV1,
     CampaignSemanticSummaryV1,
     CampaignSummaryV1,
     ComparisonMatrix,
@@ -73,6 +76,18 @@ _ARTIFACTS: dict[str, tuple[type[BaseModel], str]] = {
     "campaign_semantic_summary": (
         CampaignSemanticSummaryV1,
         "schemas/v1/campaign_semantic_summary.schema.json",
+    ),
+    "campaign_result_pack": (
+        CampaignResultPackV1,
+        "schemas/v1/campaign_result_pack.schema.json",
+    ),
+    "campaign_result_pack_comparison": (
+        CampaignResultPackComparisonV1,
+        "schemas/v1/campaign_result_pack_comparison.schema.json",
+    ),
+    "campaign_compare": (
+        CampaignCompareV1,
+        "schemas/v1/campaign_compare.schema.json",
     ),
 }
 

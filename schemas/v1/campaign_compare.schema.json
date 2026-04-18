@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/sempervent/agent-llm-wiki-matrix/schemas/v1/campaign_compare.schema.json",
+  "title": "CampaignCompareV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "created_at",
+    "left",
+    "right",
+    "identity",
+    "sweep_dimensions",
+    "fingerprint_axis_insights",
+    "artifacts",
+    "comparative_analysis",
+    "semantic_summary_totals",
+    "failure_tags",
+    "browser_evidence",
+    "member_runs",
+    "run_health"
+  ],
+  "properties": {
+    "schema_version": { "type": "integer", "const": 1 },
+    "created_at": { "type": "string", "minLength": 1 },
+    "left": { "type": "object", "additionalProperties": true },
+    "right": { "type": "object", "additionalProperties": true },
+    "identity": { "type": "object", "additionalProperties": true },
+    "sweep_dimensions": { "type": "object", "additionalProperties": true },
+    "fingerprint_axis_insights": { "type": "object", "additionalProperties": true },
+    "artifacts": { "type": "object", "additionalProperties": true },
+    "comparative_analysis": { "type": "object", "additionalProperties": true },
+    "semantic_summary_totals": { "type": "object", "additionalProperties": true },
+    "failure_tags": { "type": "object", "additionalProperties": true },
+    "browser_evidence": { "type": "object", "additionalProperties": true },
+    "member_runs": { "type": "object", "additionalProperties": true },
+    "run_health": { "type": "object", "additionalProperties": true }
+  }
+}

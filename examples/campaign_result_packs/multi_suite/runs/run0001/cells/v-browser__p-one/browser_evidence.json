@@ -1,0 +1,60 @@
+{
+  "console_messages": [
+    {
+      "level": "log",
+      "text": "mock_trace=94de29738ca1"
+    }
+  ],
+  "dom_excerpts": [
+    {
+      "accessibility_name": "Mock action v-browser__p-one",
+      "aria_role": "button",
+      "dom_order": 0,
+      "label": "mock primary surface",
+      "selector": "[data-mock-id='94de29738ca1']",
+      "visible_text": "Deterministic mock excerpt for v-browser__p-one"
+    }
+  ],
+  "extensions": {
+    "accessibility": {
+      "rules_checked": 0,
+      "violations_count": 0
+    },
+    "network": {
+      "failed_requests": 0,
+      "requests_total": 0
+    },
+    "runner": "mock",
+    "structured_capture_version": 1,
+    "trace_digest": "94de29738ca1"
+  },
+  "id": "mock-evidence-v-browser__p-one",
+  "navigation_sequence": [
+    {
+      "action": "navigate",
+      "title": "Start",
+      "url": "https://example.test/"
+    },
+    {
+      "action": "navigate",
+      "title": "Mock step (94de29738ca1)",
+      "url": "https://example.test/step-2"
+    }
+  ],
+  "notes": "MockBrowserRunner: deterministic; no real browser.",
+  "schema_version": 1,
+  "screenshots": [
+    {
+      "caption": "Mock screenshot metadata only (no binary).",
+      "capture_scope": "viewport",
+      "captured_at": "1970-01-01T00:00:00Z",
+      "content_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "device_pixel_ratio": 1.0,
+      "mime_type": "image/png",
+      "sequence": 0,
+      "viewport_height": 720,
+      "viewport_width": 1280
+    }
+  ],
+  "title": "Mock browser evidence (v-browser__p-one)"
+}

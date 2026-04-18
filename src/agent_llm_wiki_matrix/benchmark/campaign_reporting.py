@@ -11,11 +11,19 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
+from agent_llm_wiki_matrix.benchmark.campaign_browser_evidence import (
+    campaign_browser_evidence_json_rows,
+    render_campaign_browser_evidence_markdown,
+)
 from agent_llm_wiki_matrix.benchmark.campaign_fingerprint_compare import (
     build_fingerprint_axis_groups,
     build_fingerprint_axis_insights,
+    build_fingerprint_axis_interpretation,
     fingerprint_compare_to_json,
     render_fingerprint_compare_markdown,
+)
+from agent_llm_wiki_matrix.benchmark.campaign_semantic_summary import (
+    render_campaign_semantic_judge_section_markdown,
 )
 from agent_llm_wiki_matrix.benchmark.persistence import write_json_sorted, write_utf8_text
 from agent_llm_wiki_matrix.models import (
@@ -136,6 +144,39 @@ def _manifest_paths_for_succeeded_runs(
         if p.is_file():
             out.append(p)
     return sorted(out, key=lambda x: str(x))
+
+
+def suite_ref_benchmark_id_partition_coincide(
+    manifest: BenchmarkCampaignManifest,
+) -> bool:
+    """True when ``suite_ref`` and ``benchmark_id`` induce the same partition of runs.
+
+    Then the two axes carry the same sweep signal; Markdown summaries list ``suite_ref``
+    only to avoid redundant emphasis. JSON rollups are unchanged.
+    """
+    runs = manifest.runs
+    if len(runs) < 2:
+        return False
+    suites = {r.suite_ref for r in runs}
+    benches = {r.benchmark_id for r in runs}
+    if len(suites) <= 1 or len(benches) <= 1:
+        return False
+    for i, a in enumerate(runs):
+        for b in runs[i + 1 :]:
+            if (a.suite_ref == b.suite_ref) != (a.benchmark_id == b.benchmark_id):
+                return False
+    return True
+
+
+def _markdown_sweep_axis_keys(
+    axis_keys: Sequence[str],
+    manifest: BenchmarkCampaignManifest,
+) -> list[str]:
+    """Drop ``benchmark_id`` from ordered axis names when it duplicates ``suite_ref``."""
+    keys = list(axis_keys)
+    if suite_ref_benchmark_id_partition_coincide(manifest):
+        return [k for k in keys if k != "benchmark_id"]
+    return keys
 
 
 def summarize_campaign_dimensions(manifest: BenchmarkCampaignManifest) -> dict[str, Any]:
@@ -316,17 +357,21 @@ def render_comparative_executive_markdown(
     """Top-of-report digest: dimensions, score extremes, backends, instability, gaps, FT-*."""
     dim = summarize_campaign_dimensions(manifest)
     varied = sorted(k for k, v in dim.items() if isinstance(v, dict) and v.get("varied"))
+    coincide = suite_ref_benchmark_id_partition_coincide(manifest)
+    varied_md = _markdown_sweep_axis_keys(varied, manifest)
     ext = mean_score_extremes_by_sweep_axis(manifest)
     lines = [
         "## At a glance",
         "",
     ]
-    if varied:
-        lines.append(
-            "- **Varied sweep axes:** "
-            + ", ".join(f"`{a}`" for a in varied)
-            + ".",
-        )
+    if varied_md:
+        ax_line = ", ".join(f"`{a}`" for a in varied_md)
+        lines.append(f"- **Varied sweep axes:** {ax_line}.")
+        if coincide:
+            lines.append(
+                "- _Note:_ `suite_ref` and `benchmark_id` sweep together — "
+                "member scores by benchmark are the same grouping as by suite.",
+            )
     else:
         lines.append(
             "- **Varied sweep axes:** _none — single configuration path in this campaign._",
@@ -335,7 +380,7 @@ def render_comparative_executive_markdown(
     if ext.get("comparable"):
         lines.extend(["", "### Mean member score — best / worst by axis", ""])
         axes_block = ext.get("axes") or {}
-        for axis_name in sorted(axes_block.keys()):
+        for axis_name in _markdown_sweep_axis_keys(sorted(axes_block.keys()), manifest):
             block = axes_block[axis_name]
             if not isinstance(block, dict):
                 continue
@@ -430,6 +475,7 @@ def render_comparative_executive_markdown(
 def render_member_mean_score_tables_markdown(manifest: BenchmarkCampaignManifest) -> str:
     """One table per axis with multiple distinct values (member-run mean scores)."""
     roll = rollup_member_mean_scores_by_dimension(manifest)
+    coincide = suite_ref_benchmark_id_partition_coincide(manifest)
     lines: list[str] = [
         "## Member-run mean score by sweep value",
         "",
@@ -439,6 +485,8 @@ def render_member_mean_score_tables_markdown(manifest: BenchmarkCampaignManifest
     ]
     any_table = False
     for axis_key in sorted(roll.keys()):
+        if coincide and axis_key == "benchmark_id":
+            continue
         rows = roll[axis_key]
         if len(rows) < 2:
             continue
@@ -494,10 +542,9 @@ def render_campaign_at_a_glance_markdown(
     lines = [
         "## At a glance",
         "",
-        "Quick read on **mean-score spreads** across sweep axes, **backend** leaders, "
-        "**semantic instability** (when longitudinal analysis ran), **execution-mode gaps**, "
-        "and **failure taxonomy** signals. See **`reports/campaign-report.md`** for the full "
-        "comparative narrative and **`campaign-semantic-summary.md`** for judge-variance rollups.",
+        "Mean-score spreads, backends, semantic instability, mode gaps, and **FT-*** tags. "
+        "Details: **`reports/campaign-report.md`**; judge variance: "
+        "**`campaign-semantic-summary.md`**.",
         "",
     ]
     if manifest.dry_run:
@@ -505,12 +552,13 @@ def render_campaign_at_a_glance_markdown(
         return "\n".join(lines)
 
     ext = mean_score_extremes_by_sweep_axis(manifest)
+    coincide = suite_ref_benchmark_id_partition_coincide(manifest)
     lines.extend(["### Mean score — best / worst by sweep axis", ""])
     if not ext.get("comparable"):
         lines.append(f"- {ext.get('note', 'Not enough runs to compare.')}")
     else:
         axes = ext.get("axes") or {}
-        for axis_name in sorted(axes.keys()):
+        for axis_name in _markdown_sweep_axis_keys(sorted(axes.keys()), manifest):
             block = axes.get(axis_name)
             if not isinstance(block, dict):
                 continue
@@ -524,6 +572,11 @@ def render_campaign_at_a_glance_markdown(
                 f"- **`{axis_name}`:** best `{b['label']}` ({b['mean_score']:.6f}), "
                 f"worst `{w['label']}` ({w['mean_score']:.6f}), spread **{block['spread']:.6f}**",
             )
+    if coincide:
+        lines.append(
+            "_`benchmark_id` tracks `suite_ref` here (same grouping); see comparative report "
+            "for the full dimension table._",
+        )
     lines.append("")
 
     snaps: list[RunSnapshot] = []
@@ -586,77 +639,111 @@ def render_campaign_at_a_glance_markdown(
         if not ranked:
             lines.append("_No FT-* signals in this pass._")
         else:
-            for i, (code, n) in enumerate(ranked[:10], start=1):
-                desc = FAILURE_TAXONOMY.get(code, "")
-                lines.append(f"{i}. **`{code}`** — {n} signal(s) — {desc}")
+            top = ranked[:8]
+            parts = [f"`{c}`×{n}" for c, n in top]
+            lines.append("- " + ", ".join(parts))
+            if len(ranked) > 8:
+                rest_n = len(ranked) - 8
+                lines.append(
+                    f"- _… +{rest_n} more (see taxonomy in `reports/campaign-report.md`)._",
+                )
     lines.append("")
 
+    lines.extend(["### Judge confidence & repeat disagreement (rollup)", ""])
+    if semantic_summary is None:
+        lines.append("_No semantic summary artifact — run campaign with member manifests._")
+    else:
+        tot = semantic_summary.totals
+        _mrc = tot.max_range_across_campaign
+        _max_range_disp = _mrc if _mrc is not None else "—"
+        lines.extend(
+            [
+                f"- **Low-confidence (merged):** {tot.low_confidence_cells} — "
+                f"judge {tot.cells_flagged_judge_low_confidence}, "
+                f"repeat {tot.cells_flagged_repeat_confidence_low}",
+                f"- **Repeat-judge cells (N>1):** {tot.cells_with_repeat_judge}; "
+                f"**max range:** {_max_range_disp}",
+                "",
+            ],
+        )
+        ih = semantic_summary.instability_highlights
+        cf_items = list(ih.confidence_flag_counts.items())
+        if cf_items:
+            fk, fv = cf_items[0]
+            lines.append(
+                f"- **Top threshold flag:** `{fk}` ({fv} cell(s))",
+            )
+        if semantic_summary.criterion_instability:
+            c0 = semantic_summary.criterion_instability[0]
+            lines.append(
+                f"- **Top unstable criterion (by Σ score_range):** `{c0.criterion_id}` "
+                f"(Σ={c0.sum_score_range:.6f})",
+            )
+        lines.append("")
     lines.extend(["### Semantic / hybrid judge — axis hotspots (rollup)", ""])
     if semantic_summary is None:
         lines.append("_No semantic summary artifact (see campaign-semantic-summary when present)._")
+    elif semantic_summary.totals.cells_semantic_or_hybrid == 0:
+        lines.append("_All cells used deterministic scoring — no judge variance rollups._")
     else:
-        t = semantic_summary.totals
-        if t.cells_semantic_or_hybrid == 0:
-            lines.append("_All cells used deterministic scoring — no judge variance rollups._")
-        else:
 
-            def _hot_table(
-                title: str,
-                rollups: Sequence[Any],
-                primary: str,
-                fallback: str,
-            ) -> None:
-                def _rank(x: Any) -> tuple[float, float]:
-                    p = getattr(x, primary, None)
-                    f = getattr(x, fallback, None)
-                    return (
-                        float(p) if p is not None else -1.0,
-                        float(f) if f is not None else -1.0,
+        def _hot_table(
+            title: str,
+            rollups: Sequence[Any],
+            primary: str,
+            fallback: str,
+        ) -> None:
+            def _rank(x: Any) -> tuple[float, float]:
+                p = getattr(x, primary, None)
+                f = getattr(x, fallback, None)
+                return (
+                    float(p) if p is not None else -1.0,
+                    float(f) if f is not None else -1.0,
+                )
+
+            def _hot_score(x: Any) -> float:
+                a, b = _rank(x)
+                return max(a, b) if max(a, b) >= 0 else -1.0
+
+            ranked = sorted(
+                rollups,
+                key=lambda x: (_hot_score(x), x.axis_value),
+                reverse=True,
+            )
+            lines.append(
+                f"**{title}** (ranked by `{primary}`, then `{fallback}`):",
+            )
+            if not rollups:
+                lines.append("- _No rollup rows._")
+            else:
+                for x in ranked[:5]:
+                    pr, fb = _rank(x)
+                    pr_s = f"{pr:.6f}" if pr >= 0 else "—"
+                    fb_s = f"{fb:.6f}" if fb >= 0 else "—"
+                    lines.append(
+                        f"- `{x.axis_value}` — mean_range={pr_s}, max_range={fb_s} "
+                        f"(low-conf.: {x.low_confidence_cells})",
                     )
+            lines.append("")
 
-                def _hot_score(x: Any) -> float:
-                    a, b = _rank(x)
-                    return max(a, b) if max(a, b) >= 0 else -1.0
-
-                ranked = sorted(
-                    rollups,
-                    key=lambda x: (_hot_score(x), x.axis_value),
-                    reverse=True,
-                )
-                lines.append(
-                    f"**{title}** (ranked by `{primary}`, then `{fallback}`):",
-                )
-                if not rollups:
-                    lines.append("- _No rollup rows._")
-                else:
-                    for x in ranked[:5]:
-                        pr, fb = _rank(x)
-                        pr_s = f"{pr:.6f}" if pr >= 0 else "—"
-                        fb_s = f"{fb:.6f}" if fb >= 0 else "—"
-                        lines.append(
-                            f"- `{x.axis_value}` — mean_range={pr_s}, max_range={fb_s} "
-                            f"(low-conf.: {x.low_confidence_cells})",
-                        )
-                lines.append("")
-
-            _hot_table(
-                "By suite",
-                semantic_summary.by_suite,
-                "mean_range_across_cells",
-                "max_range_observed",
-            )
-            _hot_table(
-                "By provider axis",
-                semantic_summary.by_provider,
-                "mean_range_across_cells",
-                "max_range_observed",
-            )
-            _hot_table(
-                "By execution mode",
-                semantic_summary.by_execution_mode,
-                "mean_range_across_cells",
-                "max_range_observed",
-            )
+        _hot_table(
+            "By suite",
+            semantic_summary.by_suite,
+            "mean_range_across_cells",
+            "max_range_observed",
+        )
+        _hot_table(
+            "By provider axis",
+            semantic_summary.by_provider,
+            "mean_range_across_cells",
+            "max_range_observed",
+        )
+        _hot_table(
+            "By execution mode",
+            semantic_summary.by_execution_mode,
+            "mean_range_across_cells",
+            "max_range_observed",
+        )
 
     lines.append("---")
     lines.append("")
@@ -680,6 +767,9 @@ def build_campaign_analysis_dict(
     manifest: BenchmarkCampaignManifest,
     snapshots: list[RunSnapshot],
     analysis: LongitudinalAnalysis,
+    *,
+    campaign_dir: Path | None = None,
+    semantic_summary: CampaignSemanticSummaryV1 | None = None,
 ) -> dict[str, Any]:
     """Structured mirror of the Markdown report (deterministic key order via JSON dump)."""
     dimensions = summarize_campaign_dimensions(manifest)
@@ -691,7 +781,12 @@ def build_campaign_analysis_dict(
 
     fp_rows = build_fingerprint_axis_groups(snapshots, analysis)
     fp_insights = build_fingerprint_axis_insights(snapshots, analysis)
-    fp_block = fingerprint_compare_to_json(fp_rows, fp_insights)
+    fp_interp = build_fingerprint_axis_interpretation(snapshots, analysis, fp_insights)
+    fp_block = fingerprint_compare_to_json(
+        fp_rows,
+        fp_insights,
+        interpretation=fp_interp,
+    )
 
     out: dict[str, Any] = {
         "schema_version": 1,
@@ -735,6 +830,68 @@ def build_campaign_analysis_dict(
     out["mean_score_extremes_by_sweep_axis"] = mean_score_extremes_by_sweep_axis(manifest)
     out["member_mean_score_by_dimension"] = member_mean_score_dimension_to_json(manifest)
     out.update(fp_block)
+    if campaign_dir is not None:
+        be = campaign_browser_evidence_json_rows(
+            campaign_dir=campaign_dir,
+            manifest=manifest,
+        )
+        if be:
+            out["browser_evidence_member_cells"] = be
+    if semantic_summary is not None:
+        t = semantic_summary.totals
+        ih = semantic_summary.instability_highlights
+        out["judge_campaign_semantic"] = {
+            "totals": {
+                "low_confidence_cells": t.low_confidence_cells,
+                "cells_flagged_judge_low_confidence": t.cells_flagged_judge_low_confidence,
+                "cells_flagged_repeat_confidence_low": t.cells_flagged_repeat_confidence_low,
+                "cells_with_repeat_judge": t.cells_with_repeat_judge,
+                "max_range_across_campaign": t.max_range_across_campaign,
+                "mean_range_repeat_cells": t.mean_range_repeat_cells,
+                "mean_total_weighted_stdev_repeat": t.mean_total_weighted_stdev_repeat,
+            },
+            "confidence_flag_counts": ih.confidence_flag_counts,
+            "criterion_instability_top": [
+                {
+                    "criterion_id": c.criterion_id,
+                    "cells_with_repeat_judge": c.cells_with_repeat_judge,
+                    "sum_score_range": round(c.sum_score_range, 6),
+                    "max_score_range": round(c.max_score_range, 6),
+                    "mean_score_range": round(c.mean_score_range, 6),
+                }
+                for c in semantic_summary.criterion_instability[:15]
+            ],
+            "unstable_suites": [
+                {
+                    "rank": h.rank,
+                    "axis_value": h.axis_value,
+                    "instability_score": round(h.instability_score, 6),
+                    "low_confidence_cells": h.low_confidence_cells,
+                    "repeat_judge_cells": h.repeat_judge_cells,
+                }
+                for h in ih.unstable_suites[:8]
+            ],
+            "unstable_providers": [
+                {
+                    "rank": h.rank,
+                    "axis_value": h.axis_value,
+                    "instability_score": round(h.instability_score, 6),
+                    "low_confidence_cells": h.low_confidence_cells,
+                    "repeat_judge_cells": h.repeat_judge_cells,
+                }
+                for h in ih.unstable_providers[:8]
+            ],
+            "unstable_execution_modes": [
+                {
+                    "rank": h.rank,
+                    "axis_value": h.axis_value,
+                    "instability_score": round(h.instability_score, 6),
+                    "low_confidence_cells": h.low_confidence_cells,
+                    "repeat_judge_cells": h.repeat_judge_cells,
+                }
+                for h in ih.unstable_execution_modes[:8]
+            ],
+        }
     return out
 
 
@@ -742,24 +899,34 @@ def render_campaign_comparative_markdown(
     manifest: BenchmarkCampaignManifest,
     snapshots: list[RunSnapshot],
     analysis: LongitudinalAnalysis,
+    *,
+    browser_evidence_markdown: str = "",
+    semantic_summary: CampaignSemanticSummaryV1 | None = None,
 ) -> str:
     """Narrative report: dimensions, backends, scoring instability, mode gaps, FT-* counts."""
     lines = [
         f"# Campaign comparative report: `{manifest.campaign_id}`",
         "",
-        "Aggregates **succeeded** member runs under this campaign directory. "
-        "Regression-style **`FT-*`** signals use the same taxonomy as longitudinal analysis "
-        "(adjacent run order in the campaign manifest when the same benchmark cell appears "
-        "in multiple runs). Within-run mode gaps and judge instability apply per snapshot.",
+        "Succeeded member runs only. **`FT-*`** taxonomy matches longitudinal analysis "
+        "(manifest run order). Mode gaps and judge instability are per snapshot.",
         "",
         render_comparative_executive_markdown(manifest, snapshots, analysis),
-        "## Which dimensions varied",
-        "",
     ]
+    if semantic_summary is not None:
+        lines.append(render_campaign_semantic_judge_section_markdown(semantic_summary))
+    lines.extend(
+        [
+            "## Which dimensions varied",
+            "",
+        ],
+    )
     dim = summarize_campaign_dimensions(manifest)
+    coincide = suite_ref_benchmark_id_partition_coincide(manifest)
     lines.append("| Axis | Distinct values | Varied |")
     lines.append("| --- | ---: | --- |")
     for key in sorted(dim.keys()):
+        if coincide and key == "benchmark_id":
+            continue
         block = dim[key]
         if not isinstance(block, dict):
             continue
@@ -770,7 +937,11 @@ def render_campaign_comparative_markdown(
         )
         axis = block.get("axis", key)
         dc = block.get("distinct_count", 0)
-        lines.append(f"| `{axis}` | {dc} ({vshow}) | {varied} |")
+        if coincide and key == "suite_ref":
+            axis_label = "suite_ref (paired with benchmark_id)"
+        else:
+            axis_label = str(axis)
+        lines.append(f"| `{axis_label}` | {dc} ({vshow}) | {varied} |")
     lines.append("")
 
     lines.append(render_member_mean_score_tables_markdown(manifest).rstrip())
@@ -778,8 +949,18 @@ def render_campaign_comparative_markdown(
 
     fp_rows = build_fingerprint_axis_groups(snapshots, analysis)
     fp_insights = build_fingerprint_axis_insights(snapshots, analysis)
-    lines.append(render_fingerprint_compare_markdown(fp_rows, fp_insights).rstrip())
+    fp_interp = build_fingerprint_axis_interpretation(snapshots, analysis, fp_insights)
+    lines.append(
+        render_fingerprint_compare_markdown(
+            fp_rows,
+            fp_insights,
+            interpretation=fp_interp,
+        ).rstrip(),
+    )
     lines.append("")
+    if browser_evidence_markdown.strip():
+        lines.append(browser_evidence_markdown.rstrip())
+        lines.append("")
 
     lines.extend(
         [
@@ -880,6 +1061,8 @@ def write_campaign_comparative_artifacts(
     repo_root: Path,
     output_dir: Path,
     manifest: BenchmarkCampaignManifest,
+    *,
+    semantic_summary: CampaignSemanticSummaryV1 | None = None,
 ) -> tuple[
     CampaignGeneratedReportPaths | None,
     tuple[list[RunSnapshot], LongitudinalAnalysis] | None,
@@ -887,7 +1070,9 @@ def write_campaign_comparative_artifacts(
     """Write ``reports/campaign-report.md`` and ``reports/campaign-analysis.json`` when possible.
 
     Returns ``(paths_fragment, (snapshots, analysis))`` for embedding in campaign summary, or
-    ``(None, None)`` when skipped.
+    ``(None, None)`` when skipped. Pass ``semantic_summary`` so the comparative report and JSON
+    mirror **judge_low_confidence** / **repeat_aggregation** rollups from
+    ``campaign-semantic-summary.json``.
     """
     if manifest.dry_run:
         return None, None
@@ -915,8 +1100,30 @@ def write_campaign_comparative_artifacts(
     md_path = reports_dir / "campaign-report.md"
     json_path = reports_dir / "campaign-analysis.json"
 
-    write_utf8_text(md_path, render_campaign_comparative_markdown(manifest, snaps, analysis))
-    write_json_sorted(json_path, build_campaign_analysis_dict(manifest, snaps, analysis))
+    browser_md = render_campaign_browser_evidence_markdown(
+        campaign_dir=output_dir,
+        manifest=manifest,
+    )
+    write_utf8_text(
+        md_path,
+        render_campaign_comparative_markdown(
+            manifest,
+            snaps,
+            analysis,
+            browser_evidence_markdown=browser_md,
+            semantic_summary=semantic_summary,
+        ),
+    )
+    write_json_sorted(
+        json_path,
+        build_campaign_analysis_dict(
+            manifest,
+            snaps,
+            analysis,
+            campaign_dir=output_dir,
+            semantic_summary=semantic_summary,
+        ),
+    )
 
     return (
         CampaignGeneratedReportPaths(

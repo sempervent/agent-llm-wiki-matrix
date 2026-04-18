@@ -1,0 +1,18 @@
+{
+  "evaluated_at": "1970-01-01T00:00:00Z",
+  "evaluator": "pipeline",
+  "id": "eval-v-browser-p-one",
+  "notes_markdown": "Benchmark cell evaluation (rubric hash on normalized response).",
+  "rubric_id": "rubric.smoke.v1",
+  "scores": {
+    "clarity": 0.293379,
+    "traceability": 0.318944
+  },
+  "scoring_backend": "deterministic",
+  "subject_ref": "cells/v-browser__p-one/benchmark_response.json",
+  "total_weighted_score": 0.306161,
+  "weights": {
+    "clarity": 0.5,
+    "traceability": 0.5
+  }
+}

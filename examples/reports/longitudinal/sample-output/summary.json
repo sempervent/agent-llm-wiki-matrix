@@ -72,6 +72,25 @@
       "bench.fixtures.longitudinal.v1::v-cli__p-one"
     ]
   },
+  "fingerprint_axis_interpretation": {
+    "attribution_by_axis": [],
+    "differentiation_overview": "No fingerprint axis had more than one bucket in this pass, so there is no cross-bucket spread to attribute.",
+    "drift_correlation_hints": [],
+    "instability_hotspots": [],
+    "interpretation_caveats": [
+      "Attribution labels describe **aggregate bucket patterns**, not proven causation.",
+      "Confidence is **low** when few member runs or few cells fall in each bucket.",
+      "Compare `comparison_fingerprints` on each member `manifest.json` before trusting cross-run score deltas."
+    ],
+    "notes": [
+      "Pooled mean is over all cell total_weighted_score values in each fingerprint bucket.",
+      "Judge instability counts FT-JUDGE-UNSTABLE-class rows whose run is in the bucket.",
+      "Hints are heuristic; confirm with member manifests and evaluation.json.",
+      "attribution / signal_class fields are non-causal heuristics for triage only."
+    ],
+    "schema_version": 1,
+    "score_spread_ranking": []
+  },
   "improvements": [],
   "mode_gaps": [],
   "recurring_lows": [],

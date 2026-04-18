@@ -1,0 +1,73 @@
+{
+  "benchmark_id": "bench.fixtures.browser.checkout.v1",
+  "cells": [
+    {
+      "aggregate_response_relpath": "cells/v-checkout__p-one/benchmark_response.json",
+      "browser_evidence_relpath": "cells/v-checkout__p-one/browser_evidence.json",
+      "cell_id": "v-checkout__p-one",
+      "evaluation_relpath": "cells/v-checkout__p-one/evaluation.json",
+      "normalized_response_relpath": "cells/v-checkout__p-one/response.normalized.txt",
+      "raw_response_relpath": "cells/v-checkout__p-one/response.raw.txt",
+      "request_relpath": "cells/v-checkout__p-one/request.json",
+      "runtime": {
+        "browser_seconds": 0.010608,
+        "evaluation_seconds": 0.00165,
+        "judge_repeat_count": 1,
+        "provider_seconds": 2.4e-05,
+        "schema_version": 1
+      }
+    }
+  ],
+  "comparison_fingerprints": {
+    "browser_config": "sha256:dda4aeabb9afaebafd877fa47366f98b75cfb4b85e82c5284907c1c50a63a730",
+    "prompt_registry_state": "sha256:9604a174787655177b3c8c0e634e5a80348399f090bc741cac5825a8a5b128f2",
+    "prompt_set": "sha256:d64d0007d66dc64fc2af7b613b06bf34206ddcd09d7a9dc5e5eb209c133eaa02",
+    "provider_config": "sha256:a21f9f3dfa8d97e31e7fda04965e51bb8a25f8e5ca454efcafaba0ad229e3d9a",
+    "scoring_config": "sha256:f958bcbda76ceda7438ca44922ecf99f6ef81948463ec797c7b454a29b249496",
+    "suite_definition": "sha256:dfb8f3d095b1ec61cdc9993c8d8933d4928855cff904106f25b1c7c1d41d352a"
+  },
+  "created_at": "1970-01-01T00:00:00Z",
+  "definition_source_relpath": "fixtures/benchmarks/browser_checkout.v1.yaml",
+  "expected_artifact_kinds": [],
+  "failure_taxonomy_hints": [],
+  "matrix_grid_md_path": "markdown/matrix.grid.md",
+  "matrix_grid_path": "matrices/grid.json",
+  "matrix_grid_row_inputs_path": "matrices/grid.row_inputs.json",
+  "matrix_pairwise_md_path": "markdown/matrix.pairwise.md",
+  "matrix_pairwise_path": "matrices/pairwise.json",
+  "matrix_pairwise_row_inputs_path": "matrices/pairwise.row_inputs.json",
+  "prompt_ids": [
+    "p-one"
+  ],
+  "report_json_path": "reports/report.json",
+  "report_md_path": "reports/report.md",
+  "retry_summary": {
+    "cells_with_judge_parse_fallback": 0,
+    "schema_version": 1,
+    "total_judge_invocations": 0
+  },
+  "rubric_ref": "examples/dataset/rubrics/browser_realism.v1.json",
+  "run_id": "campaign.examples.browser_evidence_compare.v1__0000",
+  "runtime_summary": {
+    "browser_phase_seconds": 0.010608,
+    "duration_seconds": 0.019634,
+    "evaluation_phase_seconds": 0.00165,
+    "finished_at_utc": "2026-04-18T01:11:09Z",
+    "judge_phase_seconds": 0.0,
+    "provider_completion_seconds": 2.4e-05,
+    "schema_version": 1,
+    "started_at_utc": "2026-04-18T01:11:09Z"
+  },
+  "schema_version": 1,
+  "success_criteria": [],
+  "tags": [
+    "campaign:campaign.examples.browser_evidence_compare.v1",
+    "campaign_run:0000",
+    "example:campaign",
+    "axis:browser_evidence"
+  ],
+  "title": "Browser file-runner benchmark (checkout fixture)",
+  "variant_ids": [
+    "v-checkout"
+  ]
+}

@@ -49,4 +49,4 @@ See `.env.example`. Notable keys:
 
 ## CI-friendly commands
 
-`just ci` runs Ruff, Mypy, and pytest **without** `tests/integration/`. `just benchmark-offline` runs the full harness in a container (mock-only, deterministic). Optional live checks are documented in `docs/workflows/live-verification.md`.
+**`uv run just ci`** runs Ruff, Mypy, and pytest **without** `tests/integration/` (fallback **`uv run`** commands: **`docs/workflows/verification.md`**). **`just benchmark-offline`** runs the full harness in a container (mock-only, deterministic). Optional live checks: **`docs/workflows/live-verification.md`**.

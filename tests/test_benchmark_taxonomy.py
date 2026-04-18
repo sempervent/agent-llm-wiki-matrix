@@ -21,6 +21,7 @@ _TAXONOMY_SUITES = (
     "examples/benchmark_suites/v1/suite.taxonomy.browser_evidence.v1.yaml",
     "examples/benchmark_suites/v1/suite.taxonomy.browser_checkout.v1.yaml",
     "examples/benchmark_suites/v1/suite.taxonomy.browser_form.v1.yaml",
+    "examples/benchmark_suites/v1/suite.taxonomy.browser_traces_compare.v1.yaml",
     "examples/benchmark_suites/v1/suite.taxonomy.matrix_reasoning.v1.yaml",
     "examples/benchmark_suites/v1/suite.taxonomy.multi_agent_coordination.v1.yaml",
     "examples/benchmark_suites/v1/suite.taxonomy.campaign_coordination.v1.yaml",

@@ -1,0 +1,140 @@
+{
+  "by_execution_mode": [
+    {
+      "axis_kind": "execution_mode",
+      "axis_value": "browser_mock",
+      "cell_rows": 2,
+      "low_confidence_cells": 0,
+      "repeat_judge_cells": 0,
+      "semantic_cells": 0
+    }
+  ],
+  "by_provider": [
+    {
+      "axis_kind": "provider_config_ref",
+      "axis_value": "(default)",
+      "cell_rows": 2,
+      "low_confidence_cells": 0,
+      "repeat_judge_cells": 0,
+      "semantic_cells": 0
+    }
+  ],
+  "by_suite": [
+    {
+      "axis_kind": "suite_ref",
+      "axis_value": "fixtures/benchmarks/browser_checkout.v1.yaml",
+      "cell_rows": 1,
+      "low_confidence_cells": 0,
+      "repeat_judge_cells": 0,
+      "semantic_cells": 0
+    },
+    {
+      "axis_kind": "suite_ref",
+      "axis_value": "fixtures/benchmarks/browser_form.v1.yaml",
+      "cell_rows": 1,
+      "low_confidence_cells": 0,
+      "repeat_judge_cells": 0,
+      "semantic_cells": 0
+    }
+  ],
+  "campaign_id": "campaign.examples.browser_evidence_compare.v1",
+  "cells": [
+    {
+      "backend_kind": "mock",
+      "benchmark_id": "bench.fixtures.browser.checkout.v1",
+      "cell_id": "v-checkout__p-one",
+      "confidence_flags": [],
+      "confidence_low": false,
+      "eval_scoring_label": "suite_default",
+      "execution_mode": "browser_mock",
+      "prompt_id": "p-one",
+      "repeat_aggregation_present": false,
+      "repeat_confidence_low": false,
+      "run_id": "campaign.examples.browser_evidence_compare.v1__0000",
+      "run_index": 0,
+      "scoring_backend": "deterministic",
+      "suite_ref": "fixtures/benchmarks/browser_checkout.v1.yaml",
+      "variant_id": "v-checkout"
+    },
+    {
+      "backend_kind": "mock",
+      "benchmark_id": "bench.fixtures.browser.form.v1",
+      "cell_id": "v-form__p-one",
+      "confidence_flags": [],
+      "confidence_low": false,
+      "eval_scoring_label": "suite_default",
+      "execution_mode": "browser_mock",
+      "prompt_id": "p-one",
+      "repeat_aggregation_present": false,
+      "repeat_confidence_low": false,
+      "run_id": "campaign.examples.browser_evidence_compare.v1__0001",
+      "run_index": 1,
+      "scoring_backend": "deterministic",
+      "suite_ref": "fixtures/benchmarks/browser_form.v1.yaml",
+      "variant_id": "v-form"
+    }
+  ],
+  "created_at": "1970-01-01T00:00:00Z",
+  "criterion_instability": [],
+  "instability_highlights": {
+    "confidence_flag_counts": {},
+    "unstable_execution_modes": [
+      {
+        "axis_kind": "execution_mode",
+        "axis_value": "browser_mock",
+        "cell_rows": 2,
+        "instability_score": -1.0,
+        "low_confidence_cells": 0,
+        "rank": 1,
+        "repeat_judge_cells": 0,
+        "semantic_cells": 0
+      }
+    ],
+    "unstable_providers": [
+      {
+        "axis_kind": "provider_config_ref",
+        "axis_value": "(default)",
+        "cell_rows": 2,
+        "instability_score": -1.0,
+        "low_confidence_cells": 0,
+        "rank": 1,
+        "repeat_judge_cells": 0,
+        "semantic_cells": 0
+      }
+    ],
+    "unstable_suites": [
+      {
+        "axis_kind": "suite_ref",
+        "axis_value": "fixtures/benchmarks/browser_form.v1.yaml",
+        "cell_rows": 1,
+        "instability_score": -1.0,
+        "low_confidence_cells": 0,
+        "rank": 1,
+        "repeat_judge_cells": 0,
+        "semantic_cells": 0
+      },
+      {
+        "axis_kind": "suite_ref",
+        "axis_value": "fixtures/benchmarks/browser_checkout.v1.yaml",
+        "cell_rows": 1,
+        "instability_score": -1.0,
+        "low_confidence_cells": 0,
+        "rank": 2,
+        "repeat_judge_cells": 0,
+        "semantic_cells": 0
+      }
+    ]
+  },
+  "schema_version": 1,
+  "title": "Example \u2014 browser evidence contrast (checkout vs form fixtures)",
+  "totals": {
+    "cells_deterministic": 2,
+    "cells_flagged_judge_low_confidence": 0,
+    "cells_flagged_repeat_confidence_low": 0,
+    "cells_semantic_or_hybrid": 0,
+    "cells_total": 2,
+    "cells_with_repeat_judge": 0,
+    "low_confidence_cells": 0,
+    "runs_scanned": 2
+  }
+}

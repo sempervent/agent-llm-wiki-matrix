@@ -24,6 +24,16 @@ uv run alwm benchmark campaign run \
   --output-dir examples/campaign_runs/multi_suite
 ```
 
+**Browser evidence contrast** (two browser-heavy suites — checkout vs form fixtures; **Cross-run contrast** + signal digests in `reports/campaign-report.md`):
+
+```bash
+export ALWM_FIXTURE_MODE=1
+uv run alwm benchmark campaign run \
+  --definition examples/campaigns/v1/browser_evidence_compare.v1.yaml \
+  --output-dir examples/campaign_runs/browser_evidence_compare \
+  --created-at 1970-01-01T00:00:00Z
+```
+
 Plan only (no `runs/`; useful before large sweeps):
 
 ```bash

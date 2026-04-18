@@ -62,7 +62,7 @@ CLI: **`--eval-scoring-backend`**, **`--judge-provider-config`**. With **`ALWM_F
 
 These copy into **`manifest.json`** when set. Example suites: `examples/benchmark_suites/v1/suite.taxonomy.*.v1.yaml`; example runs with taxonomy: `examples/benchmark_runs/taxonomy-repo-governance/`, `taxonomy-runtime-config/`.
 
-**Task families:** `repo_governance`, `runtime_config`, `documentation`, `browser_evidence`, `matrix_reasoning`, `multi_agent_coordination`, `campaign`, `scaffolding`, `integration`, `other`. Example browser suites: **`suite.taxonomy.browser_evidence.v1`**, **`suite.taxonomy.browser_checkout.v1`**, **`suite.taxonomy.browser_form.v1`**, **`suite.agentic.browser_interpretation.v1`**, **`suite.agentic.browser_checkout.v1`** (all use deterministic **`file`** or default **`mock`** runners unless you opt into Playwright). **Difficulty:** `trivial` … `stress`. **Determinism:** `deterministic_fixture`, `deterministic_scoring`, `stochastic_live`. **Tool requirements (hints):** `none`, `cli`, `registry`, `browser_mock`, `repo_context`, `live_llm`, `playwright`, `compose`, `multi_variant`.
+**Task families:** `repo_governance`, `runtime_config`, `documentation`, `browser_evidence`, `matrix_reasoning`, `multi_agent_coordination`, `campaign`, `scaffolding`, `integration`, `other`. Example browser suites: **`suite.taxonomy.browser_evidence.v1`**, **`suite.taxonomy.browser_checkout.v1`**, **`suite.taxonomy.browser_form.v1`**, **`suite.taxonomy.browser_traces_compare.v1`** (two rich **`file`** traces side by side), **`suite.agentic.browser_interpretation.v1`**, **`suite.agentic.browser_checkout.v1`** (all use deterministic **`file`** or default **`mock`** runners unless you opt into Playwright). **Difficulty:** `trivial` … `stress`. **Determinism:** `deterministic_fixture`, `deterministic_scoring`, `stochastic_live`. **Tool requirements (hints):** `none`, `cli`, `registry`, `browser_mock`, `repo_context`, `live_llm`, `playwright`, `compose`, `multi_variant`.
 
 ## Running locally (offline)
 
@@ -86,7 +86,7 @@ Artifacts (under `--output-dir`; lexicographic cell order in `manifest.json`):
 - `matrices/grid.json`, `matrices/pairwise.json` — **matrix** artifacts.
 - `matrices/grid.row_inputs.json`, `matrices/pairwise.row_inputs.json` — **matrix_grid_inputs** / **matrix_pairwise_inputs** (row inputs and evaluation refs).
 - `markdown/matrix.grid.md`, `markdown/matrix.pairwise.md` — rendered matrix tables.
-- `reports/report.json`, `reports/report.md` — **report** JSON + generated Markdown (when **`browser_mock`** cells ran, **`report.md`** includes **Browser evidence (fixture summary)** — evidence ids, runner, excerpt/screenshot counts, extension keys — before optional **Runtime observability**).
+- `reports/report.json`, `reports/report.md` — **report** JSON + generated Markdown (when **`browser_mock`** cells ran, **`report.md`** includes **Browser evidence (fixture summary)** — evidence ids, runner, **signals** digest (nav/console/DOM/screenshot counts), **extension digest** (fixture profile, network/a11y/perf summaries), DOM snapshot flag — plus **Browser traces (DOM, screenshots, extensions)** with compact extension tables, optional fenced DOM snippets, and structured **`extensions`** (Playwright remains optional; MCP is documented as a local stdio JSON bridge, not a hosted browser). Optional **Runtime observability** follows when present.
 - `manifest.json` — run summary with **cells[]** path index; may include **`definition_source_relpath`** and **`prompt_registry_effective_ref`** for reproducibility when the definition path and registry-backed prompts are known. Validate with **`alwm validate <path> benchmark_manifest`** (JSON Schema `schemas/v1/manifest.schema.json` + Pydantic `BenchmarkRunManifest`). The harness writes manifests that pass this check; older committed runs may omit optional provenance keys entirely (still valid).
 
 ### Runtime observability (optional fields)
@@ -154,7 +154,7 @@ If you skip migration, Ollama simply downloads models again into **`./.ollama-mo
 
 ## Integration tests (opt-in)
 
-Default **`just test`** / **`just ci`** run **`pytest tests/ --ignore=tests/integration`** so CI never requires Ollama or llama.cpp.
+Default **`just test`** / **`just ci`** run **`pytest tests/ --ignore=tests/integration`** so CI never requires Ollama or llama.cpp. **Canonical vs fallback commands:** **`docs/workflows/verification.md`**.
 
 To verify end-to-end benchmark cells against **live** backends:
 

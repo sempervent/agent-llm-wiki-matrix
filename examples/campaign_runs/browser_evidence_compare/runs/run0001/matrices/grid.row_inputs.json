@@ -1,0 +1,18 @@
+{
+  "benchmark_id": "bench.fixtures.browser.form.v1",
+  "created_at": "1970-01-01T00:00:00Z",
+  "entries": [
+    {
+      "col_label": "p-one",
+      "evaluation_relpath": "cells/v-form__p-one/evaluation.json",
+      "prompt_id": "p-one",
+      "row_label": "v-form",
+      "total_weighted_score": 0.36131,
+      "variant_id": "v-form"
+    }
+  ],
+  "matrix_id": "campaign.examples.browser_evidence_compare.v1__0001-grid",
+  "metric": "total_weighted_rubric_score",
+  "run_id": "campaign.examples.browser_evidence_compare.v1__0001",
+  "schema_version": 1
+}

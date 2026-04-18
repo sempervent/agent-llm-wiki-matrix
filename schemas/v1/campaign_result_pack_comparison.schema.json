@@ -1,0 +1,204 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/sempervent/agent-llm-wiki-matrix/schemas/v1/campaign_result_pack_comparison.schema.json",
+  "title": "CampaignResultPackComparisonV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "created_at",
+    "left",
+    "right",
+    "identity",
+    "artifacts",
+    "comparative_analysis",
+    "semantic_summary_totals",
+    "failure_tags",
+    "member_runs",
+    "portability"
+  ],
+  "properties": {
+    "schema_version": { "type": "integer", "const": 1 },
+    "created_at": { "type": "string", "minLength": 1 },
+    "left": { "$ref": "#/$defs/packHeader" },
+    "right": { "$ref": "#/$defs/packHeader" },
+    "identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "same_campaign_id",
+        "left_campaign_id",
+        "right_campaign_id",
+        "pack_identity_fingerprint",
+        "campaign_definition_fingerprint",
+        "campaign_experiment_fingerprints"
+      ],
+      "properties": {
+        "same_campaign_id": { "type": "boolean" },
+        "left_campaign_id": { "type": "string" },
+        "right_campaign_id": { "type": "string" },
+        "pack_identity_fingerprint": { "$ref": "#/$defs/strPairMatch" },
+        "campaign_definition_fingerprint": { "$ref": "#/$defs/strPairMatch" },
+        "campaign_experiment_fingerprints": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["axis", "left", "right", "match"],
+            "properties": {
+              "axis": { "type": "string" },
+              "left": { "oneOf": [{ "type": "null" }, { "type": "string" }] },
+              "right": { "oneOf": [{ "type": "null" }, { "type": "string" }] },
+              "match": { "type": "boolean" }
+            }
+          }
+        }
+      }
+    },
+    "artifacts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["entries"],
+      "properties": {
+        "entries": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "artifact_key",
+              "left",
+              "right",
+              "both_present",
+              "same_relative_path"
+            ],
+            "properties": {
+              "artifact_key": { "type": "string" },
+              "left": { "oneOf": [{ "type": "null" }, { "type": "string" }] },
+              "right": { "oneOf": [{ "type": "null" }, { "type": "string" }] },
+              "both_present": { "type": "boolean" },
+              "same_relative_path": { "type": "boolean" }
+            }
+          }
+        }
+      }
+    },
+    "comparative_analysis": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "left_present",
+        "right_present",
+        "backend_performance",
+        "semantic_instability_by_scoring_backend",
+        "mean_score_extremes_comparable_flag_match"
+      ],
+      "properties": {
+        "left_present": { "type": "boolean" },
+        "right_present": { "type": "boolean" },
+        "backend_performance": { "type": "array" },
+        "semantic_instability_by_scoring_backend": { "type": "array" },
+        "mean_score_extremes_comparable_flag_match": {
+          "oneOf": [{ "type": "null" }, { "type": "boolean" }]
+        },
+        "browser_evidence_comparison": {
+          "type": "object",
+          "description": "Pairwise diff of browser_evidence_member_cells from each campaign-analysis.json (DOM/screenshot counts, digests, extension keys)."
+        }
+      }
+    },
+    "semantic_summary_totals": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["left_totals", "right_totals", "numeric_deltas_right_minus_left"],
+      "properties": {
+        "left_totals": { "oneOf": [{ "type": "null" }, { "type": "object" }] },
+        "right_totals": { "oneOf": [{ "type": "null" }, { "type": "object" }] },
+        "numeric_deltas_right_minus_left": { "type": "object" }
+      }
+    },
+    "failure_tags": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["codes_compared", "only_in_left", "only_in_right"],
+      "properties": {
+        "codes_compared": { "type": "array" },
+        "only_in_left": { "type": "array", "items": { "type": "string" } },
+        "only_in_right": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "member_runs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "left_count",
+        "right_count",
+        "run_ids_only_in_left",
+        "run_ids_only_in_right",
+        "run_ids_in_both"
+      ],
+      "properties": {
+        "left_count": { "type": "integer", "minimum": 0 },
+        "right_count": { "type": "integer", "minimum": 0 },
+        "run_ids_only_in_left": { "type": "array", "items": { "type": "string" } },
+        "run_ids_only_in_right": { "type": "array", "items": { "type": "string" } },
+        "run_ids_in_both": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "portability": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["left", "right"],
+      "properties": {
+        "left": { "$ref": "#/$defs/portabilitySide" },
+        "right": { "$ref": "#/$defs/portabilitySide" }
+      }
+    }
+  },
+  "$defs": {
+    "packHeader": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "label", "pack_id", "title", "campaign_id"],
+      "properties": {
+        "path": { "type": "string" },
+        "label": { "type": "string" },
+        "pack_id": { "type": "string" },
+        "title": { "type": "string" },
+        "campaign_id": { "type": "string" }
+      }
+    },
+    "strPairMatch": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["left", "right", "match"],
+      "properties": {
+        "left": { "oneOf": [{ "type": "null" }, { "type": "string" }] },
+        "right": { "oneOf": [{ "type": "null" }, { "type": "string" }] },
+        "match": { "type": "boolean" }
+      }
+    },
+    "portabilitySide": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "member_depth",
+        "longitudinal_member_glob",
+        "has_source_campaign_dir",
+        "included_vs_campaign_run_count",
+        "pack_check_errors",
+        "pack_check_warnings"
+      ],
+      "properties": {
+        "member_depth": { "type": "string" },
+        "longitudinal_member_glob": { "type": "string" },
+        "has_source_campaign_dir": { "type": "boolean" },
+        "included_vs_campaign_run_count": {
+          "oneOf": [{ "type": "null" }, { "type": "string" }]
+        },
+        "pack_check_errors": { "type": "array", "items": { "type": "string" } },
+        "pack_check_warnings": { "type": "array", "items": { "type": "string" } }
+      }
+    }
+  }
+}

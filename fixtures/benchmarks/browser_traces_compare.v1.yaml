@@ -1,0 +1,29 @@
+# Two file-backed fixtures: multi-step checkout vs single-page form validation (a11y + console).
+schema_version: 1
+id: bench.fixtures.browser.traces_compare.v1
+title: Browser traces — checkout vs form validation (fixtures)
+rubric_ref: examples/dataset/rubrics/browser_realism.v1.json
+prompts:
+  - id: p-one
+    text: >-
+      Contrast the two traces: navigation depth, DOM excerpt roles (button vs alert), screenshot
+      scopes, and what the extensions claim about network vs accessibility.
+variants:
+  - id: v-checkout
+    agent_stack: browser-checkout
+    execution_mode: browser_mock
+    backend:
+      kind: mock
+      model: mock-model
+    browser:
+      runner: file
+      fixture_relpath: fixtures/browser_evidence/v1/checkout_flow.json
+  - id: v-form
+    agent_stack: browser-form
+    execution_mode: browser_mock
+    backend:
+      kind: mock
+      model: mock-model
+    browser:
+      runner: file
+      fixture_relpath: fixtures/browser_evidence/v1/form_validation.json

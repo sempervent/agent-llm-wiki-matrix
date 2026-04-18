@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Literal, Self
+from typing import Any, Literal, Self
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
@@ -573,6 +573,10 @@ class CampaignSemanticCellRow(BaseModel):
         default_factory=list,
         description="Sample of threshold flags from JudgeRepeatConfidence (capped in builder).",
     )
+    repeat_confidence_low: bool = Field(
+        default=False,
+        description="True when repeat_aggregation.confidence.low_confidence is set.",
+    )
 
 
 class CampaignSemanticAxisRollup(BaseModel):
@@ -600,6 +604,63 @@ class CampaignSemanticAxisRollup(BaseModel):
     mean_total_weighted_stdev: float | None = None
 
 
+class CampaignCriterionInstabilityRow(BaseModel):
+    """Aggregate per-criterion disagreement from repeat judge ``per_criterion`` rows."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    criterion_id: str = Field(min_length=1)
+    cells_with_repeat_judge: int = Field(
+        ge=0,
+        description="Cells where this criterion appeared in a repeat judge block.",
+    )
+    sum_score_range: float = Field(ge=0.0, description="Sum of score_range across those cells.")
+    max_score_range: float = Field(
+        ge=0.0,
+        description="Largest single-cell score_range for this criterion.",
+    )
+    mean_score_range: float = Field(
+        ge=0.0,
+        description="Mean score_range across cells (sum / count).",
+    )
+
+
+class CampaignAxisInstabilityHighlight(BaseModel):
+    """One ranked slice (suite, provider, or mode) for campaign-level instability reporting."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    axis_kind: Literal["suite_ref", "provider_config_ref", "execution_mode"]
+    axis_value: str = Field(min_length=1)
+    rank: int = Field(ge=1)
+    instability_score: float = Field(
+        description=(
+            "Comparable score: max(mean_range_across_cells, max_range_observed) when present."
+        ),
+    )
+    cell_rows: int = Field(ge=0)
+    semantic_cells: int = Field(ge=0)
+    repeat_judge_cells: int = Field(ge=0)
+    low_confidence_cells: int = Field(ge=0)
+    max_range_observed: float | None = None
+    mean_range_across_cells: float | None = None
+    mean_total_weighted_stdev: float | None = None
+
+
+class CampaignSemanticInstabilityHighlights(BaseModel):
+    """Ranked axis slices plus optional confidence-flag histogram."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    unstable_suites: list[CampaignAxisInstabilityHighlight] = Field(default_factory=list)
+    unstable_providers: list[CampaignAxisInstabilityHighlight] = Field(default_factory=list)
+    unstable_execution_modes: list[CampaignAxisInstabilityHighlight] = Field(default_factory=list)
+    confidence_flag_counts: dict[str, int] = Field(
+        default_factory=dict,
+        description="Histogram of JudgeRepeatConfidence.flags across cells (repeat judge only).",
+    )
+
+
 class CampaignSemanticTotals(BaseModel):
     """Campaign-wide counts for deterministic vs semantic scoring paths."""
 
@@ -614,6 +675,16 @@ class CampaignSemanticTotals(BaseModel):
         description="Cells where judge ran N>1 and repeat_aggregation exists.",
     )
     low_confidence_cells: int = Field(ge=0)
+    cells_flagged_judge_low_confidence: int = Field(
+        default=0,
+        ge=0,
+        description="Cells where Evaluation.judge_low_confidence is true.",
+    )
+    cells_flagged_repeat_confidence_low: int = Field(
+        default=0,
+        ge=0,
+        description="Cells where repeat_aggregation.confidence.low_confidence is true.",
+    )
     max_range_across_campaign: float | None = Field(
         default=None,
         description="Max of per-cell max_range_across_criteria (repeat judge only).",
@@ -641,6 +712,13 @@ class CampaignSemanticSummaryV1(BaseModel):
     by_suite: list[CampaignSemanticAxisRollup] = Field(default_factory=list)
     by_provider: list[CampaignSemanticAxisRollup] = Field(default_factory=list)
     by_execution_mode: list[CampaignSemanticAxisRollup] = Field(default_factory=list)
+    criterion_instability: list[CampaignCriterionInstabilityRow] = Field(
+        default_factory=list,
+        description="Per-criterion disagreement mass from repeat-judge provenance (sorted).",
+    )
+    instability_highlights: CampaignSemanticInstabilityHighlights = Field(
+        default_factory=CampaignSemanticInstabilityHighlights,
+    )
     cells: list[CampaignSemanticCellRow] = Field(
         default_factory=list,
         description="Per-cell detail (may be large; omit in future if needed).",
@@ -760,6 +838,207 @@ class CampaignSummaryV1(BaseModel):
     git_commit_sha: str | None = None
     git_describe: str | None = None
     runs: list[dict[str, object]] = Field(default_factory=list)
+
+
+class CampaignResultPackArtifacts(BaseModel):
+    """Relative paths inside a campaign result pack (same layout as a campaign output tree)."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    campaign_manifest: str = Field(default="manifest.json", min_length=1)
+    campaign_summary_json: str = Field(default="campaign-summary.json", min_length=1)
+    campaign_summary_md: str = Field(default="campaign-summary.md", min_length=1)
+    campaign_semantic_summary_json: str | None = Field(
+        default=None,
+        description="Omitted when absent from the source campaign.",
+    )
+    campaign_semantic_summary_md: str | None = None
+    campaign_comparative_report_md: str | None = Field(
+        default=None,
+        description="Markdown comparative report (e.g. reports/campaign-report.md).",
+    )
+    campaign_analysis_json: str | None = Field(
+        default=None,
+        description="JSON mirror (e.g. reports/campaign-analysis.json).",
+    )
+    campaign_result_pack_json: str = Field(
+        default="campaign-result-pack.json",
+        min_length=1,
+        description="This pack manifest path relative to pack root.",
+    )
+    index_md: str = Field(
+        default="INDEX.md",
+        min_length=1,
+        description="Human overview and links at pack root.",
+    )
+
+
+class CampaignResultPackMemberRun(BaseModel):
+    """One included member benchmark manifest."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    run_id: str = Field(min_length=1)
+    run_index: int = Field(ge=0)
+    status: str = Field(min_length=1)
+    manifest_relpath: str = Field(
+        min_length=1,
+        description="Path to benchmark manifest inside the pack (e.g. runs/run0000/manifest.json).",
+    )
+    suite_ref: str = Field(min_length=1)
+    benchmark_id: str = Field(min_length=1)
+
+
+class CampaignResultPackV1(BaseModel):
+    """Campaign result pack index (artifact kind campaign_result_pack).
+
+    Bundles campaign manifest, summaries, comparative artifacts, semantic summary,
+    and selected member run trees (or manifest-only slices) for publishing and diffing.
+    Default assembly copies **full** member runs so ``runs/*/manifest.json`` globs stay
+    longitudinal-compatible; ``member_depth=manifest`` is smaller but may break cell loads.
+
+    **Canonical outward-facing unit:** treat the pack directory (``campaign-result-pack.json``
+    + ``INDEX.md`` + mirrored campaign layout) as the stable artifact to cite, archive, and
+    diff—not the raw campaign tree alone.
+    """
+
+    model_config = ConfigDict(extra="forbid")
+
+    schema_version: Literal[1] = 1
+    layout_version: Literal[1] = 1
+    pack_id: str = Field(min_length=1)
+    created_at: str = Field(
+        min_length=1,
+        description="When this pack manifest was assembled (RFC 3339).",
+    )
+    source_campaign_relpath: str | None = Field(
+        default=None,
+        description="Optional repo-relative label for where the campaign was produced.",
+    )
+    campaign_id: str = Field(min_length=1)
+    title: str = Field(min_length=1)
+    campaign_created_at: str | None = Field(
+        default=None,
+        description="RFC 3339 timestamp from the source campaign manifest (member run stamp).",
+    )
+    definition_source_relpath: str | None = Field(
+        default=None,
+        description="Repo-relative path to the campaign definition file (from campaign manifest).",
+    )
+    fixture_mode_force_mock: bool | None = Field(
+        default=None,
+        description="Whether member runs used forced mock providers (from campaign manifest).",
+    )
+    campaign_run_count: int | None = Field(
+        default=None,
+        ge=0,
+        description="Number of rows on the source campaign manifest (before pack filters).",
+    )
+    included_member_count: int | None = Field(
+        default=None,
+        ge=0,
+        description="Number of member runs copied into this pack.",
+    )
+    alwm_version: str | None = Field(
+        default=None,
+        description="agent-llm-wiki-matrix package version when the pack was assembled.",
+    )
+    pack_identity_fingerprint: str | None = Field(
+        default=None,
+        description=(
+            "sha256:… canonical hash of bundled experiment identity (excludes pack assembly time, "
+            "pack_id, notes, and absolute paths). Compare across packs to see if the same "
+            "logical bundle was produced."
+        ),
+    )
+    campaign_definition_fingerprint: str | None = None
+    campaign_experiment_fingerprints: CampaignExperimentFingerprints | None = None
+    git_commit_sha: str | None = None
+    git_describe: str | None = None
+    source_campaign_dir: str | None = Field(
+        default=None,
+        description="Absolute path to the source campaign directory when the pack was assembled.",
+    )
+    member_depth: Literal["full", "manifest"] = Field(
+        default="full",
+        description="Whether full per-run trees or only manifest.json were copied for members.",
+    )
+    longitudinal_member_glob: str = Field(
+        default="runs/*/manifest.json",
+        min_length=1,
+        description="Glob for member benchmark manifests relative to this pack root.",
+    )
+    artifacts: CampaignResultPackArtifacts
+    member_runs: list[CampaignResultPackMemberRun] = Field(default_factory=list)
+    notes: str | None = Field(
+        default=None,
+        description="Optional operator notes (e.g. why runs were subset).",
+    )
+
+
+class CampaignResultPackComparisonV1(BaseModel):
+    """Output of comparing two campaign result pack directories (``pack-compare.json``)."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    schema_version: Literal[1] = 1
+    created_at: str = Field(min_length=1)
+    left: dict[str, Any] = Field(description="Header for the left pack (path, label, ids).")
+    right: dict[str, Any] = Field(description="Header for the right pack.")
+    identity: dict[str, Any] = Field(
+        description=(
+            "Campaign id, pack_identity_fingerprint, definition + experiment fingerprint diffs."
+        ),
+    )
+    artifacts: dict[str, Any] = Field(description="Per-artifact-key path presence and equality.")
+    comparative_analysis: dict[str, Any] = Field(
+        description="Diffs from ``campaign-analysis.json`` when present on each side.",
+    )
+    semantic_summary_totals: dict[str, Any] = Field(
+        description="Selected totals from ``campaign-semantic-summary.json`` when present.",
+    )
+    failure_tags: dict[str, Any] = Field(description="FT-* counts from comparative analysis.")
+    member_runs: dict[str, Any] = Field(description="Member run id presence and counts.")
+    portability: dict[str, Any] = Field(
+        description="member_depth, glob, source_campaign_dir, pack-check warnings per side.",
+    )
+
+
+class CampaignCompareV1(BaseModel):
+    """Output of comparing two completed campaign directories (``campaign-compare.json``)."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    schema_version: Literal[1] = 1
+    created_at: str = Field(min_length=1)
+    left: dict[str, Any] = Field(description="Header for the left campaign directory.")
+    right: dict[str, Any] = Field(description="Header for the right campaign directory.")
+    identity: dict[str, Any] = Field(
+        description="Campaign ids, definition + experiment fingerprint diffs, definition paths.",
+    )
+    sweep_dimensions: dict[str, Any] = Field(
+        description="Sweep axis coverage (varied flags, distinct counts) per side.",
+    )
+    fingerprint_axis_insights: dict[str, Any] = Field(
+        description="Fingerprint-axis interpretation rows from each ``campaign-analysis.json``.",
+    )
+    artifacts: dict[str, Any] = Field(
+        description="Standard campaign artifact paths present on each side.",
+    )
+    comparative_analysis: dict[str, Any] = Field(
+        description="Diffs from ``campaign-analysis.json`` when present.",
+    )
+    semantic_summary_totals: dict[str, Any] = Field(
+        description="Selected totals from ``campaign-semantic-summary.json`` when present.",
+    )
+    failure_tags: dict[str, Any] = Field(description="FT-* counts from comparative analysis.")
+    browser_evidence: dict[str, Any] = Field(
+        description="Browser / structured-capture row counts and run coverage.",
+    )
+    member_runs: dict[str, Any] = Field(description="Member run id presence and counts.")
+    run_health: dict[str, Any] = Field(
+        description="Dry-run flags and manifest run counts per side.",
+    )
 
 
 BenchmarkTaskFamily = Literal[

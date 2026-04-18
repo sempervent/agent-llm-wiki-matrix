@@ -14,6 +14,16 @@ from agent_llm_wiki_matrix import __version__
 from agent_llm_wiki_matrix.artifacts import list_artifact_kinds, load_artifact_file
 from agent_llm_wiki_matrix.benchmark import load_benchmark_definition, run_benchmark
 from agent_llm_wiki_matrix.benchmark.campaign_definitions import load_benchmark_campaign_definition
+from agent_llm_wiki_matrix.benchmark.campaign_directory_compare import (
+    compare_campaign_directories_cli,
+)
+from agent_llm_wiki_matrix.benchmark.campaign_result_pack import (
+    assemble_campaign_result_pack,
+    validate_campaign_result_pack_directory,
+)
+from agent_llm_wiki_matrix.benchmark.campaign_result_pack_compare import (
+    compare_campaign_result_packs_cli,
+)
 from agent_llm_wiki_matrix.benchmark.campaign_runner import run_benchmark_campaign
 from agent_llm_wiki_matrix.benchmark.definitions import EvalHybridWeights
 from agent_llm_wiki_matrix.benchmark.live_probe import (
@@ -912,6 +922,246 @@ def cmd_benchmark_campaign_plan(
     )
     planned = manifest.run_count if manifest.run_count is not None else 0
     click.echo(f"planned {planned} run(s); wrote dry-run manifest under {out}")
+
+
+@benchmark_campaign_cmd.command("pack")
+@click.argument(
+    "campaign_dir",
+    type=click.Path(file_okay=False, path_type=Path, exists=True),
+)
+@click.option(
+    "--output-dir",
+    "-o",
+    type=click.Path(file_okay=False, path_type=Path),
+    required=True,
+    help="Directory to write the pack (created if missing).",
+)
+@click.option(
+    "--pack-id",
+    required=True,
+    help="Stable identifier for this pack (e.g. minimal-offline-pack).",
+)
+@click.option(
+    "--title",
+    default=None,
+    help="Override pack title (default: title from the campaign manifest).",
+)
+@click.option(
+    "--source-label",
+    default=None,
+    help=(
+        "Optional repo-relative label stored in the pack "
+        "(e.g. examples/campaign_runs/minimal_offline)."
+    ),
+)
+@click.option(
+    "--created-at",
+    default="1970-01-01T00:00:00Z",
+    show_default=True,
+    help="RFC 3339 timestamp for the pack manifest.",
+)
+@click.option(
+    "--member-depth",
+    type=click.Choice(["full", "manifest"]),
+    default="full",
+    show_default=True,
+    help="Copy full per-run trees or only manifest.json per member.",
+)
+@click.option(
+    "--run-index",
+    "run_indices",
+    multiple=True,
+    type=int,
+    help="Include only these member run indices (0-based; repeatable).",
+)
+@click.option(
+    "--include-failed-members",
+    is_flag=True,
+    help="Include member runs that did not succeed (default: succeeded only).",
+)
+@click.option(
+    "--record-source-abspath",
+    is_flag=True,
+    help="Record absolute source path in pack JSON (default off for git-friendly bundles).",
+)
+@click.option("--notes", default=None, help="Optional operator notes stored in the pack.")
+def cmd_benchmark_campaign_pack(
+    campaign_dir: Path,
+    output_dir: Path,
+    pack_id: str,
+    title: str | None,
+    source_label: str | None,
+    created_at: str,
+    member_depth: Literal["full", "manifest"],
+    run_indices: tuple[int, ...],
+    include_failed_members: bool,
+    record_source_abspath: bool,
+    notes: str | None,
+) -> None:
+    """Assemble a markdown-first campaign result pack from a completed campaign directory."""
+    idx_set: set[int] | None = set(run_indices) if run_indices else None
+    pack = assemble_campaign_result_pack(
+        campaign_dir=campaign_dir.resolve(),
+        pack_dir=output_dir.resolve(),
+        pack_id=pack_id,
+        title=title,
+        created_at=created_at,
+        run_indices=idx_set,
+        member_depth=member_depth,
+        source_campaign_relpath=source_label,
+        notes=notes,
+        only_succeeded_members=not include_failed_members,
+        record_source_abspath=record_source_abspath,
+    )
+    out = output_dir.resolve()
+    click.echo(
+        f"wrote result pack {pack.pack_id} with {len(pack.member_runs)} member run(s) under {out}",
+    )
+
+
+@benchmark_campaign_cmd.command("pack-check")
+@click.argument(
+    "pack_dir",
+    type=click.Path(file_okay=False, path_type=Path, exists=True),
+)
+@click.option(
+    "--strict",
+    "strict_portability",
+    is_flag=True,
+    help="Treat portability hints (e.g. manifest-only members) as errors.",
+)
+def cmd_benchmark_campaign_pack_check(pack_dir: Path, strict_portability: bool) -> None:
+    """Validate pack completeness: files on disk, schema/kinds, manifest/summary consistency."""
+    result = validate_campaign_result_pack_directory(
+        pack_dir.resolve(),
+        strict_portability=strict_portability,
+    )
+    for line in result.errors:
+        click.echo(line, err=True)
+    for line in result.warnings:
+        click.echo(line, err=True)
+    if not result.ok(strict_portability=strict_portability):
+        raise SystemExit(1)
+    click.echo("pack-check: ok")
+
+
+@benchmark_campaign_cmd.command("compare-packs")
+@click.argument(
+    "left_pack",
+    type=click.Path(file_okay=False, path_type=Path, exists=True),
+)
+@click.argument(
+    "right_pack",
+    type=click.Path(file_okay=False, path_type=Path, exists=True),
+)
+@click.option(
+    "--output-dir",
+    "-o",
+    type=click.Path(file_okay=False, path_type=Path),
+    required=True,
+    help="Directory for pack-compare.json and pack-compare-report.md (created if missing).",
+)
+@click.option(
+    "--left-label",
+    default=None,
+    help="Display label for the left pack (default: path string).",
+)
+@click.option(
+    "--right-label",
+    default=None,
+    help="Display label for the right pack (default: path string).",
+)
+@click.option(
+    "--repo-root",
+    type=click.Path(file_okay=False, path_type=Path, exists=True),
+    default=None,
+    help=(
+        "If set, store pack paths in JSON/Markdown relative to this directory "
+        "(portable committed reports; default: absolute paths)."
+    ),
+)
+def cmd_benchmark_campaign_compare_packs(
+    left_pack: Path,
+    right_pack: Path,
+    output_dir: Path,
+    left_label: str | None,
+    right_label: str | None,
+    repo_root: Path | None,
+) -> None:
+    """Compare two campaign result packs: fingerprints, artifacts, scores, FT-*, portability."""
+    jp, mp = compare_campaign_result_packs_cli(
+        left_pack,
+        right_pack,
+        output_dir=output_dir,
+        left_label=left_label,
+        right_label=right_label,
+        repo_root=repo_root,
+    )
+    click.echo(f"wrote {jp}")
+    click.echo(f"wrote {mp}")
+
+
+@benchmark_campaign_cmd.command("compare")
+@click.argument(
+    "left_campaign",
+    type=click.Path(file_okay=False, path_type=Path, exists=True),
+)
+@click.argument(
+    "right_campaign",
+    type=click.Path(file_okay=False, path_type=Path, exists=True),
+)
+@click.option(
+    "--output-dir",
+    "-o",
+    type=click.Path(file_okay=False, path_type=Path),
+    required=True,
+    help="Directory for campaign-compare.json and campaign-compare-report.md.",
+)
+@click.option(
+    "--left-label",
+    default=None,
+    help="Display label for the left campaign (default: path string).",
+)
+@click.option(
+    "--right-label",
+    default=None,
+    help="Display label for the right campaign (default: path string).",
+)
+@click.option(
+    "--repo-root",
+    type=click.Path(file_okay=False, path_type=Path, exists=True),
+    default=None,
+    help=(
+        "If set, store campaign paths in JSON/Markdown relative to this directory "
+        "(portable committed reports; default: absolute paths)."
+    ),
+)
+@click.option(
+    "--created-at",
+    default=None,
+    help="RFC 3339 timestamp for the comparison manifest (default: now; use fixed for repro).",
+)
+def cmd_benchmark_campaign_compare(
+    left_campaign: Path,
+    right_campaign: Path,
+    output_dir: Path,
+    left_label: str | None,
+    right_label: str | None,
+    repo_root: Path | None,
+    created_at: str | None,
+) -> None:
+    """Compare two completed campaign directories (manifests, summaries, analysis, semantics)."""
+    jp, mp = compare_campaign_directories_cli(
+        left_campaign,
+        right_campaign,
+        output_dir=output_dir,
+        left_label=left_label,
+        right_label=right_label,
+        repo_root=repo_root,
+        created_at=created_at,
+    )
+    click.echo(f"wrote {jp}")
+    click.echo(f"wrote {mp}")
 
 
 @benchmark_cmd.command("longitudinal")

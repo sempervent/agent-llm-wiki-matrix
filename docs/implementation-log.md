@@ -2,6 +2,114 @@
 
 Chronological record of repository work. Latest entries first.
 
+## 2026-04-19 — Pack/directory compare: browser evidence pairing
+
+**Delivered:** **`campaign_compare_core.py`** — **`build_browser_evidence_member_cells_comparison_block`**, **`render_browser_evidence_member_cells_comparison_markdown`**; merged into **`build_analysis_comparison_block`** as **`browser_evidence_comparison`**. **`campaign_result_pack_compare.py`** / **`campaign_directory_compare.py`** render the Markdown section after semantic instability (directory: **`top_heading_level=2`**); directory report drops the older duplicate browser bullets in favor of the paired table. Example **`examples/campaign_result_packs/compare_minimal_vs_multi/`** regenerated. Schema note on **`browser_evidence_comparison`**; docs **`docs/workflows/benchmark-campaigns.md`**, **`docs/architecture/data-model.md`**. Tests **`tests/test_campaign_result_pack_compare.py`**, **`tests/test_campaign_directory_compare.py`**.
+
+**Verification:** `uv run pytest tests/test_campaign_result_pack_compare.py tests/test_campaign_directory_compare.py`; `uv run ruff check` / `mypy` on touched modules.
+
+## 2026-04-19 — Campaign-to-campaign comparison (directories)
+
+**Delivered:** **`benchmark/campaign_compare_core.py`** — shared analysis/semantic/FT-* diff blocks for pack and campaign workflows. **`benchmark/campaign_directory_compare.py`** — **`build_campaign_directory_comparison`**, **`render_campaign_compare_markdown`**, **`write_campaign_compare_artifacts`**; sweep dimensions via **`summarize_campaign_dimensions`**; **`fingerprint_axis_insights`** diff; **`browser_evidence_member_cells`** rollups. **`CampaignCompareV1`** + **`schemas/v1/campaign_compare.schema.json`**; kind **`campaign_compare`** in **`artifacts.py`**. CLI **`alwm benchmark campaign compare`** ( **`--repo-root`**, **`--created-at`** ). Example **`examples/campaign_compares/minimal_offline_vs_multi_suite/`**. Tests **`tests/test_campaign_directory_compare.py`**; **`tests/test_schema_drift_contracts.py`** loads **`campaign-compare.json`**. Docs **`docs/workflows/benchmark-campaigns.md`**, **`examples/campaign_compares/README.md`**, **`README.md`**, **`AGENTS.md`**.
+
+**Verification:** `uv run pytest tests/test_campaign_directory_compare.py tests/test_campaign_result_pack_compare.py tests/test_schema_drift_contracts.py`; `uv run ruff check` on touched modules.
+
+## 2026-04-19 — Fingerprint interpretation: evidence strength + explicit uncertainty
+
+**Delivered:** **`campaign_fingerprint_compare.py`** — **`_compute_evidence_strength`**; **attribution** rows add **attribution_label**, **evidence_strength**, **uncertainty_notes**, **metrics.min_bucket_cell_count** / **distinct_bucket_count**; overview and caveats stress weak samples; **groups** gain **run_count**. Markdown: category legend, expanded table, **_Limit:_** lines. Docs **`docs/workflows/longitudinal-reporting.md`**, **`benchmark-campaigns.md`**. Tests **`tests/test_campaign_reporting.py`**, **`tests/test_fingerprint_interpretation_attribution.py`**.
+
+**Backward compatibility:** **`schema_version`** **1**; additive JSON fields. Scoring unchanged.
+
+**Verification:** `uv run pytest tests/ --ignore=tests/integration/`.
+
+## 2026-04-18 — Campaign result pack publication workflow (docs + INDEX)
+
+**Delivered:** **`docs/workflows/campaign-result-pack-publication.md`** — assemble, validate, compare-packs, interpret **`pack-compare-report.md`**. **`_render_pack_index_md`** — **Publication workflow** + **Publish-ready checklist** sections. **`docs/workflows/benchmark-campaigns.md`**, **`examples/campaign_result_packs/README.md`**, **`README.md`** — canonical outward-facing bundle, completeness table, walkthrough links.
+
+**Verification:** `uv run ruff check src/agent_llm_wiki_matrix/benchmark/campaign_result_pack.py`; regenerate example packs (`alwm benchmark campaign pack …`) so **`INDEX.md`** matches the template.
+
+## 2026-04-18 — Fingerprint interpretation: attribution + uncertainty
+
+**Delivered:** **`classify_axis_difference_attribution`** — labels **likely_configuration**, **likely_instability**, **mixed_config_and_instability**, **inconclusive** with **confidence**; JSON adds **attribution_by_axis**, **differentiation_overview**, **interpretation_caveats**; hints gain **signal_class**. Markdown: uncertainty blockquote, summary, per-axis table + rationales, grouped raw signals. **schema_version** stays **1**. Tests **`tests/test_fingerprint_interpretation_attribution.py`**. **`campaign_result_pack_compare`** missing model imports fixed for **mypy**. Regenerated campaign + longitudinal examples.
+
+**Verification:** `uv run pytest --ignore=tests/integration/`; `uv run ruff check src tests`; `uv run mypy src`.
+
+## 2026-04-18 — Browser reporting: signals, extension digests, campaign contrast
+
+**Delivered:** **`browser/formatting.py`** — **`signals_digest_line`**, **`extension_digest_short`**, **`format_extensions_compact_markdown`**; **`BrowserEvidenceReportRow`** gains **`signals_digest`** / **`extension_digest`**; benchmark + campaign tables and detail sections updated; **`_describe_runner_cell`**. **`campaign_browser_evidence.py`** — **`render_campaign_browser_cross_run_comparison`**; **`browser_evidence_member_cells`** rows add **`signals_digest`** / **`extension_digest`**. Example **`examples/campaigns/v1/browser_evidence_compare.v1.yaml`** + **`examples/campaign_runs/browser_evidence_compare/`**; refreshed **`examples/campaign_runs/multi_suite/`** and **`examples/campaign_result_packs/multi_suite/`**. Docs **`docs/workflows/benchmarking.md`**, **`benchmark-campaigns.md`**, **`examples/campaigns/v1/README.md`**. Tests **`tests/test_browser_formatting.py`**, **`tests/test_benchmark_browser.py`**.
+
+**Verification:** `uv run pytest tests/ --ignore=tests/integration/`; `uv run ruff check` on touched modules.
+
+## 2026-04-18 — Campaign result pack comparison (CLI + artifacts)
+
+**Delivered:** **`benchmark/campaign_result_pack_compare.py`** — **`build_campaign_result_pack_comparison`**, **`render_campaign_result_pack_compare_markdown`**, **`write_campaign_result_pack_compare_artifacts`**; optional **`repo_root`** for portable paths in JSON/Markdown. **`CampaignResultPackComparisonV1`** + **`schemas/v1/campaign_result_pack_comparison.schema.json`**; kind **`campaign_result_pack_comparison`** in **`artifacts.py`**. CLI **`alwm benchmark campaign compare-packs`** ( **`--repo-root`** ). Example packs **`examples/campaign_result_packs/multi_suite/`** and **`examples/campaign_result_packs/compare_minimal_vs_multi/`**. Tests **`tests/test_campaign_result_pack_compare.py`**; **`tests/test_schema_drift_contracts.py`** loads **`pack-compare.json`**. Docs **`docs/workflows/benchmark-campaigns.md`**, **`docs/architecture/data-model.md`**, **`examples/campaign_result_packs/README.md`**.
+
+**Verification:** `uv run just ci`.
+
+## 2026-04-18 — Verification surface (docs): canonical, fallback, live
+
+**Delivered:** **`docs/workflows/verification.md`** — matrix (**`just ci`**, **`just test`**, **`just validate-artifacts`**, live/smoke) with **`uv run`** fallbacks; clarifies **`validate-artifacts`** ⊂ full pytest, not a **`just ci`** replacement. Updated **`README.md`**, **`AGENTS.md`**, **`docs/workflows/local-dev.md`**, **`live-verification.md`**, **`benchmarking.md`**, **`docs/architecture/runtime.md`**, **`docs/audits/schema-drift-contracts-inventory.md`**.
+
+**Verification:** docs-only; **`justfile`** unchanged.
+
+## 2026-04-18 — Report Markdown readability (campaign + benchmark; no scoring change)
+
+**Delivered:** **`suite_ref_benchmark_id_partition_coincide`** + **`_markdown_sweep_axis_keys`** in **`campaign_reporting.py`** — when suite and benchmark partitions match, Markdown omits duplicate **`benchmark_id`** sweep lines; dimensions table uses **`suite_ref (paired with benchmark_id)`**. Tighter copy for comparative + campaign-summary **At a glance**, FT-* digest, judge rollup bullets; **`campaign_semantic_summary.md`** (**`## Snapshot`**, merged coverage/range rows; removed duplicate **`## Totals`**). **`campaign_browser_evidence`**: shorter intro; per-cell headings drop **`benchmark_id`** when paired with suite. **`browser/formatting.py`**: shorter benchmark-run browser blurb. Tests **`tests/test_report_markdown_readability.py`**.
+
+**Analysis JSON:** unchanged (**`build_campaign_analysis_dict`** fields).
+
+**Verification:** `uv run pytest tests/ --ignore=tests/integration/`.
+
+## 2026-04-18 — Fingerprint axis interpretation (campaign + longitudinal)
+
+**Delivered:** **`build_fingerprint_axis_interpretation`** in **`benchmark/campaign_fingerprint_compare.py`** — **`score_spread_ranking`**, **`instability_hotspots`**, **`drift_correlation_hints`**; **`cell_count`** on per-group insight rows. **`fingerprint_axis_interpretation`** in **`campaign-analysis.json`** and **`summary.json`** (longitudinal). Markdown: **`render_fingerprint_compare_markdown`**, **`render_provider_comparison_markdown`**. Examples: **`examples/campaign_runs/minimal_offline/`**, **`multi_suite/`**, **`campaign_result_packs/minimal_offline/`**, **`examples/reports/longitudinal/sample-output/`**. Tests **`tests/test_campaign_reporting.py`**, **`tests/test_longitudinal.py`**. Docs **`docs/workflows/benchmark-campaigns.md`**, **`longitudinal-reporting.md`**.
+
+**Verification:** `uv run ruff check src tests`; `uv run mypy src`; `uv run pytest --ignore=tests/integration`.
+
+## 2026-04-18 — Schema/runtime drift verification (committed trees)
+
+**Delivered:** **`tests/test_schema_drift_contracts.py`** — deterministic sweep of **`examples/`** and **`fixtures/`** for **`benchmark_manifest`** / **`benchmark_campaign_manifest`**, campaign summaries, semantic summaries, **result packs**, browser evidence, cell I/O, **`evaluation_judge_provenance`**, **`reports/report.json`**, **`matrices/*.json`**, **`examples/dataset/rubrics/*.json`**; **`collect_committed_artifact_drift_errors()`** for reuse; regression tests for observability + **`generated_report_paths`**. **`just validate-artifacts`** recipe. Removed **`tests/test_schema_drift_examples.py`** (superseded). Audits **`docs/audits/schema-drift-contracts-inventory.md`**, updated **`docs/audits/schema-runtime-hardening-2026-04-18.md`**; pointers in **`docs/roadmap/v0.2.3.md`**, **`docs/tracking/v0.2.3-campaign.md`**, **`AGENTS.md`**.
+
+**Verification:** `just validate-artifacts`; `uv run just ci`.
+
+## 2026-04-18 — MCP stdio docs + browser realism claims
+
+**Delivered:** **`fixtures/mcp_servers/stdio_browser_evidence_server.py`** — multi-scenario **`alwm_browser_evidence`** (`alwm:checkout_flow` / `alwm:form_validation` / URL hints → **`checkout_flow`** / **`form_validation`** / **`export_flow`**). **`tests/test_mcp_stdio.py`** — deterministic stdio path (rich **`BrowserEvidence`** + CLI **`--stdio`**). Docs **`README.md`**, **`AGENTS.md`**, **`docs/architecture/browser.md`**, **`docs/audits/capability-classification.md`**, **`docs/workflows/live-verification.md`**, **`examples/browser_evidence/v1/README.md`**, **`.env.example`**; **`browser/formatting.py`** report copy. **No** remote/IDE MCP implementation.
+
+**Verification:** `uv run pytest tests/ --ignore=tests/integration`; `uv run ruff check src tests`; `uv run mypy src`.
+
+## 2026-04-18 — Campaign semantic judge: confidence + instability (criteria + axes)
+
+**Delivered:** **`CampaignSemanticSummaryV1`** gains **`criterion_instability`** (per-criterion **score_range** sums from **`repeat_aggregation.disagreement.per_criterion`**), **`instability_highlights`** (ranked unstable **suites** / **providers** / **execution modes**, **`confidence_flag_counts`**), **`totals.cells_flagged_judge_low_confidence`** vs **`cells_flagged_repeat_confidence_low`**, **`CampaignSemanticCellRow.repeat_confidence_low`**. **`CampaignSemanticSummaryV1`** Markdown leads with **Judge confidence & disagreement**; **`campaign-report.md`** embeds **`render_campaign_semantic_judge_section_markdown`**; **`campaign-analysis.json`** adds **`judge_campaign_semantic`**. Pipeline order: semantic summary **before** comparative artifacts. **`schemas/v1/campaign_semantic_summary.schema.json`**. Regenerated **`examples/campaign_runs/minimal_offline/`**, **`multi_suite/`**, **`examples/campaign_result_packs/minimal_offline/`** `campaign-semantic-summary.json`. Tests **`tests/test_benchmark_campaign.py`**. Docs **`docs/workflows/benchmark-campaigns.md`**.
+
+**Verification:** `uv run pytest tests/ --ignore=tests/integration`; `uv run mypy src`; `uv run ruff check src tests`.
+
+## 2026-04-18 — Browser evidence reporting (legible Markdown + traces suite)
+
+**Delivered:** **`browser/formatting.py`** — **`format_extensions_markdown`**, **`render_dom_excerpts_markdown`**, **`render_screenshots_markdown`**, **`render_browser_evidence_detail_markdown`**, expanded **`render_benchmark_browser_evidence_markdown`** (summary + legible per-cell blocks; honest Playwright optional / MCP stdio copy). **`benchmark/runner.py`** passes **`(BrowserEvidenceReportRow, BrowserEvidence)`** pairs. **`benchmark/campaign_browser_evidence.py`** — campaign-level browser markdown + **`browser_evidence_member_cells`** for **`campaign-analysis.json`** via **`campaign_reporting`**. **`fixtures/benchmarks/browser_traces_compare.v1.yaml`**, **`examples/benchmark_suites/v1/suite.taxonomy.browser_traces_compare.v1.yaml`**, **`examples/benchmark_runs/browser-traces-compare/README.md`**. Tests **`tests/test_browser_formatting.py`**, **`tests/test_benchmark_browser.py`**; taxonomy list **`tests/test_benchmark_taxonomy.py`**. Docs **`docs/workflows/benchmarking.md`**, **`docs/workflows/benchmark-campaigns.md`**, **`docs/architecture/browser.md`**.
+
+**Verification:** `uv run ruff check src tests`; `uv run mypy src`; `uv run pytest`.
+
+## 2026-04-18 — Campaign examples + result pack follow-up (schema drift)
+
+**Delivered:** Regenerated **`examples/campaign_runs/multi_suite/`** so **`campaign-semantic-summary.json`** matches the current **`campaign_semantic_summary`** schema (fixes **`test_schema_drift_examples`**). Rebuilt **`examples/campaign_result_packs/minimal_offline/`** from **`examples/campaign_runs/minimal_offline`**. Restored **`examples/campaign_runs/multi_suite/README.md`**. **`docs/workflows/campaign-walkthrough.md`** — Step 6 (result pack) + See also pointer.
+
+**Verification:** `uv run pytest tests/ --ignore=tests/integration/`.
+
+## 2026-04-18 — Campaign result packs (CLI + artifact + example)
+
+**Delivered:** **`CampaignResultPackV1`** / **`CampaignResultPackArtifacts`** / **`CampaignResultPackMemberRun`** in **`models.py`**; **`schemas/v1/campaign_result_pack.schema.json`**; **`benchmark/campaign_result_pack.py`** (**`assemble_campaign_result_pack`**, **`INDEX.md`** with **`ALWM_REPO_ROOT`** + repo-relative longitudinal examples). **`alwm benchmark campaign pack`** (`--pack-id`, **`--title`**, `--source-label`, `--member-depth`, `--run-index`, `--include-failed-members`, **`--record-source-abspath`**). Default **omit** absolute source path for portable packs. **`artifacts.py`** kind **`campaign_result_pack`**. Tests **`tests/test_campaign_result_pack.py`**; **`tests/test_schema_drift_examples.py`** loads **`campaign-result-pack.json`**. Docs **`docs/workflows/benchmark-campaigns.md`**, **`docs/architecture/data-model.md`**, **`examples/campaign_result_packs/README.md`**, **`README.md`** command table.
+
+**Example:** **`examples/campaign_result_packs/minimal_offline/`** (from **`examples/campaign_runs/minimal_offline`**).
+
+**Verification:** `uv run pytest tests/test_campaign_result_pack.py tests/test_schema_drift_examples.py`; `uv run alwm validate examples/campaign_result_packs/minimal_offline/campaign-result-pack.json campaign_result_pack`.
+
+## 2026-04-18 — Schema / runtime drift hardening (committed artifacts)
+
+**Delivered:** **`tests/test_schema_drift_examples.py`** validates **`examples/`** + **`fixtures/`** for **`benchmark_manifest`**, **`benchmark_campaign_manifest`**, **`campaign_summary`**, **`campaign_semantic_summary`**, **`browser_evidence`**, **`evaluation`**, **`benchmark_request`**, **`benchmark_response`**; focused assertions for **`runtime_summary`**, **`retry_summary`**, **`generated_report_paths`**. Audit **`docs/audits/schema-runtime-hardening-2026-04-18.md`** (local **`out/`** may hold stale five-axis fingerprints—regenerate or delete).
+
+**Verification:** `uv run pytest tests/test_schema_drift_examples.py -v`.
+
 ## 2026-04-18 — Campaign reporting readability (at-a-glance + member-score rollups)
 
 **Delivered:** **`campaign_reporting`** — **`## At a glance`** lead section and **member-run mean score** tables on **`reports/campaign-report.md`**; **`member_mean_score_by_dimension`** in **`campaign-analysis.json`** (alongside existing **`mean_score_extremes_by_sweep_axis`**). **`campaign-summary.md`** embeds **`render_campaign_at_a_glance_markdown`** when longitudinal + semantic bundles are available after a full run. **`write_campaign_comparative_artifacts`** returns **`(paths, longitudinal_bundle)`** so the summary avoids a second analysis pass. **`campaign_semantic_summary.md`** already surfaces ranked instability hotspots; comparative narrative cross-links remain. Docs **`docs/workflows/benchmark-campaigns.md`**; log entry. Tests **`tests/test_campaign_reporting.py`**. Regenerated **`examples/campaign_runs/minimal_offline/`** and added **`examples/campaign_runs/multi_suite/`** (multi-suite sweep example).

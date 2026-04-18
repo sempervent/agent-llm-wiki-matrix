@@ -1,0 +1,561 @@
+{
+  "artifacts": {
+    "entries": [
+      {
+        "artifact_key": "campaign_analysis_json",
+        "both_present": true,
+        "left": "reports/campaign-analysis.json",
+        "right": "reports/campaign-analysis.json",
+        "same_relative_path": true
+      },
+      {
+        "artifact_key": "campaign_comparative_report_md",
+        "both_present": true,
+        "left": "reports/campaign-report.md",
+        "right": "reports/campaign-report.md",
+        "same_relative_path": true
+      },
+      {
+        "artifact_key": "campaign_manifest",
+        "both_present": true,
+        "left": "manifest.json",
+        "right": "manifest.json",
+        "same_relative_path": true
+      },
+      {
+        "artifact_key": "campaign_semantic_summary_json",
+        "both_present": true,
+        "left": "campaign-semantic-summary.json",
+        "right": "campaign-semantic-summary.json",
+        "same_relative_path": true
+      },
+      {
+        "artifact_key": "campaign_semantic_summary_md",
+        "both_present": true,
+        "left": "campaign-semantic-summary.md",
+        "right": "campaign-semantic-summary.md",
+        "same_relative_path": true
+      },
+      {
+        "artifact_key": "campaign_summary_json",
+        "both_present": true,
+        "left": "campaign-summary.json",
+        "right": "campaign-summary.json",
+        "same_relative_path": true
+      },
+      {
+        "artifact_key": "campaign_summary_md",
+        "both_present": true,
+        "left": "campaign-summary.md",
+        "right": "campaign-summary.md",
+        "same_relative_path": true
+      }
+    ]
+  },
+  "browser_evidence": {
+    "aggregate": {
+      "delta_dom_excerpts_right_minus_left": 2,
+      "delta_screenshots_right_minus_left": 2,
+      "left_total_dom_excerpts": 0,
+      "left_total_screenshots": 0,
+      "right_total_dom_excerpts": 2,
+      "right_total_screenshots": 2
+    },
+    "has_any_evidence": true,
+    "index_notes": [],
+    "keys_only_in_left": [],
+    "keys_only_in_right": [
+      "fixtures/benchmarks/offline.v1.yaml / v-browser__p-one / bench.offline.v1",
+      "fixtures/benchmarks/offline.v1.yaml / v-browser__p-two / bench.offline.v1"
+    ],
+    "left_row_count": 0,
+    "left_unique_cell_keys": 0,
+    "paired_rows": [
+      {
+        "benchmark_id": "bench.offline.v1",
+        "browser_runner_right": "mock",
+        "cell_id": "v-browser__p-one",
+        "dom_excerpt_count_right": 1,
+        "evidence_id_right": "mock-evidence-v-browser__p-one",
+        "extension_digest_right": "net 0 req/ok \u00b7 a11y 0v \u00b7 trace 94de29738ca1",
+        "extension_keys_right": [
+          "accessibility",
+          "network",
+          "runner",
+          "structured_capture_version",
+          "trace_digest"
+        ],
+        "pairing": "right_only",
+        "run_id_right": "campaign.examples.multi_suite.v1__0001",
+        "runner_extension_key_right": true,
+        "screenshot_count_right": 1,
+        "signals_digest_right": "nav\u00d72 \u00b7 console\u00d71 \u00b7 dom\u00d71 \u00b7 shot\u00d71",
+        "suite_ref": "fixtures/benchmarks/offline.v1.yaml"
+      },
+      {
+        "benchmark_id": "bench.offline.v1",
+        "browser_runner_right": "mock",
+        "cell_id": "v-browser__p-two",
+        "dom_excerpt_count_right": 1,
+        "evidence_id_right": "mock-evidence-v-browser__p-two",
+        "extension_digest_right": "net 0 req/ok \u00b7 a11y 0v \u00b7 trace 692a9af2e692",
+        "extension_keys_right": [
+          "accessibility",
+          "network",
+          "runner",
+          "structured_capture_version",
+          "trace_digest"
+        ],
+        "pairing": "right_only",
+        "run_id_right": "campaign.examples.multi_suite.v1__0001",
+        "runner_extension_key_right": true,
+        "screenshot_count_right": 1,
+        "signals_digest_right": "nav\u00d72 \u00b7 console\u00d71 \u00b7 dom\u00d71 \u00b7 shot\u00d71",
+        "suite_ref": "fixtures/benchmarks/offline.v1.yaml"
+      }
+    ],
+    "right_row_count": 2,
+    "right_unique_cell_keys": 2,
+    "run_ids": {
+      "left": [],
+      "only_in_left": [],
+      "only_in_right": [
+        "campaign.examples.multi_suite.v1__0001"
+      ],
+      "right": [
+        "campaign.examples.multi_suite.v1__0001"
+      ]
+    }
+  },
+  "comparative_analysis": {
+    "backend_performance": [
+      {
+        "backend_kind": "mock",
+        "delta_right_minus_left": -0.257164,
+        "left_mean_score": 0.667276,
+        "right_mean_score": 0.410112
+      }
+    ],
+    "browser_evidence_comparison": {
+      "aggregate": {
+        "delta_dom_excerpts_right_minus_left": 2,
+        "delta_screenshots_right_minus_left": 2,
+        "left_total_dom_excerpts": 0,
+        "left_total_screenshots": 0,
+        "right_total_dom_excerpts": 2,
+        "right_total_screenshots": 2
+      },
+      "has_any_evidence": true,
+      "index_notes": [],
+      "keys_only_in_left": [],
+      "keys_only_in_right": [
+        "fixtures/benchmarks/offline.v1.yaml / v-browser__p-one / bench.offline.v1",
+        "fixtures/benchmarks/offline.v1.yaml / v-browser__p-two / bench.offline.v1"
+      ],
+      "left_row_count": 0,
+      "left_unique_cell_keys": 0,
+      "paired_rows": [
+        {
+          "benchmark_id": "bench.offline.v1",
+          "browser_runner_right": "mock",
+          "cell_id": "v-browser__p-one",
+          "dom_excerpt_count_right": 1,
+          "evidence_id_right": "mock-evidence-v-browser__p-one",
+          "extension_digest_right": "net 0 req/ok \u00b7 a11y 0v \u00b7 trace 94de29738ca1",
+          "extension_keys_right": [
+            "accessibility",
+            "network",
+            "runner",
+            "structured_capture_version",
+            "trace_digest"
+          ],
+          "pairing": "right_only",
+          "run_id_right": "campaign.examples.multi_suite.v1__0001",
+          "runner_extension_key_right": true,
+          "screenshot_count_right": 1,
+          "signals_digest_right": "nav\u00d72 \u00b7 console\u00d71 \u00b7 dom\u00d71 \u00b7 shot\u00d71",
+          "suite_ref": "fixtures/benchmarks/offline.v1.yaml"
+        },
+        {
+          "benchmark_id": "bench.offline.v1",
+          "browser_runner_right": "mock",
+          "cell_id": "v-browser__p-two",
+          "dom_excerpt_count_right": 1,
+          "evidence_id_right": "mock-evidence-v-browser__p-two",
+          "extension_digest_right": "net 0 req/ok \u00b7 a11y 0v \u00b7 trace 692a9af2e692",
+          "extension_keys_right": [
+            "accessibility",
+            "network",
+            "runner",
+            "structured_capture_version",
+            "trace_digest"
+          ],
+          "pairing": "right_only",
+          "run_id_right": "campaign.examples.multi_suite.v1__0001",
+          "runner_extension_key_right": true,
+          "screenshot_count_right": 1,
+          "signals_digest_right": "nav\u00d72 \u00b7 console\u00d71 \u00b7 dom\u00d71 \u00b7 shot\u00d71",
+          "suite_ref": "fixtures/benchmarks/offline.v1.yaml"
+        }
+      ],
+      "right_row_count": 2,
+      "right_unique_cell_keys": 2,
+      "run_ids": {
+        "left": [],
+        "only_in_left": [],
+        "only_in_right": [
+          "campaign.examples.multi_suite.v1__0001"
+        ],
+        "right": [
+          "campaign.examples.multi_suite.v1__0001"
+        ]
+      }
+    },
+    "left_present": true,
+    "mean_score_extremes_comparable_flag_match": false,
+    "right_present": true,
+    "semantic_instability_by_scoring_backend": []
+  },
+  "created_at": "1970-01-01T00:00:00Z",
+  "failure_tags": {
+    "codes_compared": [
+      {
+        "code": "FT-ABS-LOW",
+        "delta_right_minus_left": null,
+        "left_signal_count": null,
+        "right_signal_count": 4
+      },
+      {
+        "code": "FT-MODE-GAP",
+        "delta_right_minus_left": null,
+        "left_signal_count": null,
+        "right_signal_count": 2
+      }
+    ],
+    "only_in_left": [],
+    "only_in_right": [
+      "FT-ABS-LOW",
+      "FT-MODE-GAP"
+    ]
+  },
+  "fingerprint_axis_insights": {
+    "left_present": true,
+    "per_axis_key": [
+      {
+        "axis_key": "browser_config_fingerprint",
+        "left_pooled_mean_score_spread": null,
+        "left_varied": false,
+        "right_pooled_mean_score_spread": 0.300025,
+        "right_varied": true,
+        "spread_delta_right_minus_left": null
+      },
+      {
+        "axis_key": "execution_mode",
+        "left_pooled_mean_score_spread": null,
+        "left_varied": false,
+        "right_pooled_mean_score_spread": 0.300025,
+        "right_varied": true,
+        "spread_delta_right_minus_left": null
+      },
+      {
+        "axis_key": "prompt_registry_state_fingerprint",
+        "left_pooled_mean_score_spread": null,
+        "left_varied": false,
+        "right_pooled_mean_score_spread": null,
+        "right_varied": false,
+        "spread_delta_right_minus_left": null
+      },
+      {
+        "axis_key": "provider_config_fingerprint",
+        "left_pooled_mean_score_spread": null,
+        "left_varied": false,
+        "right_pooled_mean_score_spread": 0.300025,
+        "right_varied": true,
+        "spread_delta_right_minus_left": null
+      },
+      {
+        "axis_key": "scoring_config_fingerprint",
+        "left_pooled_mean_score_spread": null,
+        "left_varied": false,
+        "right_pooled_mean_score_spread": null,
+        "right_varied": false,
+        "spread_delta_right_minus_left": null
+      }
+    ],
+    "right_present": true
+  },
+  "identity": {
+    "campaign_definition_fingerprint": {
+      "left": "sha256:340780556158635e0b33298b726f530cbc86f7dcfdd8923934bbb14a0734e47b",
+      "match": false,
+      "right": "sha256:98d0b9852fa277dc5b164fe14a3711b50be2a72ea5f5fca5ed0dd09fe8072566"
+    },
+    "campaign_experiment_fingerprints": [
+      {
+        "axis": "browser_configs",
+        "left": "sha256:591cbc3aa572200862e2f336261f05849fe93c17d226a939565815d0cb075961",
+        "match": true,
+        "right": "sha256:591cbc3aa572200862e2f336261f05849fe93c17d226a939565815d0cb075961"
+      },
+      {
+        "axis": "campaign_definition",
+        "left": "sha256:340780556158635e0b33298b726f530cbc86f7dcfdd8923934bbb14a0734e47b",
+        "match": false,
+        "right": "sha256:98d0b9852fa277dc5b164fe14a3711b50be2a72ea5f5fca5ed0dd09fe8072566"
+      },
+      {
+        "axis": "prompt_registry_state",
+        "left": "sha256:d409ed75b3cb355ac6727f09877d7ef98c40adce16e3e8284c6dcfe9c5c3db21",
+        "match": true,
+        "right": "sha256:d409ed75b3cb355ac6727f09877d7ef98c40adce16e3e8284c6dcfe9c5c3db21"
+      },
+      {
+        "axis": "provider_configs",
+        "left": "sha256:69c4ef3c9876f8d46bd609d755baa1bb850cd8d9fdcbdee0748b6e10c36cf5f1",
+        "match": true,
+        "right": "sha256:69c4ef3c9876f8d46bd609d755baa1bb850cd8d9fdcbdee0748b6e10c36cf5f1"
+      },
+      {
+        "axis": "scoring_configs",
+        "left": "sha256:2c7f1b6d79305cde67076936152d80992802d413157de43143bac86c13c21fc8",
+        "match": true,
+        "right": "sha256:2c7f1b6d79305cde67076936152d80992802d413157de43143bac86c13c21fc8"
+      },
+      {
+        "axis": "suite_definitions",
+        "left": "sha256:89fed34c06b5afbe00f18b22f21c268389fdf928f73f446796d8c19666514348",
+        "match": false,
+        "right": "sha256:d2b3773206bf3494af78922b52603f56a48e60aea74a7f40998fc98adbafbeca"
+      }
+    ],
+    "definition_source_relpath": {
+      "left": "examples/campaigns/v1/minimal_offline.v1.yaml",
+      "match": false,
+      "right": "examples/campaigns/v1/multi_suite.v1.yaml"
+    },
+    "left_campaign_id": "campaign.examples.minimal_offline.v1",
+    "right_campaign_id": "campaign.examples.multi_suite.v1",
+    "same_campaign_id": false
+  },
+  "left": {
+    "campaign_id": "campaign.examples.minimal_offline.v1",
+    "definition_source_relpath": "examples/campaigns/v1/minimal_offline.v1.yaml",
+    "label": "examples/campaign_runs/minimal_offline",
+    "path": "examples/campaign_runs/minimal_offline",
+    "title": "Minimal offline campaign (single suite, deterministic)"
+  },
+  "member_runs": {
+    "left_count": 1,
+    "right_count": 2,
+    "run_ids_in_both": [],
+    "run_ids_only_in_left": [
+      "campaign.examples.minimal_offline.v1__0000"
+    ],
+    "run_ids_only_in_right": [
+      "campaign.examples.multi_suite.v1__0000",
+      "campaign.examples.multi_suite.v1__0001"
+    ]
+  },
+  "right": {
+    "campaign_id": "campaign.examples.multi_suite.v1",
+    "definition_source_relpath": "examples/campaigns/v1/multi_suite.v1.yaml",
+    "label": "examples/campaign_runs/multi_suite",
+    "path": "examples/campaign_runs/multi_suite",
+    "title": "Example \u2014 multi-suite sweep (two fixtures)"
+  },
+  "run_health": {
+    "left": {
+      "dry_run": false,
+      "manifest_run_count": 1
+    },
+    "right": {
+      "dry_run": false,
+      "manifest_run_count": 2
+    }
+  },
+  "schema_version": 1,
+  "semantic_summary_totals": {
+    "left_totals": {
+      "cells_flagged_judge_low_confidence": 0,
+      "cells_flagged_repeat_confidence_low": 0,
+      "cells_semantic_or_hybrid": 0,
+      "cells_total": 1,
+      "cells_with_repeat_judge": 0,
+      "low_confidence_cells": 0
+    },
+    "numeric_deltas_right_minus_left": {
+      "cells_flagged_judge_low_confidence": 0.0,
+      "cells_flagged_repeat_confidence_low": 0.0,
+      "cells_semantic_or_hybrid": 0.0,
+      "cells_total": 6.0,
+      "cells_with_repeat_judge": 0.0,
+      "low_confidence_cells": 0.0
+    },
+    "right_totals": {
+      "cells_flagged_judge_low_confidence": 0,
+      "cells_flagged_repeat_confidence_low": 0,
+      "cells_semantic_or_hybrid": 0,
+      "cells_total": 7,
+      "cells_with_repeat_judge": 0,
+      "low_confidence_cells": 0
+    }
+  },
+  "sweep_dimensions": {
+    "left_dimensions": {
+      "benchmark_id": {
+        "axis": "benchmark_id",
+        "distinct_count": 1,
+        "values": [
+          "bench.fixtures.campaign.micro.v1"
+        ],
+        "varied": false
+      },
+      "browser_config_applied": {
+        "axis": "browser_config_applied",
+        "distinct_count": 1,
+        "values": [
+          "False"
+        ],
+        "varied": false
+      },
+      "eval_scoring_label": {
+        "axis": "eval_scoring_label",
+        "distinct_count": 1,
+        "values": [
+          "suite_default"
+        ],
+        "varied": false
+      },
+      "execution_modes_filter": {
+        "axis": "execution_modes_filter",
+        "distinct_count": 1,
+        "values": [
+          "\u2014"
+        ],
+        "varied": false
+      },
+      "provider_config_ref": {
+        "axis": "provider_config_ref",
+        "distinct_count": 1,
+        "values": [
+          "null (harness default)"
+        ],
+        "varied": false
+      },
+      "suite_ref": {
+        "axis": "suite_ref",
+        "distinct_count": 1,
+        "values": [
+          "fixtures/benchmarks/campaign_micro.v1.yaml"
+        ],
+        "varied": false
+      }
+    },
+    "per_axis": [
+      {
+        "axis": "benchmark_id",
+        "left_distinct_count": 1,
+        "left_varied": false,
+        "right_distinct_count": 2,
+        "right_varied": true,
+        "values_match": false
+      },
+      {
+        "axis": "browser_config_applied",
+        "left_distinct_count": 1,
+        "left_varied": false,
+        "right_distinct_count": 1,
+        "right_varied": false,
+        "values_match": true
+      },
+      {
+        "axis": "eval_scoring_label",
+        "left_distinct_count": 1,
+        "left_varied": false,
+        "right_distinct_count": 1,
+        "right_varied": false,
+        "values_match": true
+      },
+      {
+        "axis": "execution_modes_filter",
+        "left_distinct_count": 1,
+        "left_varied": false,
+        "right_distinct_count": 1,
+        "right_varied": false,
+        "values_match": true
+      },
+      {
+        "axis": "provider_config_ref",
+        "left_distinct_count": 1,
+        "left_varied": false,
+        "right_distinct_count": 1,
+        "right_varied": false,
+        "values_match": true
+      },
+      {
+        "axis": "suite_ref",
+        "left_distinct_count": 1,
+        "left_varied": false,
+        "right_distinct_count": 2,
+        "right_varied": true,
+        "values_match": false
+      }
+    ],
+    "right_dimensions": {
+      "benchmark_id": {
+        "axis": "benchmark_id",
+        "distinct_count": 2,
+        "values": [
+          "bench.fixtures.campaign.micro.v1",
+          "bench.offline.v1"
+        ],
+        "varied": true
+      },
+      "browser_config_applied": {
+        "axis": "browser_config_applied",
+        "distinct_count": 1,
+        "values": [
+          "False"
+        ],
+        "varied": false
+      },
+      "eval_scoring_label": {
+        "axis": "eval_scoring_label",
+        "distinct_count": 1,
+        "values": [
+          "suite_default"
+        ],
+        "varied": false
+      },
+      "execution_modes_filter": {
+        "axis": "execution_modes_filter",
+        "distinct_count": 1,
+        "values": [
+          "\u2014"
+        ],
+        "varied": false
+      },
+      "provider_config_ref": {
+        "axis": "provider_config_ref",
+        "distinct_count": 1,
+        "values": [
+          "null (harness default)"
+        ],
+        "varied": false
+      },
+      "suite_ref": {
+        "axis": "suite_ref",
+        "distinct_count": 2,
+        "values": [
+          "fixtures/benchmarks/campaign_micro.v1.yaml",
+          "fixtures/benchmarks/offline.v1.yaml"
+        ],
+        "varied": true
+      }
+    },
+    "varied_flags_differ_on_axes": [
+      "benchmark_id",
+      "suite_ref"
+    ]
+  }
+}

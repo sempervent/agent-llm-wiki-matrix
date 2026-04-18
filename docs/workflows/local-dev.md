@@ -4,7 +4,7 @@
 
 1. Install **[uv](https://docs.astral.sh/uv/)** (required for this repository’s host workflow).
 2. From the repo root: `uv venv --python 3.11` then `uv pip install -e ".[dev]"` (see **`AGENTS.md`**). Activating `.venv` is optional if you use **`uv run`** for commands.
-3. Run checks: **`uv run just ci`** (install [just](https://github.com/casey/just) if needed). Equivalent: activate `.venv` and run `just ci`.
+3. Run checks: **`uv run just ci`** (recommended: install [just](https://github.com/casey/just)). **Without `just`:** **`uv run ruff check src tests`**, **`uv run mypy src`**, **`uv run pytest tests/ --ignore=tests/integration`** — see **[verification.md](verification.md)**. Equivalent with **`just`:** activate `.venv` and run **`just ci`**.
 4. CLI examples: `uv run alwm version`, `uv run alwm validate …`, pipeline commands (`ingest`, `evaluate`, `compare`, `report`), `uv run alwm providers show`.
 
 Do **not** use `python -m venv`, bare `pip install`, Poetry, Pipenv, or Conda for the standard setup here unless you have an explicit reason (document in PRs if so).

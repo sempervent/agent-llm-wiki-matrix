@@ -1,0 +1,20 @@
+{
+  "evaluated_at": "1970-01-01T00:00:00Z",
+  "evaluator": "pipeline",
+  "id": "eval-v-checkout-p-one",
+  "notes_markdown": "Benchmark cell evaluation (rubric hash on normalized response).",
+  "rubric_id": "rubric.examples.browser_realism.v1",
+  "scores": {
+    "grounding": 0.597771,
+    "hallucination_resistance": 0.564065,
+    "source_fidelity": 0.550425
+  },
+  "scoring_backend": "deterministic",
+  "subject_ref": "cells/v-checkout__p-one/benchmark_response.json",
+  "total_weighted_score": 0.571024,
+  "weights": {
+    "grounding": 0.34,
+    "hallucination_resistance": 0.33,
+    "source_fidelity": 0.33
+  }
+}

@@ -587,19 +587,6 @@ def run_benchmark_campaign(
         runs=entries,
         aggregated_runtime=aggregated_runtime,
     )
-    extra_paths, longitudinal_bundle = write_campaign_comparative_artifacts(
-        repo_root,
-        output_dir,
-        manifest,
-    )
-    manifest = manifest.model_copy(
-        update={
-            "generated_report_paths": merge_generated_report_paths(
-                manifest.generated_report_paths,
-                extra_paths,
-            ),
-        },
-    )
     semantic_paths, semantic_model = write_campaign_semantic_summary_artifacts(
         repo_root=repo_root,
         campaign_dir=output_dir,
@@ -610,6 +597,20 @@ def run_benchmark_campaign(
             "generated_report_paths": merge_generated_report_paths(
                 manifest.generated_report_paths,
                 semantic_paths,
+            ),
+        },
+    )
+    extra_paths, longitudinal_bundle = write_campaign_comparative_artifacts(
+        repo_root,
+        output_dir,
+        manifest,
+        semantic_summary=semantic_model,
+    )
+    manifest = manifest.model_copy(
+        update={
+            "generated_report_paths": merge_generated_report_paths(
+                manifest.generated_report_paths,
+                extra_paths,
             ),
         },
     )

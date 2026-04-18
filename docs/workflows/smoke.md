@@ -1,6 +1,6 @@
 # Smoke workflow (`just smoke`)
 
-End-to-end checks beyond unit tests: Python smoke markers, host CLI paths, and (when Docker is available) Compose + runtime image behavior.
+End-to-end checks **beyond** default **`just ci`** (see **[verification.md](verification.md)** for the offline merge bar vs this supplementary gate): Python smoke markers, host CLI paths, and (when Docker is available) Compose + runtime image behavior.
 
 ## What runs
 

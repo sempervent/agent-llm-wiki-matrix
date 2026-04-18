@@ -21,7 +21,7 @@ Capture **browser evidence** (navigation, console messages, optional DOM snapsho
 - Prefer **committed JSON** under `fixtures/browser_evidence/v1/` for reproducible tests.
 - `MockBrowserRunner` never performs I/O except hashing request fields.
 - Default `just ci` does **not** install Playwright or browser binaries.
-- **MCP stdio** uses a **local subprocess** (no network); CI runs a **fixture FastMCP server** at `fixtures/mcp_servers/stdio_browser_evidence_server.py`.
+- **MCP stdio** uses a **local subprocess** (no network). The committed **FastMCP** server at `fixtures/mcp_servers/stdio_browser_evidence_server.py` returns **realistic** multi-field `BrowserEvidence` from `fixtures/browser_evidence/v1/` (see scenario table below). That proves the MCP client and validation path—not a live browser.
 
 ## MCP stdio (minimal real protocol path)
 
@@ -33,7 +33,15 @@ Capture **browser evidence** (navigation, console messages, optional DOM snapsho
 | `ALWM_MCP_BROWSER_TOOL` | Optional; default **`alwm_browser_evidence`**. |
 | `ALWM_MCP_BROWSER_CWD` | Optional working directory for the server process (repo-relative paths resolved against `ALWM_REPO_ROOT`). |
 
-**Contract:** the tool should return **text content** whose concatenation is a single JSON object matching **`BrowserEvidence`**. Extra arguments (`start_url`, `steps`) are passed from `BrowserRunRequest` for forward-compatible servers; the fixture server ignores them.
+**Contract:** the tool should return **text content** whose concatenation is a single JSON object matching **`BrowserEvidence`**. Extra arguments (`start_url`, `steps`) are passed from `BrowserRunRequest`; the **shipped fixture server** uses them to pick a committed JSON file:
+
+| Signal | Fixture (under `fixtures/browser_evidence/v1/`) |
+| --- | --- |
+| `steps` contains `alwm:checkout_flow`, or `start_url` contains `checkout` | `checkout_flow.json` (multi-screenshot, rich `extensions`) |
+| `steps` contains `alwm:form_validation`, or `start_url` contains `signup` | `form_validation.json` (a11y-heavy excerpts) |
+| otherwise | `export_flow.json` |
+
+**Tests:** `tests/test_mcp_stdio.py` exercises checkout + form scenarios over stdio (deterministic; requires `mcp` from **dev** extras).
 
 **Dependency:** `mcp>=1.27` is listed under **`[project.optional-dependencies] dev`** and **`[dependency-groups] dev`** so `uv pip install -e ".[dev]"` / `uv sync --group dev` install it.
 
@@ -43,16 +51,25 @@ Capture **browser evidence** (navigation, console messages, optional DOM snapsho
 
 1. Optional **`[mcp]`** install surface for non-dev consumers (if needed).
 2. Tool discovery (`tools/list`) and mapping profiles for heterogeneous servers.
-3. Opt-in integration tests against a user-provided MCP command (env-gated, not default CI).
+3. Optional extra integration tests against a **user-provided** MCP command (beyond the shipped fixture server exercised in **`tests/test_mcp_stdio.py`**).
 
 Verification: `docs/workflows/live-verification.md`.
 
 ## Scoring (browser interpretation)
 
-Use **`examples/dataset/rubrics/browser_realism.v1.json`** when rubrics should stress **grounding** in the trace, **hallucination resistance**, and **source fidelity** to URLs/selectors/console lines. Default CI keeps **deterministic** hash-based scores unless a suite opts into semantic judging.
+Use **`examples/dataset/rubrics/browser_realism.v1.json`** when rubrics should stress **grounding** in the trace, **hallucination resistance**, and **source fidelity** to URLs/selectors/console lines. That rubric scores whether the **model’s answer respects the committed JSON**—it does **not**, by itself, prove that a real browser was automated. **Playwright** (optional `[browser]`) is the path for live DOM capture into `BrowserEvidence`; **MCP stdio** here is still **fixture JSON** unless you replace the server with your own tool implementation.
 
 ## Benchmark harness
 
 For variants with **`execution_mode: browser_mock`**, `run_benchmark` (`benchmark/runner.py`) calls **`run_benchmark_browser_phase`** (`benchmark/browser_execution.py`), persists **`BrowserEvidence`** to `cells/<cell>/browser_evidence.json`, and augments the provider prompt before scoring. Configure runners via **`variant.browser`** on the benchmark definition (see `schemas/v1/benchmark_definition.schema.json`). Opt-in Playwright for benchmarks: **`ALWM_BENCHMARK_PLAYWRIGHT=1`** (in addition to the `[browser]` install).
+
+## Reporting (Markdown)
+
+`browser/formatting.py` renders human-readable blocks for **`reports/report.md`** (per-run benchmark) and **`reports/campaign-report.md`** (campaign comparative, when member runs contain browser evidence):
+
+- **Summary table** — runner kind, evidence id, counts (DOM excerpts, screenshots, extension keys).
+- **Legible detail** — screenshot metadata as a table (viewport, DPR, sequence, short content hash); DOM excerpts as a table plus optional fenced **`html`** snippets; **`extensions`** as labeled bullets with remainder in fenced JSON so nested objects stay readable.
+
+Copy in those sections states that **Playwright is optional** and that **MCP** here means a **local stdio tool bridge** returning JSON — not a remote or IDE-hosted browser session.
 
 Labeling guidance: `docs/audits/capability-classification.md`.

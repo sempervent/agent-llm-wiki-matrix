@@ -13,6 +13,8 @@
     "by_suite",
     "by_provider",
     "by_execution_mode",
+    "criterion_instability",
+    "instability_highlights",
     "cells"
   ],
   "properties": {
@@ -33,6 +35,11 @@
       "type": "array",
       "items": { "$ref": "#/$defs/campaignSemanticAxisRollup" }
     },
+    "criterion_instability": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/campaignCriterionInstabilityRow" }
+    },
+    "instability_highlights": { "$ref": "#/$defs/campaignSemanticInstabilityHighlights" },
     "cells": {
       "type": "array",
       "items": { "$ref": "#/$defs/campaignSemanticCellRow" }
@@ -48,7 +55,9 @@
         "cells_deterministic",
         "cells_semantic_or_hybrid",
         "cells_with_repeat_judge",
-        "low_confidence_cells"
+        "low_confidence_cells",
+        "cells_flagged_judge_low_confidence",
+        "cells_flagged_repeat_confidence_low"
       ],
       "properties": {
         "runs_scanned": { "type": "integer", "minimum": 0 },
@@ -57,6 +66,8 @@
         "cells_semantic_or_hybrid": { "type": "integer", "minimum": 0 },
         "cells_with_repeat_judge": { "type": "integer", "minimum": 0 },
         "low_confidence_cells": { "type": "integer", "minimum": 0 },
+        "cells_flagged_judge_low_confidence": { "type": "integer", "minimum": 0 },
+        "cells_flagged_repeat_confidence_low": { "type": "integer", "minimum": 0 },
         "max_range_across_campaign": { "oneOf": [{ "type": "null" }, { "type": "number" }] },
         "mean_range_repeat_cells": { "oneOf": [{ "type": "null" }, { "type": "number" }] },
         "mean_total_weighted_stdev_repeat": { "oneOf": [{ "type": "null" }, { "type": "number" }] }
@@ -89,6 +100,79 @@
         "mean_total_weighted_stdev": { "oneOf": [{ "type": "null" }, { "type": "number" }] }
       }
     },
+    "campaignCriterionInstabilityRow": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "criterion_id",
+        "cells_with_repeat_judge",
+        "sum_score_range",
+        "max_score_range",
+        "mean_score_range"
+      ],
+      "properties": {
+        "criterion_id": { "type": "string", "minLength": 1 },
+        "cells_with_repeat_judge": { "type": "integer", "minimum": 0 },
+        "sum_score_range": { "type": "number", "minimum": 0 },
+        "max_score_range": { "type": "number", "minimum": 0 },
+        "mean_score_range": { "type": "number", "minimum": 0 }
+      }
+    },
+    "campaignAxisInstabilityHighlight": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "axis_kind",
+        "axis_value",
+        "rank",
+        "instability_score",
+        "cell_rows",
+        "semantic_cells",
+        "repeat_judge_cells",
+        "low_confidence_cells"
+      ],
+      "properties": {
+        "axis_kind": { "$ref": "#/$defs/axisKind" },
+        "axis_value": { "type": "string", "minLength": 1 },
+        "rank": { "type": "integer", "minimum": 1 },
+        "instability_score": { "type": "number" },
+        "cell_rows": { "type": "integer", "minimum": 0 },
+        "semantic_cells": { "type": "integer", "minimum": 0 },
+        "repeat_judge_cells": { "type": "integer", "minimum": 0 },
+        "low_confidence_cells": { "type": "integer", "minimum": 0 },
+        "max_range_observed": { "oneOf": [{ "type": "null" }, { "type": "number" }] },
+        "mean_range_across_cells": { "oneOf": [{ "type": "null" }, { "type": "number" }] },
+        "mean_total_weighted_stdev": { "oneOf": [{ "type": "null" }, { "type": "number" }] }
+      }
+    },
+    "campaignSemanticInstabilityHighlights": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "unstable_suites",
+        "unstable_providers",
+        "unstable_execution_modes",
+        "confidence_flag_counts"
+      ],
+      "properties": {
+        "unstable_suites": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/campaignAxisInstabilityHighlight" }
+        },
+        "unstable_providers": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/campaignAxisInstabilityHighlight" }
+        },
+        "unstable_execution_modes": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/campaignAxisInstabilityHighlight" }
+        },
+        "confidence_flag_counts": {
+          "type": "object",
+          "additionalProperties": { "type": "integer", "minimum": 0 }
+        }
+      }
+    },
     "campaignSemanticCellRow": {
       "type": "object",
       "additionalProperties": false,
@@ -106,7 +190,8 @@
         "scoring_backend",
         "repeat_aggregation_present",
         "confidence_low",
-        "confidence_flags"
+        "confidence_flags",
+        "repeat_confidence_low"
       ],
       "properties": {
         "run_id": { "type": "string", "minLength": 1 },
@@ -132,7 +217,8 @@
         "confidence_flags": {
           "type": "array",
           "items": { "type": "string", "minLength": 1 }
-        }
+        },
+        "repeat_confidence_low": { "type": "boolean" }
       }
     }
   }

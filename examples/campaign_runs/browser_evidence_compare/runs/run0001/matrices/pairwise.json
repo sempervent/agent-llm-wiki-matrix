@@ -1,0 +1,18 @@
+{
+  "col_labels": [
+    "v-form"
+  ],
+  "created_at": "1970-01-01T00:00:00Z",
+  "id": "campaign.examples.browser_evidence_compare.v1__0001-pairwise",
+  "matrix_kind": "pairwise",
+  "metric": "mean_abs_total_score_delta",
+  "row_labels": [
+    "v-form"
+  ],
+  "scores": [
+    [
+      0.0
+    ]
+  ],
+  "title": "Browser file-runner benchmark (form validation fixture) (mean abs score delta across prompts)"
+}

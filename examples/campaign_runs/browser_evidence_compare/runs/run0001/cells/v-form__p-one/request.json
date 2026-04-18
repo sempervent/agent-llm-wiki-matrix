@@ -1,0 +1,15 @@
+{
+  "benchmark_id": "bench.fixtures.browser.form.v1",
+  "browser_evidence_relpath": "cells/v-form__p-one/browser_evidence.json",
+  "browser_runner": "file",
+  "cell_id": "v-form__p-one",
+  "created_at": "1970-01-01T00:00:00Z",
+  "id": "req__campaign.examples.browser_evidence_compare.v1__0001__v-form__p-one",
+  "model": "mock-model",
+  "prompt_id": "p-one",
+  "prompt_source": "inline",
+  "prompt_text": "List validation signals from the trace (DOM, console, a11y) and avoid inventing fields absent from the JSON.\n\n## Browser evidence (runner=file)\n\n### Browser evidence (structured)\n- **id:** evidence.form_validation.v1\n- **title:** Abstract trace: signup form with validation errors\n- **navigation:**\n  - https://example.test/signup \u201cSign up\u201d [navigate]\n- **console:**\n  - [error] validation failed: email\n- **dom_excerpts:**\n  - **Email error** `#email-error` (aria_role=alert; a11y_name='Email format invalid'; order=0)\n    - visible: Enter a valid email address.\n  - **Submit** `button[type=submit]` (aria_role=button; a11y_name='Create account'; order=1)\n    - visible: Create account\n- **screenshots:**\n  - #0; viewport; sha256 `cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc`; 1280\u00d7720; image/png; Fixture: form state after failed submit.\n- **extensions:**\n- **fixture_profile:** 'form_validation.v1'\n- **structured_capture_version:** 1\n- **accessibility:**\n  - notes: Focus order vs DOM order mismatch (fixture).\n  - rules_checked: 8\n  - violations_count: 2\n- **notes:** Stress a11y roles + console errors without navigation churn.\n",
+  "run_id": "campaign.examples.browser_evidence_compare.v1__0001",
+  "schema_version": 1,
+  "variant_id": "v-form"
+}

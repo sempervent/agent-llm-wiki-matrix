@@ -7,6 +7,7 @@ from pathlib import Path
 import pytest
 
 from agent_llm_wiki_matrix.pipelines.longitudinal import (
+    analysis_to_summary_dict,
     analyze_longitudinal,
     discover_manifest_paths,
     group_snapshots_by,
@@ -202,3 +203,21 @@ def test_load_run_snapshot_relative_paths(tmp_path: Path) -> None:
     assert snap.run_id == "r1"
     assert len(snap.cells) == 1
     assert snap.cells[0].total_score == pytest.approx(0.5)
+
+
+def test_analysis_summary_includes_fingerprint_axis_interpretation() -> None:
+    repo = _repo_root()
+    paths = discover_manifest_paths(repo, "fixtures/longitudinal/paired/*/manifest.json")
+    snaps = load_run_snapshots(repo, paths)
+    analysis = analyze_longitudinal(
+        snaps,
+        regression_delta=0.03,
+        low_score=0.55,
+        min_recurring=2,
+        mode_gap_threshold=0.12,
+    )
+    d = analysis_to_summary_dict(analysis)
+    fi = d["fingerprint_axis_interpretation"]
+    assert fi["schema_version"] == 1
+    assert "differentiation_overview" in fi
+    assert "attribution_by_axis" in fi

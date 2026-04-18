@@ -1,6 +1,8 @@
 # Live runtime verification (opt-in)
 
-Default **`uv run just ci`** and **`uv run just test`** stay **deterministic**: no Docker daemons, no Ollama, no llama-server, no Playwright browsers. This document describes **optional** checks for real backends and the Playwright runner. Host commands assume **[uv](https://docs.astral.sh/uv/)** (see **`AGENTS.md`**).
+**Canonical offline verification** (default merge bar), **fallback commands without `just`**, and how **`just validate-artifacts`** relates to **`just ci`**: **[verification.md](verification.md)**.
+
+Default **`uv run just ci`** and **`uv run just test`** stay **deterministic**: no Docker daemons, no Ollama, no llama-server, no Playwright browsers. **This document** describes **optional** checks for real backends and the Playwright runner. Host commands assume **[uv](https://docs.astral.sh/uv/)** (see **`AGENTS.md`**).
 
 ## Modes
 
@@ -36,6 +38,25 @@ Tests **skip** when the flag is unset, when probes fail, or when Ollama has no m
 | `just benchmark-probe` | `benchmark-probe` — `alwm benchmark probe` only (reachability; no full benchmark) |
 
 See [benchmarking.md](benchmarking.md) for details.
+
+## MCP stdio browser runner (local protocol, fixture data)
+
+1. Install **dev** extras so the MCP Python SDK is available:
+
+   ```bash
+   uv pip install -e ".[dev]"
+   ```
+
+2. From the repo root, point **`ALWM_MCP_BROWSER_COMMAND`** at the **FastMCP** fixture server (shell-parsed argv):
+
+   ```bash
+   export ALWM_MCP_BROWSER_COMMAND="python fixtures/mcp_servers/stdio_browser_evidence_server.py"
+   uv run alwm browser run-mcp --stdio --step alwm:checkout_flow
+   ```
+
+   The server returns committed JSON from **`fixtures/browser_evidence/v1/`** (see scenario table in **`docs/architecture/browser.md`**). This verifies the **MCP client + validation** path over stdio; it is **not** a remote or IDE-hosted integration.
+
+3. **Coverage:** `tests/test_mcp_stdio.py` runs the same stack in CI (subprocess + MCP protocol; still no browser binary).
 
 ## Playwright browser runner
 

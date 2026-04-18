@@ -8,7 +8,7 @@ This document summarizes what **v0.1.0** is intended to deliver versus what rema
 
 ## Complete capabilities (default workflows)
 
-These are covered by **`just ci`** (lint, typecheck, unit tests excluding `tests/integration/`) and/or documented offline commands using **committed fixtures and examples**.
+These are covered by **`just ci`** (lint, typecheck, unit tests excluding `tests/integration/`) and/or documented offline commands using **committed fixtures and examples**. **Canonical vs fallback commands:** [docs/workflows/verification.md](workflows/verification.md).
 
 | Area | Notes |
 | --- | --- |

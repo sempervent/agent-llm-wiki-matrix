@@ -9,9 +9,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Campaign result pack comparison** — `CampaignResultPackComparisonV1` + `schemas/v1/campaign_result_pack_comparison.schema.json`; `alwm benchmark campaign compare-packs` writes `pack-compare.json` and `pack-compare-report.md` (fingerprints, artifact paths, `campaign-analysis.json` deltas, FT-\*, semantic totals, member runs, portability). Optional `--repo-root` for git-friendly relative paths. Example: `examples/campaign_result_packs/compare_minimal_vs_multi/`. Kind `campaign_result_pack_comparison` in `artifacts.py`.
+
+- **Campaign result packs** — `CampaignResultPackV1` + `schemas/v1/campaign_result_pack.schema.json`; `alwm benchmark campaign pack` assembles a git-friendly directory (`campaign-result-pack.json`, `INDEX.md`, mirrored campaign layout). Example: `examples/campaign_result_packs/minimal_offline/`. Kind `campaign_result_pack` registered in `artifacts.py`.
+
 - **MCP stdio (protocol) path** — `MCPBrowserRunner` uses the `mcp` client for a **local** stdio server when `ALWM_MCP_BROWSER_COMMAND` is set and no fixture ids are passed; `alwm browser run-mcp --stdio`; fixture server `fixtures/mcp_servers/stdio_browser_evidence_server.py`. `mcp>=1.27` is in **`dev`** optional extras. **Not** a v0.2.0 exit criterion for IDE-hosted MCP (`docs/roadmap/v0.2.0.md`).
 
 ### Changed
+
+- **Campaign semantic / hybrid judge reporting** — **`campaign-semantic-summary.json`** adds **`criterion_instability`**, **`instability_highlights`** (unstable suites / providers / modes + **confidence_flag_counts**), split **`judge_low_confidence`** vs repeat **confidence** counts; **`campaign-semantic-summary.md`** surfaces these first; **`reports/campaign-report.md`** and **`campaign-analysis.json`** (**`judge_campaign_semantic`**) include the same signals. **Semantic summary** is written **before** the comparative report so **judge** sections can embed. **No change** to default deterministic scoring.
 
 - **Campaign reporting (readability)** — **`campaign-summary.md`** includes **At a glance** (mean-score spreads by sweep axis, backend means, semantic instability counts, execution-mode gaps, top **FT-\*** tags, semantic judge rollup hints). **`reports/campaign-report.md`** leads with the same digest plus member mean-score tables and fingerprint-axis sections. **`campaign-semantic-summary.md`** adds ranked **Instability hotspots** before detailed rollups. **`campaign-analysis.json`** includes **`mean_score_extremes_by_sweep_axis`** and member mean blocks. New committed example **`examples/campaign_runs/multi_suite/`** (two suites). **No change** to default rubric scoring or harness math.
 

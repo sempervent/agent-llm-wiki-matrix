@@ -68,6 +68,7 @@ def test_browser_file_runner_benchmark(
     assert "export clicked once" in req.prompt_text
     report_md = (out / "reports" / "report.md").read_text(encoding="utf-8")
     assert "Browser evidence (fixture summary)" in report_md
+    assert "### Browser traces (DOM, screenshots, extensions)" in report_md
     assert "v-file__p-one" in report_md
     assert "evidence.export_flow.v1" in report_md
 

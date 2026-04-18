@@ -1,0 +1,118 @@
+{
+  "aggregated_runtime": {
+    "cells_with_judge_parse_fallback": 0,
+    "member_runs_timed": 2,
+    "schema_version": 1,
+    "total_browser_phase_seconds": 0.012476999999999999,
+    "total_evaluation_phase_seconds": 0.0045520000000000005,
+    "total_judge_invocations": 0,
+    "total_judge_phase_seconds": 0.0,
+    "total_provider_completion_seconds": 3.9999999999999996e-05
+  },
+  "campaign_definition_fingerprint": "sha256:781642c343722637e819c84c11296d4fab2cd91be75102df3f1f743211ae6b76",
+  "campaign_experiment_fingerprints": {
+    "browser_configs": "sha256:591cbc3aa572200862e2f336261f05849fe93c17d226a939565815d0cb075961",
+    "campaign_definition": "sha256:781642c343722637e819c84c11296d4fab2cd91be75102df3f1f743211ae6b76",
+    "prompt_registry_state": "sha256:d409ed75b3cb355ac6727f09877d7ef98c40adce16e3e8284c6dcfe9c5c3db21",
+    "provider_configs": "sha256:69c4ef3c9876f8d46bd609d755baa1bb850cd8d9fdcbdee0748b6e10c36cf5f1",
+    "scoring_configs": "sha256:2c7f1b6d79305cde67076936152d80992802d413157de43143bac86c13c21fc8",
+    "suite_definitions": "sha256:3516abc8cd145dfb87d0d3bf89f2e1a6b02bbdab7a091b80fcb808a1953faffc"
+  },
+  "campaign_id": "campaign.examples.browser_evidence_compare.v1",
+  "campaign_version": "1.0.0",
+  "created_at": "1970-01-01T00:00:00Z",
+  "definition_source_relpath": "examples/campaigns/v1/browser_evidence_compare.v1.yaml",
+  "description": "Member runs differ by suite_ref; browser evidence section compares traces without live browsers.",
+  "dry_run": false,
+  "duration_seconds": 0.269969,
+  "expected_artifact_kinds": [],
+  "failures": [],
+  "finished_at_utc": "2026-04-18T01:11:09Z",
+  "fixture_mode_force_mock": true,
+  "generated_report_paths": {
+    "campaign_analysis_json": "reports/campaign-analysis.json",
+    "campaign_comparative_report_md": "reports/campaign-report.md",
+    "campaign_manifest": "manifest.json",
+    "campaign_semantic_summary_json": "campaign-semantic-summary.json",
+    "campaign_semantic_summary_md": "campaign-semantic-summary.md",
+    "campaign_summary_json": "campaign-summary.json",
+    "campaign_summary_md": "campaign-summary.md"
+  },
+  "git_commit_sha": "148517589c625e7fc468c35311d0bcd6939462bd",
+  "git_describe": "v0.2.2-dirty",
+  "inputs_snapshot": {
+    "browser_configs": [
+      null
+    ],
+    "eval_scoring_options": [
+      null
+    ],
+    "execution_modes": null,
+    "prompt_registry_ref": null,
+    "provider_config_refs": [
+      null
+    ],
+    "suite_refs": [
+      "fixtures/benchmarks/browser_checkout.v1.yaml",
+      "fixtures/benchmarks/browser_form.v1.yaml"
+    ]
+  },
+  "run_count": 2,
+  "run_status_summary": {
+    "failed": 0,
+    "succeeded": 2
+  },
+  "runs": [
+    {
+      "benchmark_id": "bench.fixtures.browser.checkout.v1",
+      "browser_config_applied": false,
+      "cell_count": 1,
+      "comparison_fingerprints": {
+        "browser_config": "sha256:dda4aeabb9afaebafd877fa47366f98b75cfb4b85e82c5284907c1c50a63a730",
+        "prompt_registry_state": "sha256:9604a174787655177b3c8c0e634e5a80348399f090bc741cac5825a8a5b128f2",
+        "prompt_set": "sha256:d64d0007d66dc64fc2af7b613b06bf34206ddcd09d7a9dc5e5eb209c133eaa02",
+        "provider_config": "sha256:a21f9f3dfa8d97e31e7fda04965e51bb8a25f8e5ca454efcafaba0ad229e3d9a",
+        "scoring_config": "sha256:f958bcbda76ceda7438ca44922ecf99f6ef81948463ec797c7b454a29b249496",
+        "suite_definition": "sha256:dfb8f3d095b1ec61cdc9993c8d8933d4928855cff904106f25b1c7c1d41d352a"
+      },
+      "duration_seconds": 0.029195,
+      "eval_scoring_label": "suite_default",
+      "manifest_relpath": "runs/run0000/manifest.json",
+      "mean_total_weighted_score": 0.571024,
+      "output_relpath": "runs/run0000",
+      "run_id": "campaign.examples.browser_evidence_compare.v1__0000",
+      "run_index": 0,
+      "status": "succeeded",
+      "suite_ref": "fixtures/benchmarks/browser_checkout.v1.yaml"
+    },
+    {
+      "benchmark_id": "bench.fixtures.browser.form.v1",
+      "browser_config_applied": false,
+      "cell_count": 1,
+      "comparison_fingerprints": {
+        "browser_config": "sha256:bc42b4965253463647d7cea2d176bb320017c0c21ec6c795e804a48d5eb7e576",
+        "prompt_registry_state": "sha256:9604a174787655177b3c8c0e634e5a80348399f090bc741cac5825a8a5b128f2",
+        "prompt_set": "sha256:02fe65d39ff3924b2421d9d4b8f5c7aeee174ab22a3aeead64b3c33e57052575",
+        "provider_config": "sha256:b5f7c632636d4760febd533304cbbe6f61de3ee5a7629ad12003023495b0d873",
+        "scoring_config": "sha256:f958bcbda76ceda7438ca44922ecf99f6ef81948463ec797c7b454a29b249496",
+        "suite_definition": "sha256:e6adf3e31a08495bb6b896ac69161e98f5cf4f0a05b74b960468f4f91ef4e3c2"
+      },
+      "duration_seconds": 0.017932,
+      "eval_scoring_label": "suite_default",
+      "manifest_relpath": "runs/run0001/manifest.json",
+      "mean_total_weighted_score": 0.36131,
+      "output_relpath": "runs/run0001",
+      "run_id": "campaign.examples.browser_evidence_compare.v1__0001",
+      "run_index": 1,
+      "status": "succeeded",
+      "suite_ref": "fixtures/benchmarks/browser_form.v1.yaml"
+    }
+  ],
+  "schema_version": 1,
+  "started_at_utc": "2026-04-18T01:11:09Z",
+  "tags": [
+    "example:campaign",
+    "axis:browser_evidence"
+  ],
+  "title": "Example \u2014 browser evidence contrast (checkout vs form fixtures)"
+}

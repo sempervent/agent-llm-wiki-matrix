@@ -93,6 +93,18 @@ uv run alwm benchmark longitudinal \
 
 This uses the **member** benchmark manifests only; the campaign root manifest is optional context for your own notes or dashboards.
 
+## Step 6 — Publish a result pack (optional)
+
+To bundle a completed campaign into a **git-friendly** directory with **`INDEX.md`**, **`campaign-result-pack.json`**, and the same layout as a normal campaign tree (for sharing or archiving), use **`alwm benchmark campaign pack`**. See [benchmark-campaigns.md](benchmark-campaigns.md) (Result pack section) and the committed example **`examples/campaign_result_packs/minimal_offline/`**.
+
+```bash
+uv run alwm benchmark campaign pack examples/campaign_runs/minimal_offline \
+  -o /tmp/my-pack \
+  --pack-id minimal-offline \
+  --source-label examples/campaign_runs/minimal_offline \
+  --created-at 1970-01-01T00:00:00Z
+```
+
 ## Optional — Re-run offline (writes new output)
 
 To regenerate the same shape of tree in a temporary directory (does not modify committed examples):
@@ -117,7 +129,7 @@ Dry-run writes **`campaign-dry-run.json`** plus top-level manifest and summaries
 
 ## See also
 
-- [benchmark-campaigns.md](benchmark-campaigns.md) — full field reference and CLI table
+- [benchmark-campaigns.md](benchmark-campaigns.md) — full field reference, CLI table, and **result packs**
 - [../wiki/campaign-orchestration.md](../wiki/campaign-orchestration.md) — concept, failure modes
 - [../tracking/campaign-orchestration.md](../tracking/campaign-orchestration.md) — exit criteria and verification
 - [../roadmap/v0.2.0.md](../roadmap/v0.2.0.md) — milestone context for fingerprints and campaigns

@@ -26,9 +26,11 @@ Before writing **complete**:
 | Capability | Suggested label | Why (evidence) |
 | --- | --- | --- |
 | `alwm validate` kinds | **complete** | `artifacts.py` + `tests/test_domain.py` / smoke |
+| Committed **`examples/`** / **`fixtures/`** contract drift guard | **complete** | **`just validate-artifacts`** (`tests/test_schema_drift_contracts.py`); inventory **`docs/audits/schema-drift-contracts-inventory.md`** |
 | `MockBrowserRunner` / `FileBrowserRunner` | **complete** | `tests/test_browser.py`; no network |
 | `PlaywrightBrowserRunner` | **partial** (optional) | Requires `[browser]` extra + `playwright install`; `tests/integration/` gated by `ALWM_PLAYWRIGHT_SMOKE=1` |
-| `MCPBrowserRunner` | **partial** | Fixture path **or** optional **stdio MCP** when `ALWM_MCP_BROWSER_COMMAND` is set (`browser/mcp_runner.py`, `browser/mcp_stdio.py`); requires `mcp` (**`dev`** extra); `alwm browser run-mcp`; IDE/remote MCP not a v0.2.0 goal (`docs/roadmap/v0.2.0.md`) |
+| `MCPBrowserRunner` | **partial** | Fixture path **or** optional **local stdio MCP** when `ALWM_MCP_BROWSER_COMMAND` is set (`browser/mcp_runner.py`, `browser/mcp_stdio.py`); requires `mcp` (**`dev`** extra); `alwm browser run-mcp`; default tests cover the **shipped** stdio fixture server (`tests/test_mcp_stdio.py`); **remote / IDE-hosted MCP** not in scope (`docs/roadmap/v0.2.0.md`, `docs/architecture/browser.md`) |
+| `browser_realism.v1` rubric | **partial** | **`examples/dataset/rubrics/browser_realism.v1.json`** — scores **grounding in committed `BrowserEvidence` JSON**; does **not** assert a live browser unless evidence came from **Playwright** (optional `[browser]`) |
 | `alwm benchmark run` (offline) | **complete** | `tests/test_benchmark.py`, `tests/test_benchmark_browser.py`; `browser_mock` variants run browser phase + write `browser_evidence.json` |
 | `alwm benchmark campaign run` (incl. `--dry-run`) | **complete** | `tests/test_benchmark_campaign.py`; manifests registered in `artifacts.py`; workflow **`docs/workflows/benchmark-campaigns.md`**, walkthrough **`docs/workflows/campaign-walkthrough.md`** |
 | Benchmark + **Playwright** | **partial** (opt-in) | Variant `browser.runner: playwright` requires `ALWM_BENCHMARK_PLAYWRIGHT=1` + `[browser]` extra; not in default CI |
@@ -37,4 +39,4 @@ Before writing **complete**:
 
 ## When to file drift
 
-If README, `AGENTS.md`, and `docs/architecture/*.md` disagree about a command or dependency, treat it as **drift**: fix docs or code in the same PR, or open a short note in `docs/implementation-log.md`.
+If README, `AGENTS.md`, **`docs/workflows/verification.md`**, and `docs/architecture/*.md` disagree about a verification command or dependency, treat it as **drift**: fix docs or code in the same PR, or open a short note in `docs/implementation-log.md`.

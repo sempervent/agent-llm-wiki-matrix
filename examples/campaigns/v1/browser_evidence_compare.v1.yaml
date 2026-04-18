@@ -1,0 +1,17 @@
+# Two browser-heavy suites: multi-step checkout (network + perf) vs form validation (a11y + console).
+# Comparative campaign report surfaces cross-run browser contrast (deterministic fixtures).
+schema_version: 1
+id: campaign.examples.browser_evidence_compare.v1
+title: Example — browser evidence contrast (checkout vs form fixtures)
+description: >-
+  Member runs differ by suite_ref; browser evidence section compares traces without live browsers.
+campaign_version: "1.0.0"
+benchmark_suites:
+  - fixtures/benchmarks/browser_checkout.v1.yaml
+  - fixtures/benchmarks/browser_form.v1.yaml
+provider_configs: []
+scoring_configs: []
+browser_configs: []
+tags:
+  - example:campaign
+  - axis:browser_evidence

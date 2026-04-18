@@ -1,0 +1,20 @@
+{
+  "benchmark_id": "bench.fixtures.browser.form.v1",
+  "created_at": "1970-01-01T00:00:00Z",
+  "entries": [
+    {
+      "col_label": "v-form",
+      "mean_abs_score_delta": 0.0,
+      "prompt_ids": [
+        "p-one"
+      ],
+      "row_label": "v-form",
+      "variant_i": "v-form",
+      "variant_j": "v-form"
+    }
+  ],
+  "matrix_id": "campaign.examples.browser_evidence_compare.v1__0001-pairwise",
+  "metric": "mean_abs_total_score_delta",
+  "run_id": "campaign.examples.browser_evidence_compare.v1__0001",
+  "schema_version": 1
+}

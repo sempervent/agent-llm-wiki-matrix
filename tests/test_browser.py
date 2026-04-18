@@ -11,13 +11,13 @@ from click.testing import CliRunner
 from agent_llm_wiki_matrix.artifacts import load_artifact_file
 from agent_llm_wiki_matrix.browser import (
     FileBrowserRunner,
+    MCPBrowserRunner,
     MockBrowserRunner,
     PlaywrightBrowserRunner,
     evidence_to_prompt_block,
     load_browser_evidence,
 )
 from agent_llm_wiki_matrix.browser.models import BrowserRunRequest
-from agent_llm_wiki_matrix.browser.stubs import MCPBrowserRunner
 from agent_llm_wiki_matrix.cli import main
 
 _REPO = Path(__file__).resolve().parents[1]

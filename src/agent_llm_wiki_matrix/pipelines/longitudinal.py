@@ -994,6 +994,20 @@ def render_provider_comparison_markdown(analysis: LongitudinalAnalysis, *, title
     lines.append("")
     lines.append("Full hashes are 72 characters (`sha256:` + 64 hex). Truncated above for layout.")
     lines.append("")
+    from agent_llm_wiki_matrix.benchmark.campaign_fingerprint_compare import (
+        build_fingerprint_axis_insights,
+        build_fingerprint_axis_interpretation,
+        render_fingerprint_axis_interpretation_markdown,
+    )
+
+    fp_ins = build_fingerprint_axis_insights(analysis.snapshots, analysis)
+    fp_interp = build_fingerprint_axis_interpretation(
+        analysis.snapshots,
+        analysis,
+        fp_ins,
+    )
+    lines.append(render_fingerprint_axis_interpretation_markdown(fp_interp).rstrip())
+    lines.append("")
     lines.append("## By run and backend kind")
     lines.append("")
     lines.append("| Run id | Benchmark | Backend kind | Cells | Mean score |")
@@ -1038,6 +1052,11 @@ def render_provider_comparison_markdown(analysis: LongitudinalAnalysis, *, title
 
 def analysis_to_summary_dict(analysis: LongitudinalAnalysis) -> dict[str, Any]:
     """JSON-serializable summary for CI and dashboards."""
+    from agent_llm_wiki_matrix.benchmark.campaign_fingerprint_compare import (
+        build_fingerprint_axis_insights,
+        build_fingerprint_axis_interpretation,
+    )
+
     fp_rows: list[dict[str, Any]] = []
     for s in analysis.snapshots:
         if s.comparison_fingerprints is None:
@@ -1051,6 +1070,12 @@ def analysis_to_summary_dict(analysis: LongitudinalAnalysis) -> dict[str, Any]:
                     ),
                 },
             )
+    fp_insights = build_fingerprint_axis_insights(analysis.snapshots, analysis)
+    fp_interpretation = build_fingerprint_axis_interpretation(
+        analysis.snapshots,
+        analysis,
+        fp_insights,
+    )
     return {
         "runs": len(analysis.snapshots),
         "comparison_fingerprints_by_run": fp_rows,
@@ -1066,6 +1091,7 @@ def analysis_to_summary_dict(analysis: LongitudinalAnalysis) -> dict[str, Any]:
             f"{y}-W{w:02d}": [s.run_id for s in snaps]
             for (y, w), snaps in analysis.weekly_buckets.items()
         },
+        "fingerprint_axis_interpretation": fp_interpretation,
     }
 
 

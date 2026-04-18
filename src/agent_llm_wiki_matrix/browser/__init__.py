@@ -9,7 +9,11 @@ from agent_llm_wiki_matrix.browser.formatting import (
     BrowserEvidenceReportRow,
     browser_evidence_report_row_from_evidence,
     evidence_to_prompt_block,
+    format_extensions_markdown,
     render_benchmark_browser_evidence_markdown,
+    render_browser_evidence_detail_markdown,
+    render_dom_excerpts_markdown,
+    render_screenshots_markdown,
 )
 from agent_llm_wiki_matrix.browser.load import load_browser_evidence
 from agent_llm_wiki_matrix.browser.mcp_runner import MCPBrowserRunner
@@ -42,6 +46,10 @@ __all__ = [
     "browser_evidence_report_row_from_evidence",
     "create_browser_runner",
     "evidence_to_prompt_block",
+    "format_extensions_markdown",
     "load_browser_evidence",
     "render_benchmark_browser_evidence_markdown",
+    "render_browser_evidence_detail_markdown",
+    "render_dom_excerpts_markdown",
+    "render_screenshots_markdown",
 ]
