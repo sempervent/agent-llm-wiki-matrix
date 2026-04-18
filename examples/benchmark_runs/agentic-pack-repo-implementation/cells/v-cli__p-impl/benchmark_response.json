@@ -1,0 +1,19 @@
+{
+  "agent_stack": "alwm-cli",
+  "backend_kind": "mock",
+  "backend_model": "mock-model",
+  "benchmark_id": "bench.agentic.pack.repo_implementation.v1",
+  "created_at": "1970-01-01T00:00:00Z",
+  "duration_ms": 6,
+  "execution_mode": "cli",
+  "id": "resp-v-cli-p-impl",
+  "prompt_id": "p-impl",
+  "prompt_registry_id": "bench.task.repo_implementation.v1",
+  "prompt_source": "registry",
+  "prompt_source_relpath": "prompts/versions/bench.task.repo_implementation.v1.txt",
+  "prompt_text": "Repo implementation task (agentic benchmark): you will ship a small, bounded code change in agent-llm-wiki-matrix.\n\nAssume the goal is to add a new optional CLI flag `--dry-run` to an existing `alwm` subcommand (pick `validate` as the example). Respond with: (1) the exact files you would edit (repo-relative paths), (2) a step-by-step sequence including where to add tests, (3) how you would run `just ci` to verify, and (4) one risk or rollback note. Do not paste full patches\u2014focus on a credible implementation plan grounded in this repository\u2019s layout (`src/agent_llm_wiki_matrix/`, `tests/`, `justfile`).\n",
+  "registry_document_version": "0.4.0",
+  "response_text": "[mock:mock-model] a7f33410f71c44fb",
+  "schema_version": 1,
+  "variant_id": "v-cli"
+}

@@ -37,6 +37,28 @@ Example and production definitions may add **optional** fields (older suites omi
 | `retry_policy` | `{ max_attempts, backoff_seconds }` for agent implementations (harness does not loop yet). |
 | `tags` | Free-form labels for filters and dashboards. |
 | `expected_artifact_kinds` | Registered `alwm validate` kinds expected when reviewing cells. |
+| `success_criteria` | Human-readable pass conditions for comparing external agent systems (metadata; copied to **`manifest.json`**). |
+| `failure_taxonomy_hints` | Suggested failure-class labels for cross-system or longitudinal reports (metadata). |
+
+**Determinism classification** is **`taxonomy.determinism`** (`deterministic_fixture`, `deterministic_scoring`, `stochastic_live`). The **agentic benchmark pack** (`examples/benchmark_suites/v1/agentic/`) documents cross-system use: **`docs/workflows/agentic-benchmark-pack.md`**.
+
+### Eval scoring backends (optional)
+
+| Field | Meaning |
+| --- | --- |
+| `eval_scoring.backend` | `deterministic` (default): byte-hash rubric scores. `semantic_judge`: LLM returns JSON scores per criterion. `hybrid`: per-criterion blend of deterministic + semantic. |
+| `eval_scoring.hybrid` | When `backend` is `hybrid`: `deterministic_weight` and `semantic_weight` (must sum to 1.0). |
+| `eval_scoring.judge_provider_ref` | Optional repo-relative providers YAML for the judge; otherwise **`--provider-config`** on `alwm benchmark run`. |
+| `eval_scoring.judge_repeats` | Number of semantic judge calls per cell (default **1**). When **>1**, per-criterion scores are aggregated (see below) and **`evaluation_judge_provenance.json`** includes **`repeat_aggregation`** (per-run raw text, disagreement metrics, optional low-confidence flags). |
+| `eval_scoring.semantic_aggregation` | **`mean`** (default), **`median`**, or **`trimmed_mean`** (combines scores across `judge_repeats`). |
+| `eval_scoring.trim_fraction` | For **`trimmed_mean`**: fraction removed from each tail before averaging (default **0.1**). |
+| `eval_scoring.judge_max_*` | Optional thresholds (`judge_max_criterion_range`, `judge_max_criterion_stdev`, `judge_max_mean_criterion_stdev`, `judge_max_total_weighted_stdev`) that set **`judge_low_confidence`** on **`evaluation.json`** when repeated-run disagreement exceeds them. |
+
+Each successful **`alwm benchmark run`** writes **`comparison_fingerprints`** on **`manifest.json`**: six **`sha256:`** axes (suite definition, prompt set, per-variant provider configs, scoring config, browser config, **prompt registry state**) so runs can be grouped and compared longitudinally without re-reading YAML.
+
+CLI: **`--eval-scoring-backend`**, **`--judge-provider-config`**. With **`ALWM_FIXTURE_MODE=1`**, the judge uses a **mock** provider with deterministic pseudo-semantic scores (CI-safe). Opt-in live judge: set **`ALWM_JUDGE_LIVE=1`** (and configure Ollama / OpenAI-compatible env vars). Semantic or hybrid runs write **`cells/.../evaluation_judge_provenance.json`** (full judge prompt, provider, raw response(s), aggregated parsed scores, hybrid aggregation when applicable, **`repeat_aggregation`** when **`judge_repeats` > 1**) and reference it from **`evaluation.json`**.
+
+**`alwm evaluate`** (non-deterministic backends): **`--judge-repeats`**, **`--semantic-aggregation`**, **`--trim-fraction`**, and the same **`--judge-max-...`** threshold flags.
 
 These copy into **`manifest.json`** when set. Example suites: `examples/benchmark_suites/v1/suite.taxonomy.*.v1.yaml`; example runs with taxonomy: `examples/benchmark_runs/taxonomy-repo-governance/`, `taxonomy-runtime-config/`.
 
@@ -67,12 +89,16 @@ Artifacts (under `--output-dir`; lexicographic cell order in `manifest.json`):
 - `reports/report.json`, `reports/report.md` — **report** JSON + generated Markdown.
 - `manifest.json` — run summary with **cells[]** path index; may include **`definition_source_relpath`** and **`prompt_registry_effective_ref`** for reproducibility when the definition path and registry-backed prompts are known. Validate with **`alwm validate <path> benchmark_manifest`** (JSON Schema `schemas/v1/manifest.schema.json` + Pydantic `BenchmarkRunManifest`). The harness writes manifests that pass this check; older committed runs may omit optional provenance keys entirely (still valid).
 
+For a **full-application smoke** gate (pytest + host CLI + Docker offline benchmark + failure recovery analysis), see [smoke.md](smoke.md).
+
 ## Docker Compose
 
 | Recipe | Profile | Notes |
 | --- | --- | --- |
 | `just benchmark-offline` | `benchmark-offline` | Mock-only; `ALWM_FIXTURE_MODE=1`; writes `out/benchmark-offline`. |
-| `just benchmark-ollama` | `benchmark-ollama` | Ollama service has a **healthcheck** (`ollama list`); `benchmark-ollama` waits for **healthy**. Pull a model first, e.g. `docker compose --profile benchmark-ollama exec ollama ollama pull llama3.2`. |
+| `just benchmark-ollama` | `benchmark-ollama` | Full Compose benchmark using **`benchmarks/v1/ollama.v1.yaml`** ( **`gpt-oss:20b`** ). Run **`just ollama-gptoss-setup`** first so the model is pulled and verified. |
+| `just ollama-gptoss-setup` | `benchmark-ollama` | Start Ollama, pull **`gpt-oss:20b`**, **`alwm benchmark probe`** from the host. Models live under **`OLLAMA_MODELS_DIR`** (default **`./.ollama-models`**). |
+| `just smoke-ollama-live` | (host) | Opt-in minimal live benchmark (`benchmarks/v1/ollama.v1.yaml`); requires reachable Ollama with the model pulled. Not part of **`just ci`**. |
 | `just benchmark-probe` | `benchmark-probe` | Runs `alwm benchmark probe` with `OLLAMA_HOST=http://ollama:11434` and host `OPENAI_BASE_URL` for llama.cpp — no full benchmark, only API reachability. |
 | `just benchmark-llamacpp` | `benchmark-llamacpp` | Points `OPENAI_BASE_URL` at `LLAMACPP_OPENAI_BASE_URL` (default `http://host.docker.internal:8080/v1`); start `llama-server` on the host first. |
 
@@ -84,6 +110,36 @@ alwm benchmark probe
 OLLAMA_HOST=http://127.0.0.1:11434 OPENAI_BASE_URL=http://127.0.0.1:8080/v1 alwm benchmark probe
 ```
 
+### Ollama (gpt-oss:20b) local workflow
+
+The repo standardizes on **OpenAI gpt-oss** at the **`gpt-oss:20b`** tag in Ollama (see [Ollama library](https://ollama.com/library/gpt-oss)). Benchmark definitions and provider defaults use that tag so **`benchmarks/v1/ollama.v1.yaml`**, **`config/providers.example.yaml`**, and **`OLLAMA_MODEL`** stay aligned.
+
+1. **One-shot setup (recommended):** `just ollama-gptoss-setup` — starts the Compose **`ollama`** service, waits for the CLI, pulls **`gpt-oss:20b`** into the bind-mounted store (default **`./.ollama-models`**), then runs **`alwm benchmark probe`** against **`http://127.0.0.1:11434`** to confirm the API and model list.
+2. **Full Compose benchmark:** `just benchmark-ollama` (after setup; writes **`out/benchmark-ollama`**).
+3. **Host-only minimal live smoke:** `just smoke-ollama-live` — probes, then **`alwm benchmark run --definition benchmarks/v1/ollama.v1.yaml`** with **`--no-fixture-mock`** (output default **`$TMPDIR/alwm-smoke-ollama`**, override with **`ALWM_SMOKE_OLLAMA_OUT`**).
+
+Environment overrides: **`OLLAMA_PULL_MODEL`**, **`OLLAMA_PROBE_HOST`** (for **`ollama-gptoss-setup.sh`**), **`OLLAMA_HOST`**, **`OLLAMA_MODEL`** (defaults **`gpt-oss:20b`** in **`config/providers.example.yaml`** and the **`alwm benchmark probe`** CLI default).
+
+#### Migrating from the old named Docker volume to `./.ollama-models`
+
+Earlier Compose used a **named volume** (`ollama_models`) for `/root/.ollama`. The stack now **bind-mounts** **`OLLAMA_MODELS_DIR`** (default **`./.ollama-models`**) so blobs are visible on the host and easy to back up.
+
+1. Stop containers: `docker compose --profile benchmark-ollama down` (adjust profile if needed).
+2. Find the old volume: `docker volume ls | grep ollama` (often `*_ollama_models` depending on project name).
+3. Copy data into the bind mount (example; replace `VOLUME_NAME`):
+
+   ```bash
+   mkdir -p .ollama-models
+   docker run --rm -v VOLUME_NAME:/from -v "$PWD/.ollama-models:/to" alpine \
+     sh -c 'cp -a /from/. /to/'
+   ```
+
+4. Remove the old volume only after verifying pulls work: `docker volume rm VOLUME_NAME` (destructive).
+
+5. Bring Ollama back: `just ollama-gptoss-setup` or `docker compose --profile benchmark-ollama up -d ollama`.
+
+If you skip migration, Ollama simply downloads models again into **`./.ollama-models`**.
+
 ## Integration tests (opt-in)
 
 Default **`just test`** / **`just ci`** run **`pytest tests/ --ignore=tests/integration`** so CI never requires Ollama or llama.cpp.
@@ -92,7 +148,7 @@ To verify end-to-end benchmark cells against **live** backends:
 
 1. Start services (or use Compose profiles above).
 2. Export **one or both** flags:
-   - `ALWM_LIVE_BENCHMARK_OLLAMA=1` — uses `OLLAMA_HOST` (default `http://127.0.0.1:11434`) and `OLLAMA_MODEL` (default `llama3.2`).
+   - `ALWM_LIVE_BENCHMARK_OLLAMA=1` — uses `OLLAMA_HOST` (default `http://127.0.0.1:11434`) and `OLLAMA_MODEL` (default **`gpt-oss:20b`**).
    - `ALWM_LIVE_BENCHMARK_LLAMACPP=1` — uses `OPENAI_BASE_URL` and `OPENAI_MODEL` (default `gpt-oss` to match `benchmarks/v1/llamacpp.v1.yaml`).
 3. Run:
 
@@ -102,6 +158,10 @@ just test-integration
 ```
 
 Tests **skip** (fixture-safe) when the flag is unset, when the HTTP probe fails (connection error), or when Ollama has no matching model pulled. The OpenAI-compatible probe treats any HTTP response on ``GET …/v1/models`` with a non-server-error status as reachable (some llama.cpp builds return 404 for that route while chat still works).
+
+## Campaign sweeps (multi-run)
+
+Orchestrate many benchmark runs from one definition (suites × providers × eval scoring × browser overrides): **`docs/workflows/benchmark-campaigns.md`**, CLI **`alwm benchmark campaign run`** (execute) and **`alwm benchmark campaign run --dry-run`** (plan only: **`campaign-dry-run.json`**, no member **`runs/`**). Each member run is a standard benchmark directory; aggregate index is **`manifest.json`** at the campaign root. Wiki: **`docs/wiki/campaign-orchestration.md`** (concept) and **`docs/wiki/benchmark-campaigns.md`** (index); ADR: **`docs/adr/0001-campaign-orchestration.md`** or **`docs/architecture/adr/0001-benchmark-campaign-orchestration.md`**; tracking: **`docs/tracking/campaign-orchestration.md`**.
 
 ## Determinism
 

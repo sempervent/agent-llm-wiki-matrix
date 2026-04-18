@@ -1,0 +1,23 @@
+{
+  "aggregation_notes": null,
+  "evaluation_id": "fixture-eval-judge-001",
+  "evaluation_ref": "fixtures/v1/evaluation.json",
+  "hybrid_aggregation": null,
+  "judge_system_prompt": "You are an expert rubric judge.",
+  "judge_user_prompt": "RUBRIC (JSON): {}\n\nRESPONSE TO SCORE:\nhello",
+  "parse_error": null,
+  "parse_ok": true,
+  "parsed_criterion_scores": {
+    "clarity": 0.75,
+    "traceability": 0.65
+  },
+  "provider": {
+    "kind": "mock",
+    "model": "mock-model"
+  },
+  "raw_response_text": "{\"scores\": {\"clarity\": 0.75, \"traceability\": 0.65}, \"rationale\": \"fixture\"}",
+  "rubric_id": "rubric.smoke.v1",
+  "schema_version": 1,
+  "scoring_backend": "semantic_judge",
+  "subject_ref": "fixtures/v1/thought.json"
+}

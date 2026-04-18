@@ -1,0 +1,18 @@
+{
+  "benchmark_id": "bench.agentic.pack.browser_interpretation.v1",
+  "browser_evidence_relpath": "cells/v-browser__p-browser/browser_evidence.json",
+  "browser_runner": "file",
+  "cell_id": "v-browser__p-browser",
+  "created_at": "1970-01-01T00:00:00Z",
+  "id": "req__agentic-pack-browser-interpretation-example__v-browser__p-browser",
+  "model": "mock-model",
+  "prompt_id": "p-browser",
+  "prompt_registry_id": "bench.task.browser_evidence.v1",
+  "prompt_source": "registry",
+  "prompt_source_relpath": "prompts/versions/bench.task.browser_evidence.v1.txt",
+  "prompt_text": "Browser-evidence interpretation (fixture-only; no live browser). The deterministic trace JSON is committed at fixtures/browser_evidence/v1/export_flow.json. Summarize the navigation sequence, list what you would capture in a BrowserEvidence-shaped summary for auditors, and note one limitation of file-backed evidence versus live Playwright traces.\n\n## Browser evidence (runner=file)\n\n### Browser evidence (structured)\n- **id:** evidence.export_flow.v1\n- **title:** Abstract trace: Home \u2192 Settings \u2192 Export\n- **navigation:**\n  - https://example.test/ \u201cHome\u201d [navigate]\n  - https://example.test/settings \u201cSettings\u201d [navigate]\n  - https://example.test/settings/export \u201cExport\u201d [click]\n- **console:**\n  - [log] export clicked once\n  - [log] no errors in console\n- **notes:** Deterministic fixture (no PII). Matches benchmark case.browser.evidence narrative.\n",
+  "registry_document_version": "0.4.0",
+  "run_id": "agentic-pack-browser-interpretation-example",
+  "schema_version": 1,
+  "variant_id": "v-browser"
+}

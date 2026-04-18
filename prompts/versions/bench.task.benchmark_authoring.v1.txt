@@ -1,0 +1,3 @@
+Benchmark suite authoring (agentic benchmark): design a minimal `BenchmarkDefinitionV1` YAML file that could live under `examples/benchmark_suites/v1/` for an offline mock run.
+
+Include: a stable `id` and `title`, `rubric_ref` pointing at `examples/dataset/rubrics/comparison.v1.json`, exactly one `prompts` entry using `prompt_ref: bench.sample.prompt.v1`, and one `variants` entry with `execution_mode: cli`, `backend.kind: mock`, and `agent_stack` of your choice. Explain briefly why `expected_artifact_kinds` would list `benchmark_request` and `evaluation` at minimum. Do not emit a full YAML block unless helpful—structured bullets are fine.

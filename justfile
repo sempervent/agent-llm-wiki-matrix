@@ -1,54 +1,55 @@
 # agent-llm-wiki-matrix — run `just` to list recipes (https://github.com/casey/just)
+#
+# Canonical host workflow uses uv (see AGENTS.md): `uv venv`, `uv pip install`, `uv run …`.
+# Recipes invoke tools via `uv run` so an activated venv is optional.
 
 set dotenv-load
-
-# Prefer project venv when present (same behavior as the former Makefile).
-python := `test -x .venv/bin/python && echo .venv/bin/python || command -v python3`
-pip := python + " -m pip"
 
 # Default: show available recipes
 default:
     @just --list
 
-# Install package (non-editable)
+# Install package (non-editable) — uses project .venv when present
 install:
-    {{pip}} install .
+    uv pip install .
 
 # Editable install + dev dependencies
 install-dev:
-    {{pip}} install -e ".[dev]"
+    uv pip install -e ".[dev]"
 
 test:
-    {{python}} -m pytest tests/ --ignore=tests/integration
+    uv run pytest tests/ --ignore=tests/integration
 
 # Live Ollama / llama.cpp benchmark verification (opt-in env vars; skips if unreachable)
 test-integration:
-    {{python}} -m pytest tests/integration/ -v -m integration
+    uv run pytest tests/integration/ -v -m integration
 
+# Full-stack smoke: pytest -m smoke, host `alwm` benchmark + campaign + validate, Docker compose + offline benchmark.
+# On failure, prints a recovery analysis. `SMOKE_SKIP_DOCKER=1` skips Docker phases. See `docs/workflows/smoke.md`.
 smoke:
-    {{python}} -m pytest tests/test_smoke.py -v
+    ./scripts/smoke.sh
 
 lint:
-    {{python}} -m ruff check src tests
+    uv run ruff check src tests
 
 fmt:
-    {{python}} -m ruff format src tests
+    uv run ruff format src tests
 
 typecheck:
-    {{python}} -m mypy src
+    uv run mypy src
 
 ci: lint typecheck test
 
 # Opt-in: pytest integration/ (Ollama + OpenAI-compatible benchmarks); skips unless env set / reachable
 verify-live-providers:
-    {{python}} -m pytest tests/integration/test_live_benchmark_providers.py -v -m integration --strict-markers
+    uv run pytest tests/integration/test_live_benchmark_providers.py -v -m integration --strict-markers
 
-# Opt-in: Playwright file:// smoke (requires `pip install -e ".[browser]"` and `playwright install chromium` on host)
+# Opt-in: Playwright file:// smoke (requires `uv pip install -e ".[browser]"` and `uv run playwright install chromium` on host)
 verify-playwright-local:
     #!/usr/bin/env bash
     set -euo pipefail
     export ALWM_PLAYWRIGHT_SMOKE=1
-    {{python}} -m pytest tests/integration/test_playwright_browser.py -v -m integration --strict-markers
+    uv run pytest tests/integration/test_playwright_browser.py -v -m integration --strict-markers
 
 # Build browser-test image and run Playwright integration tests in Compose (headless; no external network)
 browser-verify:
@@ -65,10 +66,10 @@ compose-help:
     set -euo pipefail
     profiles=(dev test benchmark benchmark-offline benchmark-ollama benchmark-probe benchmark-llamacpp browser-verify)
     for p in "${profiles[@]}"; do
-      docker compose --profile "$p" config >/dev/null
+        docker compose --profile "$p" config >/dev/null
     done
     for p in "${profiles[@]}"; do
-      docker compose --profile "$p" config --services
+        docker compose --profile "$p" config --services
     done
 
 benchmark-offline:
@@ -77,9 +78,61 @@ benchmark-offline:
 benchmark-ollama:
     docker compose --profile benchmark-ollama run --rm benchmark-ollama
 
+# First-class local workflow: start Compose Ollama, pull gpt-oss:20b, verify via `alwm benchmark probe` (bind-mounted `./.ollama-models`).
+ollama-gptoss-setup:
+    ./scripts/ollama-gptoss-setup.sh
+
+# Opt-in live smoke: minimal Ollama benchmark (requires `ollama-gptoss-setup` or equivalent). Not part of `just ci`.
+smoke-ollama-live:
+    ./scripts/smoke-ollama-live.sh
+
 # Ollama + host OpenAI-compatible probe (inside compose; pulls ollama service)
 benchmark-probe:
     docker compose --profile benchmark-probe run --rm benchmark-probe
 
 benchmark-llamacpp:
     docker compose --profile benchmark-llamacpp run --rm benchmark-llamacpp
+
+# campaign smoke test
+campaign-smoke output_dir="/tmp/alwm-campaign-smoke" created_at="2026-04-17T00:00:00Z":
+    rm -rf {{output_dir}}
+    uv run alwm benchmark campaign run \
+        --definition examples/campaigns/v1/minimal_offline.v1.yaml \
+        --output-dir {{output_dir}} \
+        --created-at {{created_at}}
+    uv run alwm validate {{output_dir}}/manifest.json benchmark_campaign_manifest
+    uv run alwm validate {{output_dir}}/campaign-summary.json campaign_summary
+
+
+verify-campaign-smoke output_dir="/tmp/alwm-campaign-smoke" created_at="2026-04-17T00:00:00Z":
+    rm -rf {{output_dir}}
+    uv run alwm benchmark campaign run \
+        --definition examples/campaigns/v1/minimal_offline.v1.yaml \
+        --output-dir {{output_dir}} \
+        --created-at {{created_at}}
+    uv run alwm validate {{output_dir}}/manifest.json benchmark_campaign_manifest
+    uv run alwm validate {{output_dir}}/campaign-summary.json campaign_summary
+
+
+# Pull only (no probe). Prefer `just ollama-gptoss-setup` for start + pull + verify.
+ollama-pull-model model="gpt-oss:20b":
+    docker compose --profile benchmark-ollama up -d ollama
+    docker compose --profile benchmark-ollama exec ollama ollama pull {{model}}
+    docker compose --profile benchmark-ollama exec ollama ollama list
+
+# Start Ollama (Compose), list models, then open an interactive REPL (Ctrl+D / exit to quit).
+# Override model: `just ollama-chat model=gpt-oss:20b`. Pull first if missing: `just ollama-pull-model model=…`.
+ollama-chat model="gpt-oss:20b":
+    #!/usr/bin/env bash
+    set -euo pipefail
+    docker compose --profile benchmark-ollama up -d ollama
+    echo "=== ollama list ==="
+    docker compose --profile benchmark-ollama exec -it ollama ollama list
+    echo ""
+    echo "=== interactive chat: {{model}} (OLLAMA_MODEL for this session) ==="
+    export OLLAMA_MODEL="{{model}}"
+    docker compose --profile benchmark-ollama exec -it ollama ollama run "{{model}}"
+
+# Back-compat name; same as smoke-ollama-live.
+verify-ollama-gptoss-smoke:
+    ./scripts/smoke-ollama-live.sh

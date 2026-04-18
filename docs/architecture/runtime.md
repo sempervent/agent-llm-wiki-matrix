@@ -18,7 +18,7 @@ See `.env.example`. Notable keys:
 | `ALWM_FIXTURE_MODE` | When `1`, benchmarks prefer fixtures and force mock backends unless `--no-fixture-mock` |
 | `ALWM_PROVIDER` | `mock`, `ollama`, or `openai_compatible` |
 | `ALWM_PROVIDER_CONFIG` | Optional path to YAML (see `config/providers.example.yaml`) |
-| `OLLAMA_HOST`, `OLLAMA_MODEL` | Ollama endpoint overrides |
+| `OLLAMA_HOST`, `OLLAMA_MODEL` | Ollama endpoint overrides (default model **gpt-oss:20b**) |
 | `OPENAI_BASE_URL`, `OPENAI_API_KEY`, `OPENAI_MODEL` | OpenAI-compatible server overrides |
 | `LLAMACPP_OPENAI_BASE_URL` | Override for Compose **benchmark-llamacpp** (default `host.docker.internal:8080/v1`) |
 | `ALWM_LIVE_BENCHMARK_OLLAMA` | Set `1` to enable opt-in pytest live Ollama benchmark tests |
@@ -28,7 +28,7 @@ See `.env.example`. Notable keys:
 ## Browser abstraction
 
 - **Offline / CI:** `MockBrowserRunner`, `FileBrowserRunner`, JSON under `fixtures/browser_evidence/v1/` (see `docs/architecture/browser.md`).
-- **CLI:** `alwm browser prompt-block <path>`, `alwm browser run-mock`, `alwm browser run-playwright` (requires `pip install '.[browser]'`).
+- **CLI:** `alwm browser prompt-block <path>`, `alwm browser run-mock`, `alwm browser run-playwright` (requires `uv pip install -e '.[browser]'` and browser install via `uv run playwright install …`).
 - **Optional live:** `PlaywrightBrowserRunner` in `browser/playwright_runner.py` maps sessions to `BrowserEvidence` (extra `[browser]`).
 - **Stub:** `MCPBrowserRunner` raises `NotImplementedError` until MCP integration lands.
 

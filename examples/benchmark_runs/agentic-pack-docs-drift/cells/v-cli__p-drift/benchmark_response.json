@@ -1,0 +1,19 @@
+{
+  "agent_stack": "alwm-cli",
+  "backend_kind": "mock",
+  "backend_model": "mock-model",
+  "benchmark_id": "bench.agentic.pack.docs_drift_repair.v1",
+  "created_at": "1970-01-01T00:00:00Z",
+  "duration_ms": 0,
+  "execution_mode": "cli",
+  "id": "resp-v-cli-p-drift",
+  "prompt_id": "p-drift",
+  "prompt_registry_id": "bench.task.docs_drift_repair.v1",
+  "prompt_source": "registry",
+  "prompt_source_relpath": "prompts/versions/bench.task.docs_drift_repair.v1.txt",
+  "prompt_text": "Documentation drift repair (agentic benchmark): the README quickstart says contributors should use **uv** for local setup, but a hypothetical stale paragraph still mentions `pip install -e \".[dev]\"` without uv.\n\nDescribe how you would find and fix the drift: (1) which files you would search (name paths under `docs/`, `README.md`, `AGENTS.md` as relevant), (2) the minimal edit strategy so docs stay consistent, (3) what you would run to verify links and commands still match (`just ci`, spot `alwm --help`), and (4) one sentence for an implementation-log entry. Ground answers in this repository\u2019s documentation layout.\n",
+  "registry_document_version": "0.4.0",
+  "response_text": "[mock:mock-model] b14a3d0b3c40b9da",
+  "schema_version": 1,
+  "variant_id": "v-cli"
+}

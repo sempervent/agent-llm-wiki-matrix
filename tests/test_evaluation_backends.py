@@ -12,6 +12,7 @@ from agent_llm_wiki_matrix.benchmark import run_benchmark
 from agent_llm_wiki_matrix.benchmark.definitions import BenchmarkDefinitionV1, EvalHybridWeights
 from agent_llm_wiki_matrix.models import Evaluation, EvaluationJudgeProvenance
 from agent_llm_wiki_matrix.pipelines.evaluation_backends import (
+    JudgeRepeatParams,
     evaluate_with_scoring_backend,
     parse_judge_json,
 )
@@ -25,6 +26,33 @@ def test_parse_judge_json_ok() -> None:
     scores, err = parse_judge_json(raw)
     assert err is None
     assert scores == {"a": 0.25, "b": 1.0}
+
+
+def test_mock_semantic_single_run_omits_repeat_metadata() -> None:
+    rubric_path = _REPO / "fixtures" / "v1" / "rubric.json"
+    cfg = load_judge_provider_config(
+        yaml_path=None,
+        environ={"ALWM_FIXTURE_MODE": "1"},
+        judge_live=False,
+    )
+    ev, prov = evaluate_with_scoring_backend(
+        subject_ref="cells/x__y/benchmark_response.json",
+        text="hello fixture",
+        rubric_path=rubric_path,
+        evaluation_id="e1",
+        evaluated_at="1970-01-01T00:00:00Z",
+        scoring_backend="semantic_judge",
+        hybrid_weights=None,
+        judge_provider_cfg=cfg,
+        judge_live=False,
+        evaluation_json_relpath="cells/x__y/evaluation.json",
+        judge_repeat=JudgeRepeatParams(count=1),
+    )
+    assert ev.judge_repeat_count is None
+    assert ev.judge_semantic_aggregation is None
+    assert ev.judge_low_confidence is None
+    assert prov is not None
+    assert prov.repeat_aggregation is None
 
 
 def test_mock_semantic_produces_provenance_and_evaluation() -> None:
@@ -52,6 +80,40 @@ def test_mock_semantic_produces_provenance_and_evaluation() -> None:
     assert prov.provider.kind == "mock"
     assert prov.parse_ok is True
     assert set(ev.scores.keys()) == {"clarity", "traceability"}
+
+
+def test_repeated_semantic_aggregation_provenance_and_low_confidence() -> None:
+    rubric_path = _REPO / "fixtures" / "v1" / "rubric.json"
+    cfg = load_judge_provider_config(
+        yaml_path=None,
+        environ={"ALWM_FIXTURE_MODE": "1"},
+        judge_live=False,
+    )
+    ev, prov = evaluate_with_scoring_backend(
+        subject_ref="subj",
+        text="repeat me",
+        rubric_path=rubric_path,
+        evaluation_id="e-repeat",
+        evaluated_at="1970-01-01T00:00:00Z",
+        scoring_backend="semantic_judge",
+        hybrid_weights=None,
+        judge_provider_cfg=cfg,
+        judge_live=False,
+        evaluation_json_relpath="eval.json",
+        judge_repeat=JudgeRepeatParams(
+            count=3,
+            strategy="mean",
+            max_criterion_range=0.0,
+        ),
+    )
+    assert ev.judge_repeat_count == 3
+    assert ev.judge_semantic_aggregation == "mean"
+    assert ev.judge_low_confidence is True
+    assert prov is not None and prov.repeat_aggregation is not None
+    assert prov.repeat_aggregation.repeat_count == 3
+    assert len(prov.repeat_aggregation.runs) == 3
+    assert prov.repeat_aggregation.confidence.low_confidence is True
+    assert prov.repeat_aggregation.disagreement.max_range_across_criteria > 0.0
 
 
 def test_hybrid_differs_from_pure_deterministic() -> None:
@@ -98,7 +160,11 @@ def test_benchmark_run_semantic_mock_writes_provenance(
                     "backend": {"kind": "mock", "model": "mock-model"},
                 },
             ],
-            "eval_scoring": {"backend": "semantic_judge"},
+            "eval_scoring": {
+                "backend": "semantic_judge",
+                "judge_repeats": 2,
+                "semantic_aggregation": "median",
+            },
         },
     )
     out = tmp_path / "run"

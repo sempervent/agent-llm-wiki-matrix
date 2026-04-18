@@ -63,7 +63,7 @@ These are **supported combinations** for building and running v0.1.0 as document
 | Requirement | Source of truth |
 | --- | --- |
 | **Python 3.11+** | `pyproject.toml` `requires-python = ">=3.11"`; `Dockerfile` uses `python:3.11-slim-bookworm`. |
-| **Editable install** | `pip install -e ".[dev]"` (see `README.md`). |
+| **Editable install** | `uv venv` + `uv pip install -e ".[dev]"`; run checks with **`uv run just ci`** (see `README.md` and **`AGENTS.md`**). |
 | **CLI** | `alwm` console script from `[project.scripts]`. |
 
 ### Docker Compose

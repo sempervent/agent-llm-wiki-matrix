@@ -1,0 +1,19 @@
+{
+  "agent_stack": "alwm-cli",
+  "backend_kind": "mock",
+  "backend_model": "mock-model",
+  "benchmark_id": "bench.agentic.pack.multi_agent_coordination.v1",
+  "created_at": "1970-01-01T00:00:00Z",
+  "duration_ms": 0,
+  "execution_mode": "cli",
+  "id": "resp-v-cli-p-coord",
+  "prompt_id": "p-coord",
+  "prompt_registry_id": "bench.task.multi_agent_coord.v1",
+  "prompt_source": "registry",
+  "prompt_source_relpath": "prompts/versions/bench.task.multi_agent_coord.v1.txt",
+  "prompt_text": "Multi-agent coordination: two autonomous coding agents work on the same git repository during the same sprint. Describe a concrete handoff protocol: how they partition ownership of `docs/`, `src/`, and `prompts/`; how they avoid conflicting edits to `AGENTS.md` and shared audits; what the merge coordinator checks before integrating (name artifact kinds like `benchmark_manifest` and `evaluation`). Under 260 words, bullet outline acceptable.\n",
+  "registry_document_version": "0.4.0",
+  "response_text": "[mock:mock-model] 12e84e861ae97190",
+  "schema_version": 1,
+  "variant_id": "v-cli"
+}

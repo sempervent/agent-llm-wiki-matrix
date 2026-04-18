@@ -1,0 +1,33 @@
+{
+  "console_messages": [
+    {
+      "level": "log",
+      "text": "export clicked once"
+    },
+    {
+      "level": "log",
+      "text": "no errors in console"
+    }
+  ],
+  "id": "evidence.export_flow.v1",
+  "navigation_sequence": [
+    {
+      "action": "navigate",
+      "title": "Home",
+      "url": "https://example.test/"
+    },
+    {
+      "action": "navigate",
+      "title": "Settings",
+      "url": "https://example.test/settings"
+    },
+    {
+      "action": "click",
+      "title": "Export",
+      "url": "https://example.test/settings/export"
+    }
+  ],
+  "notes": "Deterministic fixture (no PII). Matches benchmark case.browser.evidence narrative.",
+  "schema_version": 1,
+  "title": "Abstract trace: Home \u2192 Settings \u2192 Export"
+}

@@ -1,0 +1,42 @@
+# Agentic cross-system pack — documentation drift detection and repair.
+schema_version: 1
+id: bench.agentic.pack.docs_drift_repair.v1
+title: Agentic pack — docs drift repair
+rubric_ref: examples/dataset/rubrics/comparison.v1.json
+taxonomy:
+  taxonomy_version: 1
+  task_family: documentation
+  difficulty: medium
+  determinism: deterministic_fixture
+  tool_requirements: [cli, registry, repo_context]
+time_budget_seconds: 150
+token_budget: 2400
+retry_policy:
+  max_attempts: 2
+  backoff_seconds: 1.0
+tags: [agentic_pack, cross_system, docs_drift]
+expected_artifact_kinds:
+  - benchmark_request
+  - benchmark_response
+  - evaluation
+  - report
+success_criteria:
+  - Identifies specific files or doc zones to search (not generic advice only).
+  - Proposes minimal edits that align with canonical policy (e.g. AGENTS.md / README).
+  - Includes a verification step that could catch re-drifting.
+failure_taxonomy_hints:
+  - vague_search_plan
+  - wrong_canonical_source
+  - over_edit
+  - missing_verification
+  - broken_link_or_command
+prompts:
+  - id: p-drift
+    prompt_ref: bench.task.docs_drift_repair.v1
+variants:
+  - id: v-cli
+    agent_stack: alwm-cli
+    execution_mode: cli
+    backend:
+      kind: mock
+      model: mock-model

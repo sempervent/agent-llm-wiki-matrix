@@ -1,0 +1,46 @@
+# Agentic cross-system pack — browser evidence interpretation (file-backed trace).
+schema_version: 1
+id: bench.agentic.pack.browser_interpretation.v1
+title: Agentic pack — browser evidence interpretation
+rubric_ref: examples/dataset/rubrics/comparison.v1.json
+taxonomy:
+  taxonomy_version: 1
+  task_family: browser_evidence
+  difficulty: medium
+  determinism: deterministic_fixture
+  tool_requirements: [browser_mock, registry, cli]
+time_budget_seconds: 180
+token_budget: 2400
+retry_policy:
+  max_attempts: 2
+  backoff_seconds: 1.5
+tags: [agentic_pack, cross_system, browser_interpretation]
+expected_artifact_kinds:
+  - benchmark_request
+  - benchmark_response
+  - evaluation
+  - browser_evidence
+  - report
+success_criteria:
+  - References the committed fixture path for the trace (fixtures/browser_evidence/…).
+  - Separates observed navigation from inferred intent.
+  - Names at least one limitation of file-backed vs live capture.
+failure_taxonomy_hints:
+  - fixture_path_wrong
+  - evidence_overclaim
+  - ignores_browser_evidence_shape
+  - missing_audit_summary
+  - conflates_mock_and_live
+prompts:
+  - id: p-browser
+    prompt_ref: bench.task.browser_evidence.v1
+variants:
+  - id: v-browser
+    agent_stack: browser-mock
+    execution_mode: browser_mock
+    backend:
+      kind: mock
+      model: mock-model
+    browser:
+      runner: file
+      fixture_relpath: fixtures/browser_evidence/v1/export_flow.json

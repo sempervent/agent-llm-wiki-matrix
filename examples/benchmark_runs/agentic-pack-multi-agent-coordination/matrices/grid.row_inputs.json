@@ -1,0 +1,26 @@
+{
+  "benchmark_id": "bench.agentic.pack.multi_agent_coordination.v1",
+  "created_at": "1970-01-01T00:00:00Z",
+  "entries": [
+    {
+      "col_label": "p-coord",
+      "evaluation_relpath": "cells/v-cli__p-coord/evaluation.json",
+      "prompt_id": "p-coord",
+      "row_label": "v-cli",
+      "total_weighted_score": 0.285726,
+      "variant_id": "v-cli"
+    },
+    {
+      "col_label": "p-coord",
+      "evaluation_relpath": "cells/v-repo__p-coord/evaluation.json",
+      "prompt_id": "p-coord",
+      "row_label": "v-repo",
+      "total_weighted_score": 0.683224,
+      "variant_id": "v-repo"
+    }
+  ],
+  "matrix_id": "agentic-pack-multi-agent-coordination-example-grid",
+  "metric": "total_weighted_rubric_score",
+  "run_id": "agentic-pack-multi-agent-coordination-example",
+  "schema_version": 1
+}

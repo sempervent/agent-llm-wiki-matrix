@@ -10,7 +10,15 @@
     "title": { "type": "string" },
     "kind": {
       "type": "string",
-      "enum": ["weekly", "model_comparison", "agent_stack", "browser_evidence"]
+      "enum": [
+        "weekly",
+        "model_comparison",
+        "agent_stack",
+        "browser_evidence",
+        "longitudinal",
+        "benchmark_weekly",
+        "failure_atlas"
+      ]
     },
     "period_start": { "type": "string", "description": "RFC 3339 date or date-time" },
     "period_end": { "type": "string", "description": "RFC 3339 date or date-time" },

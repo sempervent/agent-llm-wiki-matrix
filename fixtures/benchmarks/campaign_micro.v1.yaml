@@ -1,0 +1,15 @@
+# Minimal benchmark for campaign harness tests (1 prompt × 1 cli variant, mock backend).
+schema_version: 1
+id: bench.fixtures.campaign.micro.v1
+title: Campaign micro fixture
+rubric_ref: examples/dataset/rubrics/comparison.v1.json
+prompts:
+  - id: p1
+    text: Fixture prompt for campaign sweep smoke tests.
+variants:
+  - id: v-cli
+    agent_stack: alwm-cli
+    execution_mode: cli
+    backend:
+      kind: mock
+      model: mock-model

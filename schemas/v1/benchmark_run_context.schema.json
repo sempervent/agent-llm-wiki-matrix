@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/sempervent/agent-llm-wiki-matrix/schemas/v1/benchmark_run_context.schema.json",
+  "title": "BenchmarkRunContextV1",
+  "description": "Optional metadata for longitudinal analysis (git/release/provider labels). Not required for runs.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version"],
+  "properties": {
+    "schema_version": { "type": "integer", "const": 1 },
+    "git_ref": {
+      "type": ["string", "null"],
+      "description": "Commit SHA or symbolic ref captured at run time"
+    },
+    "release_tag": {
+      "type": ["string", "null"],
+      "description": "Semver or release tag (e.g. v0.1.0)"
+    },
+    "provider_fingerprint": {
+      "type": ["string", "null"],
+      "description": "Short summary e.g. mock/mock-model or ollama/gpt-oss:20b"
+    },
+    "notes": { "type": ["string", "null"] }
+  }
+}

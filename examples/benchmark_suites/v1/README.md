@@ -10,6 +10,12 @@
 | `suite.registry.strict_duo.v1.yaml` | Strict | `bench.task.repo_governed.v1` + `bench.task.matrix_reasoning.v1` | 2 (`cli`, `repo_governed`) | Cross-mode deltas under strict scoring |
 | `suite.registry.generous_duo.v1.yaml` | Generous | `bench.task.markdown_synthesis.v1` + `bench.task.browser_evidence.v1` | 2 (`cli`, `browser_mock`) | Markdown + browser-tagged outputs |
 
+### Agentic cross-system pack
+
+Five suites under **`agentic/`** compare external agent behaviors (implementation, docs drift, benchmark authoring, browser evidence, multi-agent coordination). Each includes **`success_criteria`**, **`failure_taxonomy_hints`**, **`expected_artifact_kinds`**, and **`taxonomy.determinism`**. See **`docs/workflows/agentic-benchmark-pack.md`** and **`examples/benchmark_suites/v1/agentic/README.md`**.
+
+Committed offline runs: `examples/benchmark_runs/agentic-pack-repo-implementation/`, `agentic-pack-docs-drift/`, `agentic-pack-benchmark-authoring/`, `agentic-pack-browser-interpretation/`, `agentic-pack-multi-agent-coordination/`.
+
 ### Taxonomy-tagged suites (task family + budgets + tags)
 
 Each file below sets `taxonomy` (`task_family`, `difficulty`, `determinism`, `tool_requirements`) and usually `tags`, `expected_artifact_kinds`, and optional time/token/retry metadata. See `docs/workflows/benchmarking.md`.

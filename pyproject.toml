@@ -66,6 +66,7 @@ ignore_errors = true
 testpaths = ["tests"]
 addopts = "-q --strict-markers"
 markers = [
+    "smoke: fast CLI + schema checks for `just smoke` (no network; optional Docker compose validation)",
     "integration: opt-in live provider tests (network; see docs/workflows/benchmarking.md)",
     "live_ollama: requires Ollama HTTP API",
     "live_llamacpp: requires OpenAI-compatible (e.g. llama.cpp) HTTP API",

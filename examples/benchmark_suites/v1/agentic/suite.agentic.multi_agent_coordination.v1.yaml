@@ -1,0 +1,49 @@
+# Agentic cross-system pack — multi-agent coordination and governance.
+schema_version: 1
+id: bench.agentic.pack.multi_agent_coordination.v1
+title: Agentic pack — multi-agent coordination
+rubric_ref: examples/dataset/rubrics/comparison.v1.json
+taxonomy:
+  taxonomy_version: 1
+  task_family: multi_agent_coordination
+  difficulty: high
+  determinism: deterministic_fixture
+  tool_requirements: [multi_variant, registry, repo_context, cli]
+time_budget_seconds: 240
+token_budget: 3200
+retry_policy:
+  max_attempts: 3
+  backoff_seconds: 2.0
+tags: [agentic_pack, cross_system, multi_agent]
+expected_artifact_kinds:
+  - benchmark_request
+  - benchmark_response
+  - evaluation
+  - matrix
+  - report
+success_criteria:
+  - Addresses merge order, ownership zones, or handoff artifacts explicitly.
+  - Mentions at least one concrete doc path (e.g. AGENTS.md, multi-agent workflow).
+  - Gives a failure mode when parallel agents conflict.
+failure_taxonomy_hints:
+  - handoff_gap
+  - merge_order_confusion
+  - hot_file_thrash
+  - missing_evidence_in_pr
+  - scope_collision
+prompts:
+  - id: p-coord
+    prompt_ref: bench.task.multi_agent_coord.v1
+variants:
+  - id: v-cli
+    agent_stack: alwm-cli
+    execution_mode: cli
+    backend:
+      kind: mock
+      model: mock-model
+  - id: v-repo
+    agent_stack: repo-governed
+    execution_mode: repo_governed
+    backend:
+      kind: mock
+      model: mock-model

@@ -1,0 +1,76 @@
+{
+  "benchmark_id": "bench.agentic.pack.browser_interpretation.v1",
+  "cells": [
+    {
+      "aggregate_response_relpath": "cells/v-browser__p-browser/benchmark_response.json",
+      "browser_evidence_relpath": "cells/v-browser__p-browser/browser_evidence.json",
+      "cell_id": "v-browser__p-browser",
+      "evaluation_relpath": "cells/v-browser__p-browser/evaluation.json",
+      "normalized_response_relpath": "cells/v-browser__p-browser/response.normalized.txt",
+      "raw_response_relpath": "cells/v-browser__p-browser/response.raw.txt",
+      "request_relpath": "cells/v-browser__p-browser/request.json"
+    }
+  ],
+  "created_at": "1970-01-01T00:00:00Z",
+  "definition_source_relpath": "examples/benchmark_suites/v1/agentic/suite.agentic.browser_interpretation.v1.yaml",
+  "expected_artifact_kinds": [
+    "benchmark_request",
+    "benchmark_response",
+    "evaluation",
+    "browser_evidence",
+    "report"
+  ],
+  "failure_taxonomy_hints": [
+    "fixture_path_wrong",
+    "evidence_overclaim",
+    "ignores_browser_evidence_shape",
+    "missing_audit_summary",
+    "conflates_mock_and_live"
+  ],
+  "matrix_grid_md_path": "markdown/matrix.grid.md",
+  "matrix_grid_path": "matrices/grid.json",
+  "matrix_grid_row_inputs_path": "matrices/grid.row_inputs.json",
+  "matrix_pairwise_md_path": "markdown/matrix.pairwise.md",
+  "matrix_pairwise_path": "matrices/pairwise.json",
+  "matrix_pairwise_row_inputs_path": "matrices/pairwise.row_inputs.json",
+  "prompt_ids": [
+    "p-browser"
+  ],
+  "prompt_registry_effective_ref": "prompts/registry.yaml",
+  "report_json_path": "reports/report.json",
+  "report_md_path": "reports/report.md",
+  "retry_policy": {
+    "backoff_seconds": 1.5,
+    "max_attempts": 2
+  },
+  "rubric_ref": "examples/dataset/rubrics/comparison.v1.json",
+  "run_id": "agentic-pack-browser-interpretation-example",
+  "schema_version": 1,
+  "success_criteria": [
+    "References the committed fixture path for the trace (fixtures/browser_evidence/\u2026).",
+    "Separates observed navigation from inferred intent.",
+    "Names at least one limitation of file-backed vs live capture."
+  ],
+  "tags": [
+    "agentic_pack",
+    "cross_system",
+    "browser_interpretation"
+  ],
+  "taxonomy": {
+    "determinism": "deterministic_fixture",
+    "difficulty": "medium",
+    "task_family": "browser_evidence",
+    "taxonomy_version": 1,
+    "tool_requirements": [
+      "browser_mock",
+      "registry",
+      "cli"
+    ]
+  },
+  "time_budget_seconds": 180.0,
+  "title": "Agentic pack \u2014 browser evidence interpretation",
+  "token_budget": 2400,
+  "variant_ids": [
+    "v-browser"
+  ]
+}

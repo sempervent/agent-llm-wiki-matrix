@@ -38,13 +38,13 @@ def test_probe_ollama_api_true(monkeypatch: pytest.MonkeyPatch) -> None:
 def test_ollama_model_available_finds_tagged_name(monkeypatch: pytest.MonkeyPatch) -> None:
     resp = MagicMock()
     resp.status_code = 200
-    resp.json.return_value = {"models": [{"name": "llama3.2:latest"}]}
+    resp.json.return_value = {"models": [{"name": "gpt-oss:20b"}]}
 
     def fake_get(_url: str, **_kwargs: object) -> MagicMock:
         return resp
 
     monkeypatch.setattr("agent_llm_wiki_matrix.benchmark.live_probe.httpx.get", fake_get)
-    assert ollama_model_available("http://h", "llama3.2") is True
+    assert ollama_model_available("http://h", "gpt-oss:20b") is True
 
 
 def test_probe_openai_compatible_true_on_404(monkeypatch: pytest.MonkeyPatch) -> None:

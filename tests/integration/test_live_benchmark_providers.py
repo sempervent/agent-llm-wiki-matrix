@@ -35,7 +35,7 @@ def test_live_benchmark_ollama_end_to_end(tmp_path: Path) -> None:
     if os.environ.get("ALWM_LIVE_BENCHMARK_OLLAMA") != "1":
         pytest.skip("Set ALWM_LIVE_BENCHMARK_OLLAMA=1 for live Ollama verification")
     host = os.environ.get("OLLAMA_HOST", "http://127.0.0.1:11434")
-    model = os.environ.get("OLLAMA_MODEL", "llama3.2")
+    model = os.environ.get("OLLAMA_MODEL", "gpt-oss:20b")
     if not probe_ollama_api(host):
         pytest.skip(f"Ollama API not reachable at {host}")
     if not ollama_model_available(host, model):

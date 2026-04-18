@@ -1,7 +1,7 @@
 # Versioned prompt registry (Phase 1 skeleton).
 # Phase 2+ will add strict schema validation and semver-style IDs.
 
-version: "0.3.0"
+version: "0.4.0"
 updated_at: "2026-04-17T00:00:00Z"
 prompts:
   - id: scaffold.echo.v1
@@ -36,3 +36,15 @@ prompts:
     description: "Parallel agents, ownership zones, merge coordination."
     path: prompts/versions/bench.task.multi_agent_coord.v1.txt
     tags: [benchmark, multi_agent, coordination, governance]
+  - id: bench.task.repo_implementation.v1
+    description: "Bounded repo implementation plan (paths, tests, verification)."
+    path: prompts/versions/bench.task.repo_implementation.v1.txt
+    tags: [benchmark, agentic, implementation]
+  - id: bench.task.docs_drift_repair.v1
+    description: "Find and repair documentation drift vs canonical tooling."
+    path: prompts/versions/bench.task.docs_drift_repair.v1.txt
+    tags: [benchmark, agentic, documentation]
+  - id: bench.task.benchmark_authoring.v1
+    description: "Author a minimal benchmark definition (structure and rationale)."
+    path: prompts/versions/bench.task.benchmark_authoring.v1.txt
+    tags: [benchmark, agentic, authoring]

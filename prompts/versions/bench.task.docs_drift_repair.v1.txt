@@ -1,0 +1,3 @@
+Documentation drift repair (agentic benchmark): the README quickstart says contributors should use **uv** for local setup, but a hypothetical stale paragraph still mentions `pip install -e ".[dev]"` without uv.
+
+Describe how you would find and fix the drift: (1) which files you would search (name paths under `docs/`, `README.md`, `AGENTS.md` as relevant), (2) the minimal edit strategy so docs stay consistent, (3) what you would run to verify links and commands still match (`just ci`, spot `alwm --help`), and (4) one sentence for an implementation-log entry. Ground answers in this repository’s documentation layout.

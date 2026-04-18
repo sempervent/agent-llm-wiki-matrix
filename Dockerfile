@@ -20,6 +20,11 @@ COPY src ./src
 RUN pip install --upgrade pip \
     && pip install .
 
+# Wheel layout puts code under site-packages; `reporting._read_template` resolves
+# ``…/python3.11/templates`` (see ``pipelines/reporting.py``). Match that path so
+# ``alwm benchmark run`` works without relying on the bind-mounted repo for Markdown templates.
+COPY templates /usr/local/lib/python3.11/templates
+
 FROM base AS runtime
 
 # Non-root user

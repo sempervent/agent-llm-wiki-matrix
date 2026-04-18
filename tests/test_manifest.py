@@ -37,6 +37,17 @@ def test_taxonomy_example_run_manifest_validates() -> None:
     )
 
 
+def test_agentic_pack_example_manifest_validates() -> None:
+    load_artifact_file(
+        _REPO
+        / "examples"
+        / "benchmark_runs"
+        / "agentic-pack-repo-implementation"
+        / "manifest.json",
+        "benchmark_manifest",
+    )
+
+
 def test_manifest_optional_null_provenance_round_trip() -> None:
     path = _REPO / "fixtures" / "v1" / "manifest.json"
     raw = json.loads(path.read_text(encoding="utf-8"))
@@ -114,4 +125,6 @@ def test_offline_run_manifest_validates_as_artifact(
         environ={"ALWM_FIXTURE_MODE": "1"},
         fixture_mode_force_mock=True,
     )
-    load_artifact_file(out / "manifest.json", "benchmark_manifest")
+    m = load_artifact_file(out / "manifest.json", "benchmark_manifest")
+    assert m.comparison_fingerprints is not None
+    assert m.comparison_fingerprints.suite_definition.startswith("sha256:")

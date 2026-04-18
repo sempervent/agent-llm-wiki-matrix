@@ -38,6 +38,30 @@
     "judge_provenance_relpath": {
       "type": ["string", "null"],
       "description": "Path to evaluation_judge_provenance.json when semantic or hybrid"
+    },
+    "judge_repeat_count": {
+      "oneOf": [
+        { "type": "integer", "minimum": 2, "maximum": 32 },
+        { "type": "null" }
+      ],
+      "description": "Semantic judge invocations when >1; null for single-run / deterministic"
+    },
+    "judge_semantic_aggregation": {
+      "oneOf": [
+        {
+          "type": "string",
+          "enum": ["mean", "median", "trimmed_mean"]
+        },
+        { "type": "null" }
+      ],
+      "description": "How repeated semantic scores were combined"
+    },
+    "judge_low_confidence": {
+      "oneOf": [
+        { "type": "boolean" },
+        { "type": "null" }
+      ],
+      "description": "True when disagreement thresholds flagged instability across repeated runs"
     }
   }
 }

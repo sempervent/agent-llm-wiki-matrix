@@ -1,0 +1,3 @@
+Repo implementation task (agentic benchmark): you will ship a small, bounded code change in agent-llm-wiki-matrix.
+
+Assume the goal is to add a new optional CLI flag `--dry-run` to an existing `alwm` subcommand (pick `validate` as the example). Respond with: (1) the exact files you would edit (repo-relative paths), (2) a step-by-step sequence including where to add tests, (3) how you would run `just ci` to verify, and (4) one risk or rollback note. Do not paste full patches—focus on a credible implementation plan grounded in this repository’s layout (`src/agent_llm_wiki_matrix/`, `tests/`, `justfile`).

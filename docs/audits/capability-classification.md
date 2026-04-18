@@ -19,7 +19,7 @@ Before writing **complete**:
 1. **Code** — Grep for the public entrypoint (`cli.py`, `create_*`, factory).
 2. **Tests** — `tests/` (and `tests/integration/` only if the feature is integration-only).
 3. **Commands** — `alwm … --help` or `just …` matches README / AGENTS.
-4. **Optional deps** — If the feature needs `pip install '.[browser]'` or similar, say **partial** or **complete (optional extra)** and name the extra.
+4. **Optional deps** — If the feature needs `uv pip install -e '.[browser]'` (or similar) for optional behavior, say **partial** or **complete (optional extra)** and name the extra.
 
 ## Repository examples (current; re-verify after changes)
 
@@ -30,6 +30,7 @@ Before writing **complete**:
 | `PlaywrightBrowserRunner` | **partial** (optional) | Requires `[browser]` extra + `playwright install`; `tests/integration/` gated by `ALWM_PLAYWRIGHT_SMOKE=1` |
 | `MCPBrowserRunner` | **partial** | Fixture-backed only (`scenario_id` / `fixture_relpath`); remote MCP tools **not** wired (`browser/mcp_runner.py`); raises `RuntimeError` without fixture |
 | `alwm benchmark run` (offline) | **complete** | `tests/test_benchmark.py`, `tests/test_benchmark_browser.py`; `browser_mock` variants run browser phase + write `browser_evidence.json` |
+| `alwm benchmark campaign run` / `plan` | **complete** | `tests/test_benchmark_campaign.py`; manifests registered in `artifacts.py`; workflow **`docs/workflows/benchmark-campaigns.md`** |
 | Benchmark + **Playwright** | **partial** (opt-in) | Variant `browser.runner: playwright` requires `ALWM_BENCHMARK_PLAYWRIGHT=1` + `[browser]` extra; not in default CI |
 | `alwm benchmark probe` | **complete** (live) | `tests/test_live_probe.py`; integration opt-in |
 | Prompt registry CLI | **complete** | `tests/test_prompt_registry.py`. Registry content grows over time—that is data, not stubbing. |

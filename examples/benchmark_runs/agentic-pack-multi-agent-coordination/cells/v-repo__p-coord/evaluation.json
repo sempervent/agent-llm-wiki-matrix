@@ -1,0 +1,22 @@
+{
+  "evaluated_at": "1970-01-01T00:00:00Z",
+  "evaluator": "pipeline",
+  "id": "eval-v-repo-p-coord",
+  "notes_markdown": "Benchmark cell evaluation (rubric hash on normalized response).",
+  "rubric_id": "rubric.examples.comparison.v1",
+  "scores": {
+    "brevity": 0.721509,
+    "grounding": 0.938887,
+    "structure": 0.632774,
+    "task_fit": 0.439727
+  },
+  "scoring_backend": "deterministic",
+  "subject_ref": "cells/v-repo__p-coord/benchmark_response.json",
+  "total_weighted_score": 0.683224,
+  "weights": {
+    "brevity": 0.25,
+    "grounding": 0.25,
+    "structure": 0.25,
+    "task_fit": 0.25
+  }
+}

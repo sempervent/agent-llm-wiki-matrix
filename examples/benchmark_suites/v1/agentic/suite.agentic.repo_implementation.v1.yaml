@@ -1,0 +1,43 @@
+# Agentic cross-system pack — bounded repo implementation planning.
+schema_version: 1
+id: bench.agentic.pack.repo_implementation.v1
+title: Agentic pack — repo implementation task
+rubric_ref: examples/dataset/rubrics/comparison.v1.json
+taxonomy:
+  taxonomy_version: 1
+  task_family: repo_governance
+  difficulty: high
+  determinism: deterministic_fixture
+  tool_requirements: [cli, registry, repo_context]
+time_budget_seconds: 180
+token_budget: 2800
+retry_policy:
+  max_attempts: 2
+  backoff_seconds: 1.5
+tags: [agentic_pack, cross_system, repo_implementation]
+expected_artifact_kinds:
+  - benchmark_request
+  - benchmark_response
+  - evaluation
+  - matrix
+  - report
+success_criteria:
+  - Names at least three concrete repo-relative paths (e.g. under src/, tests/, or docs/).
+  - Describes an ordered sequence that includes tests and a local verification command.
+  - Acknowledges scope boundaries (no unbounded refactor).
+failure_taxonomy_hints:
+  - path_hallucination
+  - missing_tests
+  - wrong_entrypoint
+  - scope_creep
+  - ungrounded_command
+prompts:
+  - id: p-impl
+    prompt_ref: bench.task.repo_implementation.v1
+variants:
+  - id: v-cli
+    agent_stack: alwm-cli
+    execution_mode: cli
+    backend:
+      kind: mock
+      model: mock-model

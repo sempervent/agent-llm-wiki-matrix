@@ -78,8 +78,9 @@ services:
       - benchmark-probe
     ports:
       - "11434:11434"
+    # Bind-mount so blobs live on the host (default ./.ollama-models; override via OLLAMA_MODELS_DIR).
     volumes:
-      - ollama_models:/root/.ollama
+      - ${OLLAMA_MODELS_DIR:-./.ollama-models}:/root/.ollama
     # ollama image has the `ollama` CLI; HTTP tools may be absent.
     healthcheck:
       test: ["CMD-SHELL", "ollama list >/dev/null 2>&1 || exit 1"]
@@ -185,5 +186,3 @@ services:
       - -v
       - --strict-markers
 
-volumes:
-  ollama_models:

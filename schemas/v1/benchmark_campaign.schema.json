@@ -1,0 +1,184 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/sempervent/agent-llm-wiki-matrix/schemas/v1/benchmark_campaign.schema.json",
+  "title": "BenchmarkCampaignDefinitionV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "id", "title"],
+  "allOf": [
+    {
+      "anyOf": [{ "required": ["suite_refs"] }, { "required": ["benchmark_suites"] }]
+    }
+  ],
+  "properties": {
+    "schema_version": { "type": "integer", "const": 1 },
+    "id": { "type": "string", "minLength": 1 },
+    "title": { "type": "string", "minLength": 1 },
+    "description": { "type": ["string", "null"] },
+    "campaign_version": {
+      "type": "string",
+      "minLength": 1,
+      "default": "1.0.0",
+      "description": "Semantic version of this campaign definition (distinct from schema_version)."
+    },
+    "suite_refs": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string", "minLength": 1 },
+      "description": "Repo-relative paths to benchmark definition YAML/JSON files."
+    },
+    "benchmark_suites": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string", "minLength": 1 },
+      "description": "Alias for suite_refs."
+    },
+    "provider_config_refs": {
+      "type": "array",
+      "items": {
+        "oneOf": [{ "type": "null" }, { "type": "string", "minLength": 1 }]
+      },
+      "description": "Providers YAML paths; empty list means a single null (harness default)."
+    },
+    "provider_configs": {
+      "type": "array",
+      "items": {
+        "oneOf": [{ "type": "null" }, { "type": "string", "minLength": 1 }]
+      },
+      "description": "Alias for provider_config_refs."
+    },
+    "eval_scoring_options": {
+      "type": "array",
+      "items": {
+        "oneOf": [{ "type": "null" }, { "$ref": "#/$defs/evalScoringSpec" }]
+      },
+      "description": "null uses each suite's eval_scoring; empty list means one null entry."
+    },
+    "scoring_configs": {
+      "type": "array",
+      "items": {
+        "oneOf": [{ "type": "null" }, { "$ref": "#/$defs/evalScoringSpec" }]
+      },
+      "description": "Alias for eval_scoring_options."
+    },
+    "execution_modes": {
+      "oneOf": [
+        { "type": "null" },
+        {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "enum": ["cli", "browser_mock", "repo_governed"]
+          }
+        }
+      ],
+      "description": "If set, only variants with these execution_mode values are kept."
+    },
+    "browser_configs": {
+      "type": "array",
+      "items": {
+        "oneOf": [{ "type": "null" }, { "$ref": "#/$defs/browserBenchConfig" }]
+      },
+      "description": "Merged into browser_mock variants; empty list means one null entry."
+    },
+    "campaign_tags": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "tags": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "description": "Alias for campaign_tags."
+    },
+    "prompt_registry_ref": {
+      "oneOf": [{ "type": "null" }, { "type": "string", "minLength": 1 }],
+      "description": "Optional override for all member runs (registry YAML relative to repo root)."
+    },
+    "owner": { "oneOf": [{ "type": "null" }, { "type": "string", "minLength": 1 }] },
+    "created_at": {
+      "oneOf": [{ "type": "null" }, { "type": "string", "minLength": 1 }],
+      "description": "RFC 3339 metadata for when the definition was written."
+    },
+    "retry_policy": {
+      "oneOf": [
+        { "type": "null" },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["max_attempts", "backoff_seconds"],
+          "properties": {
+            "max_attempts": { "type": "integer", "minimum": 1, "maximum": 64 },
+            "backoff_seconds": { "type": "number", "minimum": 0 }
+          }
+        }
+      ]
+    },
+    "time_budget_seconds": { "oneOf": [{ "type": "null" }, { "type": "number", "exclusiveMinimum": 0 }] },
+    "token_budget": { "oneOf": [{ "type": "null" }, { "type": "integer", "minimum": 1 }] },
+    "expected_artifact_kinds": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "notes": { "oneOf": [{ "type": "null" }, { "type": "string", "minLength": 1 }] }
+  },
+  "$defs": {
+    "browserBenchConfig": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "runner": {
+          "type": "string",
+          "enum": ["mock", "file", "playwright", "mcp"],
+          "default": "mock"
+        },
+        "scenario_id": { "type": "string", "minLength": 1 },
+        "fixture_relpath": { "type": "string", "minLength": 1 },
+        "start_url": { "type": "string", "minLength": 1 },
+        "steps": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "evalScoringSpec": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["backend"],
+      "properties": {
+        "backend": {
+          "type": "string",
+          "enum": ["deterministic", "semantic_judge", "hybrid"]
+        },
+        "hybrid": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["deterministic_weight", "semantic_weight"],
+          "properties": {
+            "deterministic_weight": { "type": "number", "minimum": 0, "maximum": 1 },
+            "semantic_weight": { "type": "number", "minimum": 0, "maximum": 1 }
+          }
+        },
+        "judge_provider_ref": { "type": ["string", "null"] },
+        "judge_repeats": { "type": "integer", "minimum": 1, "maximum": 32 },
+        "semantic_aggregation": {
+          "type": "string",
+          "enum": ["mean", "median", "trimmed_mean"]
+        },
+        "trim_fraction": { "type": "number", "minimum": 0, "maximum": 0.45 },
+        "judge_max_criterion_range": {
+          "oneOf": [{ "type": "null" }, { "type": "number", "minimum": 0 }]
+        },
+        "judge_max_criterion_stdev": {
+          "oneOf": [{ "type": "null" }, { "type": "number", "minimum": 0 }]
+        },
+        "judge_max_mean_criterion_stdev": {
+          "oneOf": [{ "type": "null" }, { "type": "number", "minimum": 0 }]
+        },
+        "judge_max_total_weighted_stdev": {
+          "oneOf": [{ "type": "null" }, { "type": "number", "minimum": 0 }]
+        }
+      }
+    }
+  }
+}

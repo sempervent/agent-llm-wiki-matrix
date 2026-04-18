@@ -93,3 +93,13 @@ def test_offline_benchmark_pipeline_is_deterministic(
     assert isinstance(rep, Report)
     assert (out / "reports" / "report.md").read_text(encoding="utf-8")
     assert (out / "markdown" / "matrix.grid.md").read_text(encoding="utf-8")
+
+
+def test_semantic_repeats_example_definition_loads() -> None:
+    dfn = load_benchmark_definition(
+        _REPO / "examples" / "benchmarks" / "v1" / "semantic_repeats.v1.yaml",
+    )
+    assert dfn.eval_scoring is not None
+    assert dfn.eval_scoring.judge_repeats == 3
+    assert dfn.eval_scoring.semantic_aggregation == "median"
+    assert dfn.eval_scoring.judge_max_criterion_range == 0.25

@@ -1,0 +1,16 @@
+# Fixture campaign: same micro suite, only cli execution mode (drops other modes if present).
+schema_version: 1
+id: campaign.examples.sweep_modes.v1
+title: Example — execution_modes filter (cli only)
+description: Demonstrates execution_modes axis; pairs with fixtures/benchmarks/campaign_micro.v1.yaml (single cli variant).
+campaign_version: "1.0.0"
+suite_refs:
+  - fixtures/benchmarks/campaign_micro.v1.yaml
+execution_modes:
+  - cli
+provider_config_refs: []
+eval_scoring_options: []
+browser_configs: []
+tags:
+  - example:campaign
+  - axis:execution_modes

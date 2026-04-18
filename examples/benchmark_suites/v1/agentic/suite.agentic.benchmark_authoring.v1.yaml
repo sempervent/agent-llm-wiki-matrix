@@ -1,0 +1,43 @@
+# Agentic cross-system pack — benchmark definition authoring literacy.
+schema_version: 1
+id: bench.agentic.pack.benchmark_authoring.v1
+title: Agentic pack — benchmark suite authoring
+rubric_ref: examples/dataset/rubrics/comparison.v1.json
+taxonomy:
+  taxonomy_version: 1
+  task_family: scaffolding
+  difficulty: medium
+  determinism: deterministic_fixture
+  tool_requirements: [cli, registry, repo_context]
+time_budget_seconds: 120
+token_budget: 2200
+retry_policy:
+  max_attempts: 2
+  backoff_seconds: 1.0
+tags: [agentic_pack, cross_system, benchmark_authoring]
+expected_artifact_kinds:
+  - benchmark_request
+  - benchmark_response
+  - evaluation
+  - matrix
+  - report
+success_criteria:
+  - Names required BenchmarkDefinitionV1 fields (schema_version, id, title, rubric_ref, prompts, variants).
+  - Uses prompt_ref or text correctly (not both) in the mental model.
+  - Relates expected_artifact_kinds to harness outputs (request, response, evaluation, …).
+failure_taxonomy_hints:
+  - schema_field_gaps
+  - prompt_ref_confusion
+  - rubric_path_invalid
+  - variant_mode_mismatch
+  - artifact_kind_hallucination
+prompts:
+  - id: p-author
+    prompt_ref: bench.task.benchmark_authoring.v1
+variants:
+  - id: v-cli
+    agent_stack: alwm-cli
+    execution_mode: cli
+    backend:
+      kind: mock
+      model: mock-model

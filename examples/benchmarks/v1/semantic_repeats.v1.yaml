@@ -1,0 +1,22 @@
+# Example: semantic judge with multiple runs per cell (aggregated + disagreement metrics in provenance).
+schema_version: 1
+id: bench.examples.semantic_repeats.v1
+title: Example — repeated semantic judge with median aggregation
+rubric_ref: fixtures/v1/rubric.json
+prompts:
+  - id: p-one
+    text: "Reply with the single word OK."
+variants:
+  - id: v-cli
+    agent_stack: alwm-cli
+    execution_mode: cli
+    backend:
+      kind: mock
+      model: mock-model
+eval_scoring:
+  backend: semantic_judge
+  judge_repeats: 3
+  semantic_aggregation: median
+  trim_fraction: 0.1
+  judge_max_criterion_range: 0.25
+  judge_max_total_weighted_stdev: 0.15

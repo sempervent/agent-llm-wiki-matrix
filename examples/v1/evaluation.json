@@ -13,5 +13,7 @@
   "total_weighted_score": 0.85,
   "evaluated_at": "2026-04-17T12:00:00Z",
   "evaluator": "pipeline",
-  "notes_markdown": "Fixture example; no LLM calls."
+  "notes_markdown": "Fixture example; no LLM calls.",
+  "scoring_backend": "deterministic",
+  "judge_provenance_relpath": null
 }

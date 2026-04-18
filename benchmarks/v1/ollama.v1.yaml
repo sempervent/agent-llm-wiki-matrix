@@ -1,7 +1,7 @@
-# Run against Ollama (pull a model first). Use with profile benchmark-ollama or local ALWM_PROVIDER=ollama.
+# Run against Ollama with gpt-oss:20b (see `just ollama-gptoss-setup`). Use profile benchmark-ollama or host CLI.
 schema_version: 1
 id: bench.ollama.v1
-title: Ollama smoke benchmark
+title: Ollama smoke benchmark (gpt-oss:20b)
 rubric_ref: fixtures/v1/rubric.json
 prompts:
   - id: p-one
@@ -12,4 +12,4 @@ variants:
     execution_mode: cli
     backend:
       kind: ollama
-      model: llama3.2
+      model: gpt-oss:20b

@@ -1,0 +1,15 @@
+# Multi-suite sweep: two tiny fixture definitions, default provider and scoring.
+schema_version: 1
+id: campaign.examples.multi_suite.v1
+title: Example — multi-suite sweep (two fixtures)
+description: Cartesian product visits each suite_ref with the same provider/scoring axes.
+campaign_version: "1.0.0"
+benchmark_suites:
+  - fixtures/benchmarks/campaign_micro.v1.yaml
+  - fixtures/benchmarks/offline.v1.yaml
+provider_configs: []
+scoring_configs: []
+browser_configs: []
+tags:
+  - example:campaign
+  - axis:multi_suite

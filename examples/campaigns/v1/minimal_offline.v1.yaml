@@ -1,0 +1,12 @@
+# Minimal offline campaign: one suite, default provider, suite eval_scoring, fixture mocks.
+schema_version: 1
+id: campaign.examples.minimal_offline.v1
+title: Minimal offline campaign (single suite, deterministic)
+suite_refs:
+  - fixtures/benchmarks/campaign_micro.v1.yaml
+provider_config_refs: []
+eval_scoring_options: []
+browser_configs: []
+execution_modes: null
+campaign_tags:
+  - example:campaign

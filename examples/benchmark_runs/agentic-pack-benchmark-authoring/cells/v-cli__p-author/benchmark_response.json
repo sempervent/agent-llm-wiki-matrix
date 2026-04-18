@@ -1,0 +1,19 @@
+{
+  "agent_stack": "alwm-cli",
+  "backend_kind": "mock",
+  "backend_model": "mock-model",
+  "benchmark_id": "bench.agentic.pack.benchmark_authoring.v1",
+  "created_at": "1970-01-01T00:00:00Z",
+  "duration_ms": 0,
+  "execution_mode": "cli",
+  "id": "resp-v-cli-p-author",
+  "prompt_id": "p-author",
+  "prompt_registry_id": "bench.task.benchmark_authoring.v1",
+  "prompt_source": "registry",
+  "prompt_source_relpath": "prompts/versions/bench.task.benchmark_authoring.v1.txt",
+  "prompt_text": "Benchmark suite authoring (agentic benchmark): design a minimal `BenchmarkDefinitionV1` YAML file that could live under `examples/benchmark_suites/v1/` for an offline mock run.\n\nInclude: a stable `id` and `title`, `rubric_ref` pointing at `examples/dataset/rubrics/comparison.v1.json`, exactly one `prompts` entry using `prompt_ref: bench.sample.prompt.v1`, and one `variants` entry with `execution_mode: cli`, `backend.kind: mock`, and `agent_stack` of your choice. Explain briefly why `expected_artifact_kinds` would list `benchmark_request` and `evaluation` at minimum. Do not emit a full YAML block unless helpful\u2014structured bullets are fine.\n",
+  "registry_document_version": "0.4.0",
+  "response_text": "[mock:mock-model] 257967b93055bdab",
+  "schema_version": 1,
+  "variant_id": "v-cli"
+}
