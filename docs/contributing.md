@@ -25,4 +25,4 @@ uv run just ci
 just docs
 ```
 
-Details: [Documentation site handbook](workflows/docs-site.md). Pull requests that change `docs/**` or `mkdocs.yml` run **`.github/workflows/docs.yml`** (MkDocs strict build; optional **GitHub Pages** deploy from `main`).
+Details: [Documentation site handbook](workflows/docs-site.md). Pull requests that change `docs/**` or `mkdocs.yml` run **`.github/workflows/docs.yml`** (MkDocs strict build; **`main`** also deploys to **GitHub Pages** via **`actions/deploy-pages`** when **Settings → Pages → Source** is **GitHub Actions**).

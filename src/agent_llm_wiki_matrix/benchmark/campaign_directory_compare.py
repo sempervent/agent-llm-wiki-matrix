@@ -19,6 +19,8 @@ from agent_llm_wiki_matrix.benchmark.campaign_compare_core import (
     member_run_ids_diff,
     read_json_optional,
     render_browser_evidence_member_cells_comparison_markdown,
+    render_failure_tags_compare_subsection_lines,
+    semantic_instability_rows_all_quiet,
 )
 from agent_llm_wiki_matrix.benchmark.campaign_reporting import summarize_campaign_dimensions
 from agent_llm_wiki_matrix.benchmark.persistence import write_json_sorted, write_utf8_text
@@ -291,16 +293,15 @@ def build_campaign_directory_comparison(
 
 
 def render_campaign_compare_markdown(data: dict[str, Any]) -> str:
-    """Human-readable campaign-vs-campaign report."""
+    """Human-readable campaign-vs-campaign comparison report."""
     left = data["left"]
     right = data["right"]
     ident = data["identity"]
     lines = [
         "# Campaign directory comparison",
         "",
-        "Compares two completed **campaign output directories** (manifest + standard artifacts). "
-        "**Δ** columns use **right − left** when both sides are numeric. "
-        "Structured mirror: **`campaign-compare.json`**.",
+        "Two campaign output directories. **Δ** = right − left (numeric). "
+        "JSON: **`campaign-compare.json`**.",
         "",
         f"- **Left:** `{left['label']}` — `{left['path']}`",
         f"- **Right:** `{right['label']}` — `{right['path']}`",
@@ -311,6 +312,35 @@ def render_campaign_compare_markdown(data: dict[str, Any]) -> str:
     if isinstance(ri, dict) and ri:
         lines.append(format_reader_interpretation_markdown(ri).rstrip())
         lines.append("")
+
+    mr = data["member_runs"]
+    rh = data["run_health"]
+    lines.extend(
+        [
+            "## Member runs & manifest health",
+            "",
+            f"- **Left count:** {mr['left_count']} · **Right count:** {mr['right_count']}",
+            f"- **In both:** {len(mr['run_ids_in_both'])} · **Only left:** "
+            f"{len(mr['run_ids_only_in_left'])} · **Only right:** "
+            f"{len(mr['run_ids_only_in_right'])}",
+            (
+                f"- **Left dry_run:** `{rh['left']['dry_run']}` "
+                f"(manifest runs: {rh['left']['manifest_run_count']}) · "
+                f"**Right dry_run:** `{rh['right']['dry_run']}` "
+                f"(manifest runs: {rh['right']['manifest_run_count']})"
+            ),
+            (
+                "- **Run IDs only on left:** "
+                f"{', '.join(f'`{x}`' for x in mr['run_ids_only_in_left']) or '—'}"
+            ),
+            (
+                "- **Run IDs only on right:** "
+                f"{', '.join(f'`{x}`' for x in mr['run_ids_only_in_right']) or '—'}"
+            ),
+            "",
+        ],
+    )
+
     lines.extend(
         [
             "## Identity & fingerprints",
@@ -398,13 +428,16 @@ def render_campaign_compare_markdown(data: dict[str, Any]) -> str:
         lines.append(f"| `{row['artifact_key']}` | `{lv}` | `{rv}` |")
 
     ca = data["comparative_analysis"]
+    inst_rows = ca["semantic_instability_by_scoring_backend"]
     lines.extend(
         [
             "",
-            "## Score movement (pooled backend means)",
+            "## Analysis deltas (`campaign-analysis.json`)",
             "",
-            f"- **Left analysis present:** {ca['left_present']}",
-            f"- **Right analysis present:** {ca['right_present']}",
+            f"- **`campaign-analysis.json` on left:** {ca['left_present']} · **on right:** "
+            f"{ca['right_present']}",
+            "",
+            "### Pooled backend means",
             "",
             "| backend_kind | Left | Right | Δ (R−L) |",
             "| --- | ---: | ---: | ---: |",
@@ -419,88 +452,48 @@ def render_campaign_compare_markdown(data: dict[str, Any]) -> str:
         rms = f"{rm:.6f}" if isinstance(rm, (int, float)) else "—"
         lines.append(f"| `{row['backend_kind']}` | {lms} | {rms} | {ds} |")
 
-    lines.extend(
-        [
-            "",
-            "## Instability movement (semantic instability by scoring_backend)",
-            "",
-            "| scoring_backend | Left events | Right events | Δ |",
-            "| --- | ---: | ---: | ---: |",
-        ],
-    )
-    for row in ca["semantic_instability_by_scoring_backend"]:
-        d = row["delta_right_minus_left"]
-        ds = str(d) if d is not None else "—"
+    lines.extend(["", "### Semantic instability (by scoring_backend)", ""])
+    if semantic_instability_rows_all_quiet(inst_rows):
         lines.append(
-            f"| `{row['scoring_backend']}` | {row['left_unstable_events']} | "
-            f"{row['right_unstable_events']} | {ds} |",
+            "_No unstable events reported (all counts zero on both sides). "
+            "Pooled longitudinal counts only — see analysis JSON for definitions._",
         )
-
-    be_md = render_browser_evidence_member_cells_comparison_markdown(
-        data.get("browser_evidence"),
-        top_heading_level=2,
-    )
-    if be_md:
-        lines.extend(["", be_md.rstrip()])
-
-    ft = data["failure_tags"]
-    lines.extend(["", "## Failure-tag changes (FT-*)", ""])
-    if not ft["codes_compared"] or all(
-        x.get("left_signal_count") in (None, 0) and x.get("right_signal_count") in (None, 0)
-        for x in ft["codes_compared"]
-    ):
-        lines.append("_No FT-* signal counts on either side (or analysis missing)._")
     else:
         lines.extend(
             [
-                "| Code | Left signals | Right signals | Δ |",
+                "| scoring_backend | Left events | Right events | Δ |",
                 "| --- | ---: | ---: | ---: |",
             ],
         )
-        for row in ft["codes_compared"]:
-            if row.get("left_signal_count") is None and row.get("right_signal_count") is None:
-                continue
+        for row in inst_rows:
             d = row["delta_right_minus_left"]
             ds = str(d) if d is not None else "—"
             lines.append(
-                f"| `{row['code']}` | {row['left_signal_count']} | "
-                f"{row['right_signal_count']} | {ds} |",
+                f"| `{row['scoring_backend']}` | {row['left_unstable_events']} | "
+                f"{row['right_unstable_events']} | {ds} |",
             )
-    if ft["only_in_left"]:
-        lines.append("")
-        lines.append(f"- **Only left:** {', '.join(f'`{c}`' for c in ft['only_in_left'])}")
-    if ft["only_in_right"]:
-        lines.append(f"- **Only right:** {', '.join(f'`{c}`' for c in ft['only_in_right'])}")
+
+    lines.extend(render_failure_tags_compare_subsection_lines(data["failure_tags"]))
+
+    be_md = render_browser_evidence_member_cells_comparison_markdown(
+        data.get("browser_evidence"),
+        top_heading_level=3,
+        compare_compact=True,
+    )
+    if be_md:
+        lines.extend(["", be_md.rstrip(), ""])
 
     sem = data["semantic_summary_totals"]
-    lines.extend(["", "## Semantic summary totals (selected)", ""])
+    lines.extend(["", "### Semantic summary (selected numeric Δ)", ""])
     if sem["left_totals"] is None and sem["right_totals"] is None:
         lines.append("_No `campaign-semantic-summary.json` on both sides (or empty totals)._")
     else:
-        lines.append("Numeric Δ = right − left when both numeric.")
+        lines.append("Full totals in JSON; **Δ** = right − left when both numeric.")
         for k, v in sem.get("numeric_deltas_right_minus_left", {}).items():
             lines.append(f"- **`{k}`:** {v}")
 
-    mr = data["member_runs"]
-    rh = data["run_health"]
     lines.extend(
         [
-            "",
-            "## Member runs",
-            "",
-            f"- **Left count:** {mr['left_count']} · **Right count:** {mr['right_count']}",
-            (
-                f"- **Left dry_run:** `{rh['left']['dry_run']}` · **Right dry_run:** "
-                f"`{rh['right']['dry_run']}`"
-            ),
-            (
-                "- **Only in left:** "
-                f"{', '.join(f'`{x}`' for x in mr['run_ids_only_in_left']) or '—'}"
-            ),
-            (
-                "- **Only in right:** "
-                f"{', '.join(f'`{x}`' for x in mr['run_ids_only_in_right']) or '—'}"
-            ),
             "",
             "_Machine-readable summary: `campaign-compare.json` (kind `campaign_compare`)._",
         ],

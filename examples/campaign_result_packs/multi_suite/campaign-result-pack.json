@@ -1,5 +1,5 @@
 {
-  "alwm_version": "0.2.4",
+  "alwm_version": "0.2.5",
   "artifacts": {
     "campaign_analysis_json": "reports/campaign-analysis.json",
     "campaign_comparative_report_md": "reports/campaign-report.md",
@@ -26,7 +26,7 @@
   "created_at": "1970-01-01T00:00:00Z",
   "definition_source_relpath": "examples/campaigns/v1/multi_suite.v1.yaml",
   "fixture_mode_force_mock": true,
-  "git_commit_sha": "1d6cbf5bc0c399ea757e6b38add5f4db5f10d102",
+  "git_commit_sha": "78ab7d2e11d5cb179271c2b6a0894f2ecc595489",
   "git_describe": "v0.2.4-dirty",
   "included_member_count": 2,
   "layout_version": 1,
@@ -50,8 +50,14 @@
       "suite_ref": "fixtures/benchmarks/offline.v1.yaml"
     }
   ],
+  "membership_scope": "all_runs",
+  "optional_layers_present": [
+    "comparative_analysis",
+    "comparative_report",
+    "semantic_summary"
+  ],
   "pack_id": "multi-suite",
-  "pack_identity_fingerprint": "sha256:d5f8361795b1218944a51eab111174aad02d1348d917bf8d5af2ae65697739de",
+  "pack_identity_fingerprint": "sha256:c3947bc1509720962e40d617c6ca76d71635efb748441a966db7cd0df8f2e6b2",
   "schema_version": 1,
   "source_campaign_relpath": "examples/campaign_runs/multi_suite",
   "title": "Example \u2014 multi-suite sweep (two fixtures)"

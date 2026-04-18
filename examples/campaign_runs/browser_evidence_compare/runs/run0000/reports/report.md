@@ -88,12 +88,12 @@ _Notes:_ Deterministic checkout narrative for browser benchmark realism (no PII,
 
 | Field | Value |
 | --- | --- |
-| started_at_utc | `2026-04-18T01:41:39Z` |
-| finished_at_utc | `2026-04-18T01:41:39Z` |
-| duration_seconds | 0.004050 |
-| browser_phase_seconds | 0.001263 |
+| started_at_utc | `2026-04-18T01:58:48Z` |
+| finished_at_utc | `2026-04-18T01:58:48Z` |
+| duration_seconds | 0.004847 |
+| browser_phase_seconds | 0.001538 |
 | provider_completion_seconds | 0.000015 |
-| evaluation_phase_seconds | 0.000475 |
+| evaluation_phase_seconds | 0.000737 |
 | judge_phase_seconds | 0.000000 |
 
 ### Retry and judge summary

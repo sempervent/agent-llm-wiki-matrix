@@ -187,9 +187,8 @@ def render_campaign_summary_markdown(
     lines = [
         f"# Campaign summary: `{manifest.campaign_id}`",
         "",
-        "Single-page index for this campaign: **metadata**, a **snapshot digest** (spreads, "
-        "backends, instability, tags), the **member run table**, and links to comparative "
-        "artifacts when generated.",
+        "One-page index: **metadata**, **snapshot digest** (headline signals), **member runs**, "
+        "and pointers to generated reports.",
         "",
         "## Metadata",
         "",
@@ -284,24 +283,17 @@ def render_campaign_summary_markdown(
             lines.extend(["", "## Generated reports", ""])
             if gp.campaign_comparative_report_md:
                 lines.append(
-                    f"- **Markdown:** `{gp.campaign_comparative_report_md}` "
-                    "(dimensions, backends, scoring instability, mode gaps, failure tags)",
+                    f"- **Comparative:** `{gp.campaign_comparative_report_md}` "
+                    "(narrative + fingerprint + failure atlas)",
                 )
             if gp.campaign_analysis_json:
-                lines.append(f"- **JSON:** `{gp.campaign_analysis_json}` (machine-readable mirror)")
+                lines.append(f"- **Analysis JSON:** `{gp.campaign_analysis_json}`")
             if gp.campaign_semantic_summary_json or gp.campaign_semantic_summary_md:
                 lines.extend(["", "### Semantic / hybrid judge rollup", ""])
                 if gp.campaign_semantic_summary_md:
-                    lines.append(
-                        f"- **Markdown:** `{gp.campaign_semantic_summary_md}` "
-                        "(repeat-judge disagreement, low-confidence cells; "
-                        "variance by suite / provider / mode)",
-                    )
+                    lines.append(f"- **Markdown:** `{gp.campaign_semantic_summary_md}`")
                 if gp.campaign_semantic_summary_json:
-                    lines.append(
-                        f"- **JSON:** `{gp.campaign_semantic_summary_json}` "
-                        "(structured aggregates)",
-                    )
+                    lines.append(f"- **JSON:** `{gp.campaign_semantic_summary_json}`")
     lines.extend(
         [
             "",

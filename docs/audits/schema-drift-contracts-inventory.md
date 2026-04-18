@@ -1,11 +1,12 @@
 # Audit: committed artifact drift risk (examples / fixtures / emitted campaign outputs)
 
 **Date:** 2026-04-18  
-**Method:** Deterministic **`load_artifact_file`** — each file is validated with **JSON Schema** then **Pydantic** (`src/agent_llm_wiki_matrix/artifacts.py`).
+**Last reviewed:** 2026-04-17 (v0.2.5 — verification ergonomics; inventory paths unchanged)  
+**Method:** Deterministic **`load_artifact_file`** — each file is validated with **JSON Schema** then **Pydantic** (`src/agent_llm_wiki_matrix/artifacts.py`). This document describes what **layer B** (**`tests/test_schema_drift_contracts.py`**, invoked via **`just validate-artifacts`**) sweeps. **Layer A** is **`alwm validate <path> <kind>`** (one file). **Layer C** is **`just ci`** (full default suite, which includes layer **B**).
 
 ## Canonical verification
 
-See **[docs/workflows/verification.md](../workflows/verification.md)** for how **`just validate-artifacts`** relates to **`just ci`** and **`uv run`** fallbacks.
+See **[docs/workflows/verification.md](../workflows/verification.md)** for the **three layers** (**`alwm validate`**, **`validate-artifacts`**, **`just ci`**) and **`uv run`** fallbacks.
 
 ```bash
 uv run just validate-artifacts

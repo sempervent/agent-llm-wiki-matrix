@@ -4,11 +4,9 @@
 - **Title:** Minimal offline campaign (single suite, deterministic)
 - **Created:** `1970-01-01T00:00:00Z`
 
-Rolls up **semantic** and **hybrid** scoring cells: repeat-judge disagreement, low-confidence flags, per-criterion instability, and per-axis hotspots. **Deterministic** cells are counted but do not contribute judge spread. Use with **`campaign-summary.md`** (run index) and **`reports/campaign-report.md`** (full comparative narrative).
+Semantic / hybrid judge rollups from member **evaluation** artifacts (deterministic cells counted, no spread). Cross-link: **`campaign-summary.md`**, **`reports/campaign-report.md`**.
 
 ## Executive snapshot
-
-Counts below combine judge metadata from member-run **evaluation** artifacts.
 
 | Signal | Count |
 | --- | ---: |
@@ -24,27 +22,9 @@ Counts below combine judge metadata from member-run **evaluation** artifacts.
 | Mean range (repeat cells) | — |
 | Mean σ total (repeat cells) | — |
 
-### Suites
-
-| Rank | Axis | Instab. | Cells | Sem | Rep | LC | m_rng | x_rng | σ_tot |
-| ---: | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| 1 | `fixtures/benchmarks/campaign_micro.v1.yaml` | -1.000000 | 1 | 0 | 0 | 0 | — | — | — |
-
-### Provider axis
-
-| Rank | Axis | Instab. | Cells | Sem | Rep | LC | m_rng | x_rng | σ_tot |
-| ---: | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| 1 | `(default)` | -1.000000 | 1 | 0 | 0 | 0 | — | — | — |
-
-### Execution modes
-
-| Rank | Axis | Instab. | Cells | Sem | Rep | LC | m_rng | x_rng | σ_tot |
-| ---: | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| 1 | `cli` | -1.000000 | 1 | 0 | 0 | 0 | — | — | — |
-
 ## Instability hotspots
 
-Axes with the largest judge disagreement on repeat-judge cells (**`mean_range_across_cells`** / **`max_range_observed`**).
+Ranked by **`mean_range_across_cells`** and **`max_range_observed`** (repeat-judge cells).
 
 _No semantic / hybrid cells — hotspots apply when `eval_scoring.backend` is semantic or hybrid with repeat judges._
 

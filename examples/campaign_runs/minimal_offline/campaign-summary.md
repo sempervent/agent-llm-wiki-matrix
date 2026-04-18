@@ -1,6 +1,6 @@
 # Campaign summary: `campaign.examples.minimal_offline.v1`
 
-Single-page index for this campaign: **metadata**, a **snapshot digest** (spreads, backends, instability, tags), the **member run table**, and links to comparative artifacts when generated.
+One-page index: **metadata**, **snapshot digest** (headline signals), **member runs**, and pointers to generated reports.
 
 ## Metadata
 
@@ -26,8 +26,8 @@ Stable per-axis hashes for longitudinal grouping and comparability checks (see `
 - **dry_run:** `False`
 - **Planned runs:** 1
 - **Succeeded / failed:** 1 / 0
-- **git_commit:** `1d6cbf5bc0c399ea757e6b38add5f4db5f10d102`
-- **git_describe:** `v0.2.3-dirty`
+- **git_commit:** `78ab7d2e11d5cb179271c2b6a0894f2ecc595489`
+- **git_describe:** `v0.2.4-dirty`
 
 ## Aggregated runtime (member manifests)
 
@@ -37,8 +37,8 @@ Sums of per-run `runtime_summary` fields for successful member runs that recorde
 | --- | --- |
 | member_runs_timed | 1 |
 | total_browser_phase_seconds | 0.000000 |
-| total_provider_completion_seconds | 0.000010 |
-| total_evaluation_phase_seconds | 0.000760 |
+| total_provider_completion_seconds | 0.000005 |
+| total_evaluation_phase_seconds | 0.000553 |
 | total_judge_phase_seconds | 0.000000 |
 | total_judge_invocations | 0 |
 | cells_with_judge_parse_fallback | 0 |
@@ -46,10 +46,7 @@ Sums of per-run `runtime_summary` fields for successful member runs that recorde
 
 ## Snapshot digest
 
-Condensed signals from this campaign: best/worst **mean member scores** by sweep axis, **backend** means across cells, **longitudinal** semantic instability and mode gaps, recurring **FT-*** tags, and (when present) **judge** confidence / repeat-disagreement rollups.
-
-- **Full comparative narrative:** `reports/campaign-report.md`
-- **Repeat-judge & confidence tables:** `campaign-semantic-summary.md`
+Headline signals only — **full tables** in `reports/campaign-report.md` and `campaign-semantic-summary.md`.
 
 ### Mean score — best / worst by sweep axis
 
@@ -72,15 +69,18 @@ _No mode-gap rows above threshold, or modes not comparable in member runs._
 
 _No FT-* signals in this pass._
 
-### Judge confidence & repeat disagreement (rollup)
+### Judge & semantic signals
+
+#### Confidence & repeat disagreement
 
 - **Low-confidence (merged):** 0 — judge 0, repeat 0
 - **Repeat-judge cells (N>1):** 0; **max range:** —
 
 
-### Semantic / hybrid judge — axis hotspots (rollup)
+#### Axis hotspots (suite / provider / mode)
 
 _All cells used deterministic scoring — no judge variance rollups._
+
 ---
 
 ## Member run index
@@ -93,13 +93,13 @@ One row per planned member benchmark run (including failures). **Mean score** is
 
 ## Generated reports
 
-- **Markdown:** `reports/campaign-report.md` (dimensions, backends, scoring instability, mode gaps, failure tags)
-- **JSON:** `reports/campaign-analysis.json` (machine-readable mirror)
+- **Comparative:** `reports/campaign-report.md` (narrative + fingerprint + failure atlas)
+- **Analysis JSON:** `reports/campaign-analysis.json`
 
 ### Semantic / hybrid judge rollup
 
-- **Markdown:** `campaign-semantic-summary.md` (repeat-judge disagreement, low-confidence cells; variance by suite / provider / mode)
-- **JSON:** `campaign-semantic-summary.json` (structured aggregates)
+- **Markdown:** `campaign-semantic-summary.md`
+- **JSON:** `campaign-semantic-summary.json`
 
 ## Longitudinal follow-up
 

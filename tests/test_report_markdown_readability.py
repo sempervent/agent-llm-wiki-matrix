@@ -6,6 +6,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 from agent_llm_wiki_matrix.benchmark.campaign_reporting import (
+    render_campaign_at_a_glance_markdown,
     render_campaign_comparative_markdown,
     render_comparative_executive_markdown,
     suite_ref_benchmark_id_partition_coincide,
@@ -297,3 +298,115 @@ def test_semantic_summary_markdown_snapshot_shape() -> None:
     assert "## Instability hotspots" in md
     assert "## Totals" not in md
     assert "| Runs scanned | 1 |" in md
+
+
+def test_at_a_glance_uses_merged_judge_heading() -> None:
+    """Judge rollup uses one ### block with #### subheads (no duplicate H3 pair)."""
+    m = BenchmarkCampaignManifest(
+        schema_version=1,
+        campaign_id="c",
+        title="t",
+        created_at="1970-01-01T00:00:00Z",
+        definition_source_relpath="x.yaml",
+        fixture_mode_force_mock=True,
+        dry_run=False,
+        runs=[
+            BenchmarkCampaignRunEntry(
+                run_index=0,
+                run_id="c__0000",
+                suite_ref="a.yaml",
+                benchmark_id="b1",
+                eval_scoring_label="suite_default",
+                browser_config_applied=False,
+                output_relpath="runs/run0000",
+                manifest_relpath="runs/run0000/manifest.json",
+                cell_count=1,
+                status="succeeded",
+                mean_total_weighted_score=0.9,
+                provider_config_ref=None,
+                execution_modes_filter=None,
+            ),
+        ],
+    )
+    sem = CampaignSemanticSummaryV1(
+        schema_version=1,
+        campaign_id="c",
+        title="t",
+        created_at="1970-01-01T00:00:00Z",
+        totals=CampaignSemanticTotals(
+            runs_scanned=1,
+            cells_total=1,
+            cells_deterministic=0,
+            cells_semantic_or_hybrid=1,
+            cells_with_repeat_judge=1,
+            low_confidence_cells=0,
+            cells_flagged_judge_low_confidence=0,
+            cells_flagged_repeat_confidence_low=0,
+            max_range_across_campaign=0.1,
+            mean_range_repeat_cells=None,
+            mean_total_weighted_stdev_repeat=None,
+        ),
+        by_suite=[],
+        by_provider=[],
+        by_execution_mode=[],
+        criterion_instability=[],
+        instability_highlights=CampaignSemanticInstabilityHighlights(),
+        cells=[],
+    )
+    snaps = [_snap("c__0000", "b1", scoring_backend="semantic")]
+    analysis = analyze_longitudinal(
+        snaps,
+        regression_delta=0.03,
+        low_score=0.55,
+        min_recurring=2,
+        mode_gap_threshold=0.12,
+    )
+    md = render_campaign_at_a_glance_markdown(
+        m,
+        longitudinal_bundle=(snaps, analysis),
+        semantic_summary=sem,
+    )
+    assert "### Judge & semantic signals" in md
+    assert "#### Confidence & repeat disagreement" in md
+    assert "#### Axis hotspots" in md
+    assert "### Judge confidence" not in md
+    assert "### Semantic / hybrid judge" not in md
+
+
+def test_comparative_report_has_separator_before_dimensions() -> None:
+    m = BenchmarkCampaignManifest(
+        schema_version=1,
+        campaign_id="c",
+        title="t",
+        created_at="1970-01-01T00:00:00Z",
+        definition_source_relpath="x.yaml",
+        fixture_mode_force_mock=True,
+        dry_run=False,
+        runs=[
+            BenchmarkCampaignRunEntry(
+                run_index=0,
+                run_id="c__0000",
+                suite_ref="a.yaml",
+                benchmark_id="b1",
+                eval_scoring_label="suite_default",
+                browser_config_applied=False,
+                output_relpath="runs/run0000",
+                manifest_relpath="runs/run0000/manifest.json",
+                cell_count=1,
+                status="succeeded",
+                mean_total_weighted_score=0.9,
+                provider_config_ref=None,
+                execution_modes_filter=None,
+            ),
+        ],
+    )
+    snaps = [_snap("c__0000", "b1")]
+    analysis = analyze_longitudinal(
+        snaps,
+        regression_delta=0.03,
+        low_score=0.55,
+        min_recurring=2,
+        mode_gap_threshold=0.12,
+    )
+    md = render_campaign_comparative_markdown(m, snaps, analysis, semantic_summary=None)
+    assert "\n---\n\n## Which dimensions varied" in md

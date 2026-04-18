@@ -36,8 +36,10 @@ def test_compare_same_pack_identity_match() -> None:
     assert ri["evidence_strength"] in {"weak", "moderate"}
     md = render_campaign_result_pack_compare_markdown(data)
     assert md.startswith("# Campaign result pack comparison")
-    assert "## Reader interpretation" in md
-    assert "Non-causal summary" in md
+    assert "## At a glance" in md
+    assert "## Member run overlap" in md
+    assert "## Analysis deltas" in md
+    assert "Non-causal" in md
     assert "right − left" in md
     assert "pack_identity_fingerprint" in md
 
@@ -60,9 +62,10 @@ def test_compare_minimal_vs_multi_different_campaign_ids() -> None:
     assert bec["aggregate"]["right_total_dom_excerpts"] >= 1
     assert any(r.get("pairing") == "right_only" for r in bec["paired_rows"])
     md = render_campaign_result_pack_compare_markdown(data)
-    assert "## Reader interpretation" in md
+    assert "## At a glance" in md
     assert data["reader_interpretation"]["comparison_kind"] == "pack"
-    assert "Browser evidence (`browser_evidence_member_cells`)" in md
+    assert "### Browser evidence (`browser_evidence_member_cells`)" in md
+    assert "With movement" in md
     assert "right only" in md
 
 

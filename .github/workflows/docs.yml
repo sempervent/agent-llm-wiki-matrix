@@ -1,4 +1,8 @@
-# Build the MkDocs site on doc changes; optionally publish to gh-pages from main.
+# Build MkDocs on doc changes; deploy to GitHub Pages from main using the official Pages actions.
+#
+# Repository Settings → Pages → Build and deployment → Source: GitHub Actions (required).
+# Do not use "Deploy from a branch: gh-pages" with this workflow — that pairs with branch-only deploys.
+#
 # See docs/workflows/docs-site.md
 
 name: Documentation
@@ -15,9 +19,10 @@ on:
       - "docs/**"
       - "mkdocs.yml"
       - ".github/workflows/docs.yml"
+  workflow_dispatch:
 
 concurrency:
-  group: docs-${{ github.workflow }}-${{ github.ref }}
+  group: documentation-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -50,23 +55,23 @@ jobs:
           path: site/
           retention-days: 14
 
-  deploy:
-    needs: build
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    steps:
-      - name: Download site artifact
-        uses: actions/download-artifact@v4
+      - name: Upload Pages artifact
+        if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+        uses: actions/upload-pages-artifact@v3
         with:
-          name: mkdocs-site
           path: site
 
-      - name: Deploy to gh-pages
-        uses: peaceiris/actions-gh-pages@v4
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./site
-          publish_branch: gh-pages
-          force_orphan: true
+  deploy:
+    needs: build
+    if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

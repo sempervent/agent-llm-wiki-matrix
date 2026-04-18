@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.5] — 2026-04-19
+
+**Publication-quality evidence packs, compare report readability, validation ergonomics, and MkDocs navigation** — reviewer-first **pack INDEX** and optional **`publication_hints`**, **scannable** pack/campaign **compare** Markdown (**At a glance**, **Analysis deltas**), **deduplicated** campaign/semantic/comparative Markdown, **three-layer verification** docs, and **Publication & reports** site nav—**default CI** stays **offline**.
+
+### Highlights
+
+- **Result packs** — **`CampaignResultPackV1`** optional **`publication_hints`**, **`membership_scope`**, **`optional_layers_present`**; **[docs/workflows/campaign-result-pack-publication.md](docs/workflows/campaign-result-pack-publication.md)** and regenerated **`examples/campaign_result_packs/`** (see **[docs/releases/v0.2.5.md](docs/releases/v0.2.5.md)**).
+- **Compare Markdown** — **`## At a glance`** (slim digest vs long duplicated reader prose); **member overlap** / **manifest health** earlier; **`## Analysis deltas`** for pooled means, instability, **FT-\***, browser, semantic Δ; JSON **`reader_interpretation`** unchanged.
+- **Campaign reporting** — Semantic / comparative / summary Markdown readability pass; **`tests/test_report_markdown_readability.py`**.
+- **Verification docs** — Layers **A** (`alwm validate`), **B** (`validate-artifacts`), **C** (`just ci`) in **[docs/workflows/verification.md](docs/workflows/verification.md)**; inventory note in **[docs/audits/schema-drift-contracts-inventory.md](docs/audits/schema-drift-contracts-inventory.md)**.
+- **MkDocs** — **Publication & reports (v0.2.5)** **`nav`**, **[docs/workflows/docs-site.md](docs/workflows/docs-site.md)** handbook, **[docs/index.md](docs/index.md)** cross-links.
+
+Narrative notes: [docs/releases/v0.2.5.md](docs/releases/v0.2.5.md). Prior release: [docs/releases/v0.2.4.md](docs/releases/v0.2.4.md).
+
 ## [0.2.4] — 2026-04-17
 
 **End-to-end publication workflow, MkDocs site, and compare readability** — **publication-ready** campaign paths, **navigable docs** (`mkdocs.yml`, **`just docs`**), **GitHub Actions** docs builds, **reader interpretation** on pack and campaign compares, and **report / INDEX** polish while **default CI** stays **offline**.
@@ -18,7 +32,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Compare reader interpretation** — optional **`reader_interpretation`** on **`campaign_result_pack_comparison`** and **`campaign_compare`** JSON (non-scoring narratives, **`evidence_strength`**, **`uncertainty_caveats`**) and **Reader interpretation** sections in compare Markdown.
 - **Campaign & compare Markdown** — tighter headings, digests, and cold-read **INDEX** for result packs (see **implementation log**).
 
-Narrative notes: [docs/releases/v0.2.4.md](docs/releases/v0.2.4.md). Next milestone: [docs/roadmap/v0.2.5.md](docs/roadmap/v0.2.5.md).
+Narrative notes: [docs/releases/v0.2.4.md](docs/releases/v0.2.4.md). Next milestone (now shipped): [docs/releases/v0.2.5.md](docs/releases/v0.2.5.md).
 
 ## [0.2.3] — 2026-04-19
 
@@ -32,7 +46,7 @@ Narrative notes: [docs/releases/v0.2.4.md](docs/releases/v0.2.4.md). Next milest
 - **Drift prevention** — `tests/test_schema_drift_contracts.py`, `just validate-artifacts`, inventory in `docs/audits/schema-drift-contracts-inventory.md`.
 - **Verification matrix** — canonical commands in `docs/workflows/verification.md`.
 
-Narrative notes: [docs/releases/v0.2.3.md](docs/releases/v0.2.3.md). Later milestones: [v0.2.4](docs/releases/v0.2.4.md) (shipped); current [v0.2.5](docs/roadmap/v0.2.5.md).
+Narrative notes: [docs/releases/v0.2.3.md](docs/releases/v0.2.3.md). Later milestones: [v0.2.4](docs/releases/v0.2.4.md) (shipped); [v0.2.5](docs/releases/v0.2.5.md) (shipped).
 
 ### Added
 
@@ -117,3 +131,4 @@ First tagged release: offline-first CLI, pipelines, benchmark harness, prompt re
 [0.2.1]: https://github.com/sempervent/agent-llm-wiki-matrix/releases/tag/v0.2.1
 [0.2.3]: https://github.com/sempervent/agent-llm-wiki-matrix/releases/tag/v0.2.3
 [0.2.4]: https://github.com/sempervent/agent-llm-wiki-matrix/releases/tag/v0.2.4
+[0.2.5]: https://github.com/sempervent/agent-llm-wiki-matrix/releases/tag/v0.2.5

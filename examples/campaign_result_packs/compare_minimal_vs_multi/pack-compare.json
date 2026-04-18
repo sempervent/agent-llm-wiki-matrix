@@ -162,7 +162,7 @@
     "right_present": true,
     "semantic_instability_by_scoring_backend": []
   },
-  "created_at": "2026-04-18T01:42:23Z",
+  "created_at": "2026-04-18T01:59:01Z",
   "failure_tags": {
     "codes_compared": [
       {
@@ -230,9 +230,9 @@
     ],
     "left_campaign_id": "campaign.examples.minimal_offline.v1",
     "pack_identity_fingerprint": {
-      "left": "sha256:9d6c228714d1809323eabae490bbb18b6aad06f6d328cb17b96f3f70178a3820",
+      "left": "sha256:931379d1fa93f8acac0485198d40e201f874c020b92802229a5d8cd3616fcc38",
       "match": false,
-      "right": "sha256:d5f8361795b1218944a51eab111174aad02d1348d917bf8d5af2ae65697739de"
+      "right": "sha256:c3947bc1509720962e40d617c6ca76d71635efb748441a966db7cd0df8f2e6b2"
     },
     "right_campaign_id": "campaign.examples.multi_suite.v1",
     "same_campaign_id": false

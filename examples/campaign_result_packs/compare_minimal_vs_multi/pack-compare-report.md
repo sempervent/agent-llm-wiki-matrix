@@ -1,16 +1,16 @@
 # Campaign result pack comparison
 
-Side-by-side view of two **`campaign_result_pack`** trees (published bundles). **Δ** columns use **right − left** when both sides are numeric. See **`pack-compare.json`** for the full structured diff.
+Two **`campaign_result_pack`** trees. **Δ** = right − left (numeric). Structured diff: **`pack-compare.json`**.
 
 - **Left:** `examples/campaign_result_packs/minimal_offline` — `examples/campaign_result_packs/minimal_offline` (`pack_id`: `minimal-offline`)
 - **Right:** `examples/campaign_result_packs/multi_suite` — `examples/campaign_result_packs/multi_suite` (`pack_id`: `multi-suite`)
-- **Generated:** `2026-04-18T01:42:23Z`
+- **Generated:** `2026-04-18T01:59:01Z`
 
-## Reader interpretation
+## At a glance
 
-> **Non-causal summary** — use this to orient; confirm in per-campaign reports and manifests.
+> **Non-causal** — orientation only; confirm in per-campaign reports, manifests, and the **Analysis deltas** section below.
 
-- **Evidence strength (aggregate):** **weak** (heuristic from analysis presence, member overlap, and run counts — not a power analysis).
+- **Evidence strength (aggregate):** **weak** (heuristic — not a power analysis).
 
 ### What changed
 
@@ -20,25 +20,11 @@ Side-by-side view of two **`campaign_result_pack`** trees (published bundles). *
 - **Experiment fingerprint axes that differ:** `campaign_definition`, `suite_definitions`.
 - **Member runs:** 1 only on left, 2 only on right, 0 in both — overlap affects how directly you can compare pooled tables.
 
-### Dimensions (experiment fingerprints)
+### Experiment fingerprints (mismatch)
 
-Axes where digests **differ** (configuration / suite / provider / scoring / registry / browser): `campaign_definition`, `suite_definitions`.
+Digests **differ** on: `campaign_definition`, `suite_definitions` (configuration / suite / provider / scoring / registry / browser).
 
-### Instability (longitudinal counts)
-
-No non-zero **semantic instability** rows to contrast (or analysis missing on a side).
-
-### Browser evidence (structured traces)
-
-Browser rows: left 0, right 2; Δ DOM excerpts **2**, Δ screenshots **2**. Paired cells (both sides): **0**; unpaired keys — left-only: 0, right-only: 2. Differences reflect **fixture/capture** choices, not product quality by themselves.
-
-### Semantic summary (judge rollup)
-
-**Semantic / judge rollup deltas** (right − left, selected numeric fields): `cells_flagged_judge_low_confidence` → Δ 0.0; `cells_flagged_repeat_confidence_low` → Δ 0.0; `cells_semantic_or_hybrid` → Δ 0.0; `cells_total` → Δ 6.0; `cells_with_repeat_judge` → Δ 0.0; `low_confidence_cells` → Δ 0.0 — interpret with **repeat-judge** context in the semantic summary files.
-
-### Failure tags (FT-*)
-
-**FT-* taxonomy:** 2 code(s) with count movement; only left: 0, only right: 2 — compare failure atlas sections in each campaign report for context.
+_Instability counts, browser trace pairings, semantic rollups, and **FT-*** tables are in **Analysis deltas** — not repeated here._
 
 ### Uncertainty & limits
 
@@ -46,6 +32,13 @@ Browser rows: left 0, right 2; Δ DOM excerpts **2**, Δ screenshots **2**. Pair
 - Deltas (right − left) describe **reported** counts and means — not proven causal effects.
 - When **evidence_strength** is **weak**, treat narratives as **orientation**, not proof.
 - **No overlapping member run_ids** — pooled backend/instability rows are **not** paired runs.
+
+## Member run overlap
+
+- **Left count:** 1 · **Right count:** 2
+- **In both:** 0 · **Only left:** 1 · **Only right:** 2
+- **Run IDs only on left:** `campaign.examples.minimal_offline.v1__0000`
+- **Run IDs only on right:** `campaign.examples.multi_suite.v1__0000`, `campaign.examples.multi_suite.v1__0001`
 
 ## Identity & fingerprints
 
@@ -81,25 +74,34 @@ Browser rows: left 0, right 2; Δ DOM excerpts **2**, Δ screenshots **2**. Pair
 | `campaign_summary_md` | `campaign-summary.md` | `campaign-summary.md` | yes |
 | `index_md` | `INDEX.md` | `INDEX.md` | yes |
 
-## Comparative analysis (`campaign-analysis.json`)
+## Analysis deltas (`campaign-analysis.json`)
 
-- **Left file present:** True
-- **Right file present:** True
+- **`campaign-analysis.json` on left:** True · **on right:** True
 
-### Backend mean scores (pooled cells)
+### Pooled backend means
 
 | backend_kind | Left | Right | Δ (R−L) |
 | --- | ---: | ---: | ---: |
 | `mock` | 0.667276 | 0.410112 | -0.257164 |
 
-### Semantic instability (longitudinal counts by scoring_backend)
+### Semantic instability (by scoring_backend)
 
-| scoring_backend | Left events | Right events | Δ |
+_No unstable events reported (all counts zero on both sides). Pooled longitudinal counts only — see analysis JSON for definitions._
+
+### Failure tags (FT-*)
+
+**With movement** (Δ ≠ 0 or left ≠ right counts):
+
+| Code | Left signals | Right signals | Δ |
 | --- | ---: | ---: | ---: |
+| `FT-ABS-LOW` | None | 4 | — |
+| `FT-MODE-GAP` | None | 2 | — |
+
+- **Codes only on right:** `FT-ABS-LOW`, `FT-MODE-GAP`
 
 ### Browser evidence (`browser_evidence_member_cells`)
 
-Deterministic **DOM excerpt counts**, **screenshot counts**, **signals/extension digests** (per cell), and **extension key** sets from each side's `campaign-analysis.json`. These reflect **fixture/mock** traces unless you ran a live browser — **Playwright** remains optional. When **`runner`** appears under **extension keys**, inspect the cell's **`browser_evidence`** JSON for **`extensions.runner`** (e.g. **`mcp_stdio`**) — that is a **local MCP stdio** JSON bridge, not a hosted remote browser.
+Per-cell **`browser_evidence_member_cells`** from each `campaign-analysis.json`: DOM/screenshot counts, digests, extension keys (**fixture/mock** unless you ran a live browser). **`runner`** in extension keys → inspect cell **`browser_evidence`** JSON (**local MCP stdio** bridge, not remote IDE hosting).
 
 **Rollups (analysis rows, not scored cells):**
 
@@ -109,7 +111,7 @@ Deterministic **DOM excerpt counts**, **screenshot counts**, **signals/extension
 
 - **Member run_ids with evidence only on right:** `campaign.examples.multi_suite.v1__0001`
 
-**Per-cell pairing** uses `(suite_ref, cell_id, benchmark_id)`. **Signals** = navigation/console/DOM/screenshot counts; **extension digest** summarizes network/a11y/**trace_digest** (opaque hash of captured stdio/tooling), not remote IDE MCP.
+**Pairing** (by suite/cell/benchmark): **0** both · **0** left-only · **2** right-only. Table uses `(suite_ref, cell_id, benchmark_id)`; **Signals** / **extension digest** = captured counts and hashes (not remote MCP).
 
 | suite_ref | cell_id | Pairing | L DOM | R DOM | Δ DOM | L shot | R shot | Δ shot | Runner L | Runner R | Signals (L / R) | Extension digest (L / R) |
 | --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | --- | --- | --- | --- |
@@ -120,29 +122,15 @@ Deterministic **DOM excerpt counts**, **screenshot counts**, **signals/extension
 right → `fixtures/benchmarks/offline.v1.yaml / v-browser__p-one / bench.offline.v1`, `fixtures/benchmarks/offline.v1.yaml / v-browser__p-two / bench.offline.v1`
 
 
-## Failure tags (FT-*)
+### Semantic summary (selected numeric Δ)
 
-| Code | Left signals | Right signals | Δ |
-| --- | ---: | ---: | ---: |
-| `FT-ABS-LOW` | None | 4 | — |
-| `FT-MODE-GAP` | None | 2 | — |
-- **Only right:** `FT-ABS-LOW`, `FT-MODE-GAP`
-
-## Semantic summary totals (selected fields)
-
-See JSON for full totals; numeric Δ = right − left when both numeric.
+Full totals in JSON; **Δ** = right − left when both numeric.
 - **`cells_flagged_judge_low_confidence`:** 0.0
 - **`cells_flagged_repeat_confidence_low`:** 0.0
 - **`cells_semantic_or_hybrid`:** 0.0
 - **`cells_total`:** 6.0
 - **`cells_with_repeat_judge`:** 0.0
 - **`low_confidence_cells`:** 0.0
-
-## Member runs
-
-- **Left count:** 1 · **Right count:** 2
-- **Only in left:** `campaign.examples.minimal_offline.v1__0000`
-- **Only in right:** `campaign.examples.multi_suite.v1__0000`, `campaign.examples.multi_suite.v1__0001`
 
 ## Portability & completeness
 

@@ -363,7 +363,7 @@ def render_comparative_executive_markdown(
     lines = [
         "## Executive summary",
         "",
-        "Skim this block first, then use the sections below for full tables and the failure atlas.",
+        "At-a-glance; **sections below** repeat and expand each topic (including failure atlas).",
         "",
     ]
     if varied_md:
@@ -544,13 +544,8 @@ def render_campaign_at_a_glance_markdown(
     lines = [
         "## Snapshot digest",
         "",
-        "Condensed signals from this campaign: best/worst **mean member scores** by sweep axis, "
-        "**backend** means across cells, **longitudinal** semantic instability and mode gaps, "
-        "recurring **FT-*** tags, and (when present) **judge** confidence / repeat-disagreement "
-        "rollups.",
-        "",
-        "- **Full comparative narrative:** `reports/campaign-report.md`",
-        "- **Repeat-judge & confidence tables:** `campaign-semantic-summary.md`",
+        "Headline signals only — **full tables** in `reports/campaign-report.md` and "
+        "`campaign-semantic-summary.md`.",
         "",
     ]
     if manifest.dry_run:
@@ -655,10 +650,15 @@ def render_campaign_at_a_glance_markdown(
                 )
     lines.append("")
 
-    lines.extend(["### Judge confidence & repeat disagreement (rollup)", ""])
+    lines.extend(["### Judge & semantic signals", ""])
     if semantic_summary is None:
-        lines.append("_No semantic summary artifact — run campaign with member manifests._")
+        lines.append(
+            "_No `campaign-semantic-summary` — run succeeded member benchmarks to emit judge "
+            "rollups._",
+        )
+        lines.append("")
     else:
+        lines.extend(["#### Confidence & repeat disagreement", ""])
         tot = semantic_summary.totals
         _mrc = tot.max_range_across_campaign
         _max_range_disp = _mrc if _mrc is not None else "—"
@@ -686,70 +686,69 @@ def render_campaign_at_a_glance_markdown(
                 f"(Σ={c0.sum_score_range:.6f})",
             )
         lines.append("")
-    lines.extend(["### Semantic / hybrid judge — axis hotspots (rollup)", ""])
-    if semantic_summary is None:
-        lines.append("_No semantic summary artifact (see campaign-semantic-summary when present)._")
-    elif semantic_summary.totals.cells_semantic_or_hybrid == 0:
-        lines.append("_All cells used deterministic scoring — no judge variance rollups._")
-    else:
-
-        def _hot_table(
-            title: str,
-            rollups: Sequence[Any],
-            primary: str,
-            fallback: str,
-        ) -> None:
-            def _rank(x: Any) -> tuple[float, float]:
-                p = getattr(x, primary, None)
-                f = getattr(x, fallback, None)
-                return (
-                    float(p) if p is not None else -1.0,
-                    float(f) if f is not None else -1.0,
-                )
-
-            def _hot_score(x: Any) -> float:
-                a, b = _rank(x)
-                return max(a, b) if max(a, b) >= 0 else -1.0
-
-            ranked = sorted(
-                rollups,
-                key=lambda x: (_hot_score(x), x.axis_value),
-                reverse=True,
-            )
-            lines.append(
-                f"**{title}** (ranked by `{primary}`, then `{fallback}`):",
-            )
-            if not rollups:
-                lines.append("- _No rollup rows._")
-            else:
-                for x in ranked[:5]:
-                    pr, fb = _rank(x)
-                    pr_s = f"{pr:.6f}" if pr >= 0 else "—"
-                    fb_s = f"{fb:.6f}" if fb >= 0 else "—"
-                    lines.append(
-                        f"- `{x.axis_value}` — mean_range={pr_s}, max_range={fb_s} "
-                        f"(low-conf.: {x.low_confidence_cells})",
-                    )
+        lines.extend(["#### Axis hotspots (suite / provider / mode)", ""])
+        if semantic_summary.totals.cells_semantic_or_hybrid == 0:
+            lines.append("_All cells used deterministic scoring — no judge variance rollups._")
             lines.append("")
+        else:
 
-        _hot_table(
-            "By suite",
-            semantic_summary.by_suite,
-            "mean_range_across_cells",
-            "max_range_observed",
-        )
-        _hot_table(
-            "By provider axis",
-            semantic_summary.by_provider,
-            "mean_range_across_cells",
-            "max_range_observed",
-        )
-        _hot_table(
-            "By execution mode",
-            semantic_summary.by_execution_mode,
-            "mean_range_across_cells",
-            "max_range_observed",
-        )
+            def _hot_table(
+                title: str,
+                rollups: Sequence[Any],
+                primary: str,
+                fallback: str,
+            ) -> None:
+                def _rank(x: Any) -> tuple[float, float]:
+                    p = getattr(x, primary, None)
+                    f = getattr(x, fallback, None)
+                    return (
+                        float(p) if p is not None else -1.0,
+                        float(f) if f is not None else -1.0,
+                    )
+
+                def _hot_score(x: Any) -> float:
+                    a, b = _rank(x)
+                    return max(a, b) if max(a, b) >= 0 else -1.0
+
+                ranked = sorted(
+                    rollups,
+                    key=lambda x: (_hot_score(x), x.axis_value),
+                    reverse=True,
+                )
+                lines.append(
+                    f"**{title}** (ranked by `{primary}`, then `{fallback}`):",
+                )
+                if not rollups:
+                    lines.append("- _No rollup rows._")
+                else:
+                    for x in ranked[:5]:
+                        pr, fb = _rank(x)
+                        pr_s = f"{pr:.6f}" if pr >= 0 else "—"
+                        fb_s = f"{fb:.6f}" if fb >= 0 else "—"
+                        lines.append(
+                            f"- `{x.axis_value}` — mean_range={pr_s}, max_range={fb_s} "
+                            f"(low-conf.: {x.low_confidence_cells})",
+                        )
+                lines.append("")
+
+            _hot_table(
+                "By suite",
+                semantic_summary.by_suite,
+                "mean_range_across_cells",
+                "max_range_observed",
+            )
+            _hot_table(
+                "By provider axis",
+                semantic_summary.by_provider,
+                "mean_range_across_cells",
+                "max_range_observed",
+            )
+            _hot_table(
+                "By execution mode",
+                semantic_summary.by_execution_mode,
+                "mean_range_across_cells",
+                "max_range_observed",
+            )
 
     lines.append("---")
     lines.append("")
@@ -913,10 +912,8 @@ def render_campaign_comparative_markdown(
     lines = [
         f"# Campaign comparative report: `{manifest.campaign_id}`",
         "",
-        "Analysis uses **succeeded** member benchmark runs only. **`FT-*`** codes follow the "
-        "longitudinal taxonomy (see `docs/workflows/longitudinal-reporting.md`). "
-        "**Mode gaps** and **semantic instability** counts are derived from the same longitudinal "
-        "pass as `reports/campaign-analysis.json`.",
+        "**Succeeded** member runs only. **`FT-*`:** `docs/workflows/longitudinal-reporting.md`. "
+        "Same longitudinal pass as `campaign-analysis.json`.",
         "",
         render_comparative_executive_markdown(manifest, snapshots, analysis),
     ]
@@ -924,6 +921,8 @@ def render_campaign_comparative_markdown(
         lines.append(render_campaign_semantic_judge_section_markdown(semantic_summary))
     lines.extend(
         [
+            "---",
+            "",
             "## Which dimensions varied",
             "",
         ],
@@ -974,8 +973,7 @@ def render_campaign_comparative_markdown(
         [
             "## Provider / backend performance (mean cell score)",
             "",
-            "Higher is better (simple mean of **total_weighted_score** over all cells "
-            "using that **backend_kind** across member runs).",
+            "Mean **total_weighted_score** per **backend_kind** (higher is better).",
             "",
             "| Rank | backend_kind | Mean score | Cells |",
             "| ---: | --- | ---: | ---: |",
@@ -994,9 +992,7 @@ def render_campaign_comparative_markdown(
         [
             "## Scoring backends with semantic / hybrid instability",
             "",
-            "Counts **cells** flagged in longitudinal semantic stability analysis "
-            "(low confidence or repeat-variance thresholds), grouped by **scoring_backend** "
-            "on the evaluation artifact.",
+            "Unstable **cell** events by **scoring_backend** (longitudinal thresholds).",
             "",
             "| scoring_backend | Unstable cell events |",
             "| --- | ---: |",
@@ -1039,8 +1035,7 @@ def render_campaign_comparative_markdown(
         [
             "## Top recurring failure taxonomy tags",
             "",
-            "Signal counts (unique FT-* entries per code). See `docs/workflows/"
-            "longitudinal-reporting.md` or `FAILURE_TAXONOMY` in `pipelines/longitudinal.py`.",
+            "Signal counts per **FT-*** code (`docs/workflows/longitudinal-reporting.md`).",
             "",
             "| Rank | Code | Signals | Description |",
             "| ---: | --- | ---: | --- |",

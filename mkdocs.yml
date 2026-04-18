@@ -8,6 +8,9 @@ site_author: Joshua Grant
 repo_url: https://github.com/sempervent/agent-llm-wiki-matrix
 edit_uri: edit/main/docs/
 
+# Project site base URL (GitHub Pages). Required for correct links and assets when not served from domain root.
+site_url: https://sempervent.github.io/agent-llm-wiki-matrix/
+
 docs_dir: docs
 site_dir: site
 
@@ -52,18 +55,20 @@ markdown_extensions:
   - pymdownx.tabbed:
       alternate_style: true
 
-# Nav: "Publication (v0.2.5)" = campaign/pack/compare + matrix reporting + verification. Do not list the same .md twice (v0.2.5 tracking lives only here; audit only here).
+# Nav: "Publication & reports (v0.2.5)" = E2E checklist, merge-order tracking, CLI/compare, reporting, verification, examples index.
+# Roadmap v0.2.5 theme stays under "Roadmap & milestones" only (avoid duplicate sidebar entries).
 nav:
   - Home: index.md
-  - Publication (v0.2.5):
-    - "Checklist: run → pack → publish": workflows/campaign-result-pack-publication.md
+  - Publication & reports (v0.2.5):
+    - "E2E checklist: run → validate → pack → compare → publish": workflows/campaign-result-pack-publication.md
     - "Tracking v0.2.5 (merge order)": tracking/v0.2.5-campaign.md
-    - Benchmark campaigns (CLI & outputs): workflows/benchmark-campaigns.md
-    - Campaign walkthrough (examples): workflows/campaign-walkthrough.md
+    - "Benchmark campaigns (CLI, packs, compare-packs, compare)": workflows/benchmark-campaigns.md
+    - "Campaign walkthrough (committed trees)": workflows/campaign-walkthrough.md
     - "Reporting pipeline (matrices, alwm report)": workflows/reporting.md
-    - "CI & drift (verification matrix)": workflows/verification.md
+    - "Verification (CI, drift sweep, alwm validate)": workflows/verification.md
     - "Longitudinal & regression reporting": workflows/longitudinal-reporting.md
-    - Evidence audit (publication gaps): audits/v0.2.4-publication-workflow-audit.md
+    - "Evidence audit (v0.2.4 publication gaps)": audits/v0.2.4-publication-workflow-audit.md
+    - "Examples index (repo examples/)": examples/README.md
   - Workflows:
     - Agentic benchmark pack: workflows/agentic-benchmark-pack.md
     - Benchmarking: workflows/benchmarking.md
@@ -72,13 +77,14 @@ nav:
     - Multi-agent parallel: workflows/multi-agent-parallel.md
     - Smoke tests: workflows/smoke.md
     - Walkthrough v0.1.0: workflows/walkthrough-v0.1.0.md
-    - Documentation site (handbook): workflows/docs-site.md
+    - "Documentation site (MkDocs nav & CI)": workflows/docs-site.md
   - Roadmap & milestones:
-    - v0.2.5 (active): roadmap/v0.2.5.md
+    - "v0.2.5 (complete — publication & reports)": roadmap/v0.2.5.md
     - v0.2.4: roadmap/v0.2.4.md
     - v0.2.3: roadmap/v0.2.3.md
     - v0.2.0: roadmap/v0.2.0.md
   - Releases:
+    - v0.2.5: releases/v0.2.5.md
     - v0.2.4: releases/v0.2.4.md
     - v0.2.3: releases/v0.2.3.md
     - v0.2.2: releases/v0.2.2.md
@@ -109,7 +115,6 @@ nav:
     - "Index: campaign orchestration": wiki/campaign-orchestration.md
   - ADRs:
     - ADR 0001 (alternate path under docs/adr): adr/0001-campaign-orchestration.md
-  - Examples index: examples/README.md
   - Project:
     - Release readiness: release-readiness.md
     - Implementation log: implementation-log.md

@@ -10,10 +10,10 @@
       "raw_response_relpath": "cells/v-form__p-one/response.raw.txt",
       "request_relpath": "cells/v-form__p-one/request.json",
       "runtime": {
-        "browser_seconds": 0.00054,
-        "evaluation_seconds": 0.000259,
+        "browser_seconds": 0.000646,
+        "evaluation_seconds": 0.000176,
         "judge_repeat_count": 1,
-        "provider_seconds": 6e-06,
+        "provider_seconds": 8e-06,
         "schema_version": 1
       }
     }
@@ -49,14 +49,14 @@
   "rubric_ref": "examples/dataset/rubrics/browser_realism.v1.json",
   "run_id": "campaign.examples.browser_evidence_compare.v1__0001",
   "runtime_summary": {
-    "browser_phase_seconds": 0.00054,
-    "duration_seconds": 0.002325,
-    "evaluation_phase_seconds": 0.000259,
-    "finished_at_utc": "2026-04-18T01:41:39Z",
+    "browser_phase_seconds": 0.000646,
+    "duration_seconds": 0.00245,
+    "evaluation_phase_seconds": 0.000176,
+    "finished_at_utc": "2026-04-18T01:58:48Z",
     "judge_phase_seconds": 0.0,
-    "provider_completion_seconds": 6e-06,
+    "provider_completion_seconds": 8e-06,
     "schema_version": 1,
-    "started_at_utc": "2026-04-18T01:41:39Z"
+    "started_at_utc": "2026-04-18T01:58:48Z"
   },
   "schema_version": 1,
   "success_criteria": [],

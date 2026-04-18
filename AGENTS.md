@@ -26,28 +26,20 @@ Use this section as the **single place** in `AGENTS.md` that ties **what shipped
 
 | | |
 | --- | --- |
-| **Version** | **v0.2.4** (narrative: **[docs/releases/v0.2.4.md](docs/releases/v0.2.4.md)**) |
-| **Objectives** | **End-to-end publication** workflow, **MkDocs** site + docs CI, **compare reader interpretation**, **campaign / compare / INDEX** readability, **operator rituals** aligned—**default CI** stays **offline**. |
+| **Version** | **v0.2.5** (narrative: **[docs/releases/v0.2.5.md](docs/releases/v0.2.5.md)**) |
+| **Objectives** | **Publication-quality** packs and **campaign/compare** Markdown, **scannable** compare output (**At a glance**, **Analysis deltas**), **validation** ergonomics (three layers), **MkDocs** **Publication & reports** nav—**default CI** stays **offline**. |
 | **Exit bar** | **`uv run just ci`**, **`just validate-artifacts`**, **`mkdocs build --strict`** (with **`[docs]`** extra); verification matrix and checklists—see release notes. |
-| **Changelog** | **[CHANGELOG.md](CHANGELOG.md)** — **[0.2.4]**; new work accrues under **`[Unreleased]`** until the next tagged section. |
+| **Changelog** | **[CHANGELOG.md](CHANGELOG.md)** — **[0.2.5]**; new work accrues under **`[Unreleased]`** until the next tagged section. |
 
-Older milestones for context: **[docs/releases/v0.2.2.md](docs/releases/v0.2.2.md)**, **[docs/roadmap/v0.2.0.md](docs/roadmap/v0.2.0.md)** (fingerprints + campaigns arc), **[docs/releases/v0.2.1.md](docs/releases/v0.2.1.md)**.
+Older milestones for context: **[docs/releases/v0.2.4.md](docs/releases/v0.2.4.md)**, **[docs/releases/v0.2.2.md](docs/releases/v0.2.2.md)**, **[docs/roadmap/v0.2.0.md](docs/roadmap/v0.2.0.md)** (fingerprints + campaigns arc), **[docs/releases/v0.2.1.md](docs/releases/v0.2.1.md)**.
 
-### In-flight milestone (v0.2.5 — evidence packs + report readability)
+### In-flight milestone
 
-| | |
-| --- | --- |
-| **Version** | **v0.2.5** (active) |
-| **Roadmap** | **[docs/roadmap/v0.2.5.md](docs/roadmap/v0.2.5.md)** |
-| **Tracking** | **[docs/tracking/v0.2.5-campaign.md](docs/tracking/v0.2.5-campaign.md)** — workstreams, merge order, open questions |
-| **Mission** | **Publication-quality evidence packs and final report readability**: **presentation** of packs and reports, **comparison** workflow refinement, **deduplication** in generated Markdown, **drift / validation** ergonomics, **MkDocs** **nav** quality (**`mkdocs.yml`**, **`just docs`**, **[docs/workflows/docs-site.md](docs/workflows/docs-site.md)**). |
-| **Non-goals** | Dashboards, cloud deployment, remote/IDE MCP, replacing offline default CI with live defaults. |
+**None** — **v0.2.5** is **shipped**. Open **`[Unreleased]`** in **[CHANGELOG.md](CHANGELOG.md)** for new work; create **`docs/roadmap/v0.2.6.md`** (or the next version) and matching **tracking** when the next milestone is chartered.
 
-**Canonical verification:** **`uv run just ci`** (default merge bar); **`just validate-artifacts`** (or **`uv run pytest tests/test_schema_drift_contracts.py`**) for committed JSON contracts—see **[docs/workflows/verification.md](docs/workflows/verification.md)** for the full matrix and **`uv run`** fallbacks.
+**Canonical verification (unchanged):** **`uv run just ci`** (default merge bar); **`just validate-artifacts`** (or **`uv run pytest tests/test_schema_drift_contracts.py`**) for committed JSON contracts—see **[docs/workflows/verification.md](docs/workflows/verification.md)** for the full matrix and **`uv run`** fallbacks.
 
-**Prefer next:** **[docs/tracking/v0.2.5-campaign.md](docs/tracking/v0.2.5-campaign.md)** priorities. **Avoid** unrelated feature surface.
-
-**MkDocs (keep in sync):** When you add or rename **user-facing** docs under **`docs/`**, update **`mkdocs.yml`** **`nav:`** so the site sidebar matches (see **[docs/workflows/docs-site.md](docs/workflows/docs-site.md)**). Run **`just docs-build`** before merging doc-only changes that touch **`nav`**. Do not duplicate long workflow text in **`docs/index.md`** — link to the publication checklist instead. **`README.md`** / **`AGENTS.md`** / **`CHANGELOG.md`** stay at repo root; the site links them under **Repository on GitHub**.
+**MkDocs (keep in sync):** When you add or rename **user-facing** docs under **`docs/`**, update **`mkdocs.yml`** **`nav:`** so the site sidebar matches (see **[docs/workflows/docs-site.md](docs/workflows/docs-site.md)**). The top sidebar block **Publication & reports (v0.2.5)** remains the primary path for the publication/compare/verification story; **Roadmap & milestones** holds completed theme docs (**v0.2.5**) without duplicating merge-order tracking. Run **`just docs-build`** before merging doc-only changes that touch **`nav`**. Do not duplicate long workflow text in **`docs/index.md`** — link to the publication checklist instead. **`README.md`** / **`AGENTS.md`** / **`CHANGELOG.md`** stay at repo root; the site links them under **Repository on GitHub**.
 
 ### Maintenance checklist (on each release or milestone shift)
 
@@ -184,7 +176,8 @@ Campaign-related changes must update:
 | Layer | Minimum bar |
 | --- | --- |
 | **Python (default CI parity)** | **`uv run just ci`** (or **`just ci`** with an activated uv‑managed **`.venv`**) = **ruff** + **mypy** + **`uv run pytest tests/ --ignore=tests/integration`**. **Without `just`:** same three steps explicitly — see **`docs/workflows/verification.md`**. |
-| **Committed JSON contracts** | **`uv run just validate-artifacts`** — **only** **`tests/test_schema_drift_contracts.py`** (fast sweep of **`examples/`** + **`fixtures/`** vs JSON Schema + Pydantic). **Fallback:** **`uv run pytest tests/test_schema_drift_contracts.py -v`**. That module also runs as part of the **full** default pytest invocation; **`validate-artifacts`** does **not** replace **`just ci`**. Inventory: **`docs/audits/schema-drift-contracts-inventory.md`**. |
+| **Single artifact (explicit path)** | **`alwm validate <path> <kind>`** — validates **one** file against a registered kind (not a repo sweep). Kinds: **`alwm validate --help`**; registry in **`artifacts.py`**. Mental model: layer **A** in **`docs/workflows/verification.md`**. |
+| **Committed JSON contracts** | **`uv run just validate-artifacts`** — **only** **`tests/test_schema_drift_contracts.py`** (fast sweep of **`examples/`** + **`fixtures/`** vs JSON Schema + Pydantic; layer **B**). **Fallback:** **`uv run pytest tests/test_schema_drift_contracts.py -v`**. Runs again inside full **`just ci`**; **`validate-artifacts`** alone does **not** replace **`just ci`**. Inventory: **`docs/audits/schema-drift-contracts-inventory.md`**. |
 | **Full-stack smoke** | Optional pre-release: `just smoke` (`scripts/smoke.sh`) — pytest `-m smoke`, host `alwm` benchmark + campaign, Docker Compose + offline benchmark; failure recovery analysis on errors. `SMOKE_SKIP_DOCKER=1` if Docker unavailable. See `docs/workflows/smoke.md`. |
 | **CLI** | Smoke the commands you changed (`alwm … --help`, one happy path). |
 | **Benchmarks** | Offline: `alwm benchmark run --definition fixtures/benchmarks/…` or `benchmarks/v1/offline`-style defs; outputs under `--output-dir` validate as artifacts (`benchmark_manifest` for `manifest.json`, per-cell kinds as today). |

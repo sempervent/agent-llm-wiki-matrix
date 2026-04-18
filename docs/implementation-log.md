@@ -2,6 +2,50 @@
 
 Chronological record of repository work. Latest entries first.
 
+## 2026-04-19 — Milestone closure: v0.2.5 shipped (docs + CHANGELOG)
+
+**Delivered:** **`docs/releases/v0.2.5.md`** — narrative scope, verification, follow-ups. **`CHANGELOG.md`** — **`[0.2.5]`** (highlights; empty **`[Unreleased]`**). **`docs/roadmap/v0.2.5.md`**, **`docs/tracking/v0.2.5-campaign.md`** — **complete** / **closed**. **`README.md`**, **`AGENTS.md`** — latest shipped **v0.2.5**; in-flight **none**. **`docs/index.md`**, **`mkdocs.yml`** (Releases + roadmap label), **`docs/release-readiness.md`** (intro pointer). Cross-links: **`docs/releases/v0.2.{2,3,4}.md`**, **`docs/roadmap/v0.2.{3,4}.md`**, **`docs/workflows/{verification,campaign-result-pack-publication}.md`**.
+
+**Verification:** `uv run --extra docs mkdocs build --strict`; `uv run pytest tests/ --ignore=tests/integration -q` (or `uv run just ci` when `just` is available).
+
+## 2026-04-19 — Docs CI: GitHub Pages via actions/deploy-pages + site_url
+
+**Delivered:** **`.github/workflows/docs.yml`** — replaced **`peaceiris/actions-gh-pages`** (branch **`gh-pages`**) with **`actions/upload-pages-artifact`** + **`actions/deploy-pages`** so **Settings → Pages → Source: GitHub Actions** works; job permissions scoped (**`pages:write`**, **`id-token:write`** on deploy); **`workflow_dispatch`** on **`main`** for manual publish. **`mkdocs.yml`** — **`site_url`:** **`https://sempervent.github.io/agent-llm-wiki-matrix/`** for correct project-site paths. Docs **`docs/workflows/docs-site.md`**, **`README.md`**, **`docs/workflows/verification.md`**, **`docs/contributing.md`**.
+
+**Verification:** `uv run --extra docs mkdocs build --strict`.
+
+## 2026-04-19 — v0.2.5: campaign markdown readability (digest, semantic, compare intros)
+
+**Delivered:** **`render_campaign_summary_markdown`** — shorter intro and **Generated reports** bullets. **`render_campaign_at_a_glance_markdown`** — one **Judge & semantic signals** ``###`` with ``####`` confidence + hotspots (removed duplicate H3 pair); tighter snapshot blurb. **`render_campaign_comparative_markdown`** — shorter title blurb, ``---`` before **Which dimensions varied**; shorter section intros (backend, instability, FT-*). **`render_campaign_semantic_summary_markdown`** — shorter intro; removed duplicate **Suites/Provider/Execution** instability tables (kept **Instability hotspots** + **Detailed rollups**). **`render_campaign_semantic_judge_section_markdown`** — **Judge variance (abbreviated)** + pointer line. **`render_campaign_browser_evidence_markdown`** — shorter intro. **`render_campaign_result_pack_compare_markdown`** / **`render_campaign_compare_markdown`** — shorter headers. Regenerated **`examples/campaign_runs/{minimal_offline,multi_suite,browser_evidence_compare}/`**, **`examples/campaign_result_packs/{minimal_offline,multi_suite,compare_minimal_vs_multi}/`**, **`examples/campaign_compares/minimal_offline_vs_multi_suite/`**. Docs **`docs/workflows/benchmark-campaigns.md`**. Tests **`tests/test_report_markdown_readability.py`** (merged judge heading, comparative separator).
+
+**Verification:** `uv run ruff check src tests`; `uv run mypy src`; `uv run pytest tests/ --ignore=tests/integration/`; `uv run alwm benchmark campaign run` (three example defs); pack + compare-packs; `uv run alwm benchmark campaign compare` for example compare dir.
+
+## 2026-04-19 — v0.2.5: result pack INDEX + publication hints
+
+**Delivered:** **`campaign_result_pack.py`** — **`derive_pack_publication_hints`**, **`_effective_publication_hints`**; **`membership_scope`** + **`optional_layers_present`** on **`CampaignResultPackV1`** (schema **`campaign_result_pack.schema.json`**); **`_render_pack_index_md`** restructured (**For reviewers**, **Scope of this bundle**, **What is included**; dropped wide **Bundle completeness** table). **`pack_identity_fingerprint`** payload unchanged (hints excluded). Regenerated **`examples/campaign_result_packs/{minimal_offline,multi_suite}/`**. Docs **`docs/workflows/benchmark-campaigns.md`**, **`docs/workflows/campaign-result-pack-publication.md`**, **`examples/campaign_result_packs/README.md`**, **`docs/architecture/data-model.md`**. Tests **`tests/test_campaign_result_pack.py`**.
+
+**Verification:** `uv run pytest tests/test_campaign_result_pack.py tests/test_schema_drift_contracts.py tests/test_campaign_result_pack_compare.py`; `uv run alwm validate examples/campaign_result_packs/minimal_offline/campaign-result-pack.json campaign_result_pack` and `…/multi_suite/…`.
+
+## 2026-04-17 — v0.2.5: compare reports scannable (At a glance, analysis deltas, FT/browser)
+
+**Delivered:** **`campaign_compare_core.py`** — slim **`format_reader_interpretation_markdown`** (**`## At a glance`**, no repeat of instability/browser/semantic/FT prose); **`semantic_instability_rows_all_quiet`**, **`partition_failure_tag_rows_for_display`**, **`render_failure_tags_compare_subsection_lines`**; **`render_browser_evidence_member_cells_comparison_markdown(..., compare_compact=True)`** (shorter intro + pairing scan line). **`campaign_result_pack_compare.py`** / **`campaign_directory_compare.py`** — reorder: **Member run overlap** / **Member runs & manifest health** early; single **`## Analysis deltas`** with subsections; instability one-liner when quiet; FT **With movement** / **No movement** split; browser **`###`** under analysis. **`tests/test_campaign_compare_core.py`**; compare tests updated. Regenerated **`examples/campaign_result_packs/compare_minimal_vs_multi/`**, **`examples/campaign_compares/minimal_offline_vs_multi_suite/`**. Docs **`docs/workflows/benchmark-campaigns.md`**, **`docs/workflows/campaign-result-pack-publication.md`**, **`examples/campaign_{compares,result_packs/compare_minimal_vs_multi}/README.md`**, **`CHANGELOG.md`**.
+
+**Backward compatibility:** JSON shape unchanged; **`reader_interpretation`** object still emitted (narrative fields intact for programmatic use).
+
+**Verification:** `uv run ruff check` / `mypy` on touched modules; `uv run pytest tests/ --ignore=tests/integration/`; `uv run alwm validate` on regenerated compare JSON.
+
+## 2026-04-17 — v0.2.5: MkDocs nav polish (Publication & reports, docs-site findings)
+
+**Delivered:** **`mkdocs.yml`** — top nav block **Publication & reports (v0.2.5)** (labels for E2E checklist, CLI/compare, verification, examples); **`docs/examples/README.md`** under that block only (removed duplicate top-level **Examples index**); roadmap v0.2.5 stays under **Roadmap & milestones** only. **`docs/workflows/docs-site.md`** — publication nav description, **v0.2.5 docs-site pass** table (awkward / improved / deferred). **`docs/index.md`** — already aligned (tip, glance table row 7, sidebar name). **`README.md`**, **`AGENTS.md`** — discoverability notes for the publication sidebar block. **`docs/roadmap/v0.2.5.md`** — docs-site polish row note. Cross-links: **`campaign-result-pack-publication.md`**, **`benchmark-campaigns.md`** → **`docs-site.md`** / **`index.md`**.
+
+**Verification:** `uv run --extra docs mkdocs build --strict`.
+
+## 2026-04-17 — v0.2.5: validation ergonomics (three layers, cross-links)
+
+**Delivered:** **`docs/workflows/verification.md`** — **Three layers** table (**`alwm validate`** = A, **`validate-artifacts`** = B, **`just ci`** = C), relationship bullets, tightened **Relationships** section. **`README.md`** — canonical verification table: one-file **`alwm validate`**, **`uv run just validate-artifacts`**. **`AGENTS.md`** — verification expectations: **Single artifact** row + layer **B** wording. **`docs/audits/schema-drift-contracts-inventory.md`** — **Last reviewed**, layer **A/B/C** framing, link to three layers. **`docs/workflows/docs-site.md`**, **`docs/index.md`** — site cross-links. **`mkdocs.yml`** — Publication nav label for verification page. **No CLI or `justfile` behavior change** (docs + nav label only).
+
+**Verification:** docs-only; optional `uv run pytest tests/test_schema_drift_contracts.py -q` (unchanged tests).
+
 ## 2026-04-17 — Milestone rollover: v0.2.4 shipped, v0.2.5 active
 
 **Delivered:** **[CHANGELOG.md](../CHANGELOG.md)** — **`[0.2.4]`** section; empty **`[Unreleased]`** for new work. **`docs/roadmap/v0.2.4.md`**, **`docs/tracking/v0.2.4-campaign.md`** — **complete** / **closed** with pointers to **`docs/releases/v0.2.4.md`**. **`docs/roadmap/v0.2.5.md`**, **`docs/tracking/v0.2.5-campaign.md`** — active focus (evidence packs + report readability). **`README.md`**, **`AGENTS.md`** — **Latest shipped** **v0.2.4**, **in-flight** **v0.2.5**. **`mkdocs.yml`**, **`docs/index.md`**, **`docs/workflows/{verification,campaign-result-pack-publication}.md`**, **`docs/releases/v0.2.{2,3}.md`** — milestone pointers. **`pyproject.toml`**, **`agent_llm_wiki_matrix.__init__`** → **0.2.5**; example **`alwm_version`** in **`examples/campaign_result_packs/{minimal_offline,multi_suite}/`** → **0.2.4** (assembler at **v0.2.4** tag).

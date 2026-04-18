@@ -43,7 +43,7 @@ Open the URL MkDocs prints (default **http://127.0.0.1:8000/**). Output of a bui
 | Generated output | **`site/`** (do not commit) |
 | CI workflow | **`.github/workflows/docs.yml`** |
 
-**Publication nav (v0.2.5):** The **`Publication (v0.2.5)`** nav block orders: **result-pack checklist** → **tracking v0.2.5** (merge order) → **benchmark campaigns** → **campaign walkthrough** → **reporting pipeline** (`alwm report` / matrices) → **verification** → **longitudinal** → **publication audit**. **`tracking/v0.2.5-campaign.md`** appears **only** here (not duplicated under **Tracking**, to avoid two sidebar entries to the same URL). Closed **`tracking/v0.2.4-campaign.md`** is listed under **Tracking** for history.
+**Publication nav (v0.2.5):** The **`Publication & reports (v0.2.5)`** sidebar block orders: **E2E checklist** → **tracking v0.2.5** (merge order) → **benchmark campaigns** (pack / `compare-packs` / `compare`) → **campaign walkthrough** → **reporting pipeline** (`alwm report` / matrices) → **verification** (`just ci`, `validate-artifacts`) → **longitudinal** → **v0.2.4 publication audit** → **examples index** (`docs/examples/README.md` → repo `examples/`). **Roadmap theme** for v0.2.5 lives under **Roadmap & milestones** only (not duplicated here). **`tracking/v0.2.5-campaign.md`** appears **only** under **Publication & reports** (not again under **Tracking**, to avoid two sidebar hits for the same URL).
 
 ---
 
@@ -60,12 +60,16 @@ Do **not** duplicate long procedural content — **link** to [Campaign result pa
 
 ## CI (GitHub Actions)
 
-**`.github/workflows/docs.yml`** runs when **`docs/**`**, **`mkdocs.yml`**, or the workflow file changes:
+**`.github/workflows/docs.yml`** runs when **`docs/**`**, **`mkdocs.yml`**, or the workflow file changes (and can be run manually via **Actions → Documentation → Run workflow** on **`main`**):
 
 1. **`uv sync --frozen --extra docs`**
 2. **`uv run mkdocs build --strict`**
-3. Uploads **`site/`** as a workflow artifact
-4. On **`push` to `main`**, deploys to the **`gh-pages`** branch (optional **GitHub Pages** — enable in repo settings)
+3. Uploads **`site/`** as a workflow artifact (**`mkdocs-site`**) for debugging and PRs.
+4. On **`push` to `main`** (or **`workflow_dispatch`** on **`main`**), uploads the **Pages** artifact and runs **`actions/deploy-pages`** to publish the site.
+
+**GitHub Pages settings (required once per repo):** **Settings → Pages → Build and deployment → Source:** choose **GitHub Actions** (not “Deploy from a branch”). The older **`gh-pages`** branch flow is a different mechanism and does not apply to this workflow.
+
+**Public URL:** **`https://sempervent.github.io/agent-llm-wiki-matrix/`** — **`mkdocs.yml`** sets **`site_url`** to this base so links and theme assets resolve under the project path.
 
 **`just ci`** does **not** run MkDocs; the GitHub workflow is the shared gate for site builds.
 
@@ -79,25 +83,37 @@ This section records what was learned when implementing and running MkDocs in th
 
 - **`mkdocs build --strict`** completes reliably (order-of-magnitude **~1–3s** locally for the current page set, depending on cache).
 - **Material for MkDocs** theme provides search, tabs, and readable defaults for technical docs.
-- **Navigation** groups **publication + reports** workflows at the top; **Home** (`docs/index.md`) uses a tip admonition pointing at the operator checklist and links the handbook.
+- **Navigation** groups **Publication & reports (v0.2.5)** at the top with explicit labels for E2E checklist, merge-order tracking, CLI/compare, verification, longitudinal, examples index; **Home** (`docs/index.md`) ties the tip block to sidebar naming and adds an examples row to the glance table.
 - **`just docs`** / **`just docs-build`** wrap **`uv run --extra docs`** so an activated venv is optional.
 - **Repository on GitHub** nav entries avoid duplicating **`README.md`** / **`CHANGELOG.md`** / **`AGENTS.md`** inside the static site.
 - **CI** (`.github/workflows/docs.yml`) matches local build commands: **`uv sync --frozen --extra docs`**, **`uv run mkdocs build --strict`**, path filters **`docs/**`**, **`mkdocs.yml`**, workflow file; artifact name **`mkdocs-site`** (historical label; contains `site/`).
+
+### v0.2.5 docs-site pass (navigation polish)
+
+| Finding | Change |
+| --- | --- |
+| Top nav name **Publication (v0.2.5)** did not spell out “reports” or CLI compare verbs | Renamed block to **Publication & reports (v0.2.5)**; lengthened child labels (`compare-packs`, `compare`, `validate-artifacts`). |
+| **Examples index** sat alone at the bottom of the nav, far from publication flow | Moved **`docs/examples/README.md`** under **Publication & reports** as **Examples index (repo examples/)**; removed duplicate top-level entry. |
+| **Roadmap v0.2.5** could be confused with merge-order **tracking** | Kept **roadmap** only under **Roadmap & milestones**; home page tip clarifies theme vs merge-order doc. |
+| **Documentation site** handbook label was generic | Renamed nav label to **Documentation site (MkDocs nav & CI)**. |
+
+**Deferred:** duplicate **tracking/v0.2.5** under **Tracking** (would double sidebar links to the same URL); readers use **Publication & reports** or **Home** tip instead.
 
 ### What was awkward
 
 - **Links outside `docs/`:** Many existing pages use paths like **`../../README.md`**, **`../../examples/`**, **`../../tests/`** so the same files render correctly on **GitHub**. Those targets are **not** in the MkDocs doc tree. **`mkdocs.yml`** sets **`validation.links.not_found: ignore`** so **`--strict`** builds do not fail on those links. **Trade-off:** the static site does not “fix” those links; readers use GitHub or the nav’s external links.
 - **Uv extras:** A **docs-only** install is enough to build the site but **not** to run **`just ci`**. Contributors editing Python and docs should use **`.[dev,docs]`** (or equivalent **`uv sync`** flags).
 - **Material noise:** **Material** may print a **MkDocs 2.0** informational banner on **serve** / **build**. The project pins **`mkdocs>=1.6,<2`**; the banner is upstream messaging, not a build failure.
-- **Nav vs. duplicate files:** The same `.md` file should not appear twice under **`nav:`** (duplicate sidebar/search hits). **Resolved:** **`tracking/v0.2.5-campaign.md`** is listed only under **Publication (v0.2.5)**; **`workflows/reporting.md`** is listed only under **Publication** (removed from the generic **Workflows** list to avoid duplication). **Roadmap** lists **v0.2.5 (active)** and prior milestones.
+- **Nav vs. duplicate files:** The same `.md` file should not appear twice under **`nav:`** (duplicate sidebar/search hits). **Policy:** **`tracking/v0.2.5-campaign.md`** is listed only under **Publication & reports**; **`roadmap/v0.2.5.md`** only under **Roadmap & milestones**; **`docs/examples/README.md`** only under **Publication & reports** (removed standalone **Examples index** top-level entry to reduce clutter). **`workflows/reporting.md`** appears only under **Publication & reports** (not duplicated under generic **Workflows**).
 - **`validation.links.not_found: ignore`** (in **`mkdocs.yml`**) keeps **`--strict`** from failing on **`../../README.md`**-style links that only resolve on GitHub.
 
 ### Intentionally deferred
 
 - Running **`mkdocs build`** inside default **`just ci`** (keeps local CI fast; **GitHub Actions** covers docs).
 - Tightening **`validation.links`** for *internal* `docs/` links only (would need a custom plugin or disciplined link hygiene).
-- Setting **`site_url`** in **`mkdocs.yml`** until a canonical public Pages URL is fixed.
 - Inlining repository-root Markdown into the site (would duplicate source of truth).
+
+**`site_url`** is set in **`mkdocs.yml`** to **`https://sempervent.github.io/agent-llm-wiki-matrix/`** for published Pages builds; update it if the repo is renamed or Pages uses a custom domain.
 
 ### Docs that are still hard to surface cleanly
 
@@ -111,7 +127,7 @@ This section records what was learned when implementing and running MkDocs in th
 
 1. **Nav:** Any new **user-facing** doc under **`docs/`** that should appear in the sidebar must be added to **`mkdocs.yml`** **`nav:`**.
 2. **Links:** Prefer **relative** links between `docs/` pages; keep **GitHub**-style `../../` links only when the paragraph is meant to read equally on github.com.
-3. **Publication story:** If you add a new **primary** step to the E2E publication flow, update **[campaign-result-pack-publication.md](campaign-result-pack-publication.md)** and consider a one-line pointer on **`docs/index.md`** and/or the **Publication** nav block.
+3. **Publication story:** If you add a new **primary** step to the E2E publication flow, update **[campaign-result-pack-publication.md](campaign-result-pack-publication.md)** and consider a one-line pointer on **`docs/index.md`** and/or the **Publication & reports (v0.2.5)** nav block.
 4. **CI:** If **`mkdocs.yml`** or **`docs/`** structure changes, confirm **`.github/workflows/docs.yml`** path filters still match.
 5. **Handbook:** Update **this file** (`docs-site.md`) when verification steps or known limitations change.
 
@@ -122,7 +138,7 @@ This section records what was learned when implementing and running MkDocs in th
 - **Operator checklist:** [Campaign result pack publication](campaign-result-pack-publication.md)
 - **CLI / artifacts:** [Benchmark campaigns](benchmark-campaigns.md)
 - **Matrix / `alwm report` (non-campaign):** [Reporting](reporting.md)
-- **CI matrix:** [Verification](verification.md)
+- **CI vs drift vs one-off validation:** [Verification](verification.md) — layers **A** (`alwm validate`), **B** (`validate-artifacts`), **C** (`just ci`)
 - **Regression views:** [Longitudinal reporting](longitudinal-reporting.md)
 
 The site **indexes** these; it does not replace them.

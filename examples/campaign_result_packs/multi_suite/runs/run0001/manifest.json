@@ -10,10 +10,10 @@
       "raw_response_relpath": "cells/v-browser__p-one/response.raw.txt",
       "request_relpath": "cells/v-browser__p-one/request.json",
       "runtime": {
-        "browser_seconds": 0.000328,
-        "evaluation_seconds": 0.000158,
+        "browser_seconds": 0.000127,
+        "evaluation_seconds": 0.000134,
         "judge_repeat_count": 1,
-        "provider_seconds": 6e-06,
+        "provider_seconds": 4e-06,
         "schema_version": 1
       }
     },
@@ -26,10 +26,10 @@
       "raw_response_relpath": "cells/v-browser__p-two/response.raw.txt",
       "request_relpath": "cells/v-browser__p-two/request.json",
       "runtime": {
-        "browser_seconds": 4.8e-05,
-        "evaluation_seconds": 0.00015,
+        "browser_seconds": 4.7e-05,
+        "evaluation_seconds": 0.000197,
         "judge_repeat_count": 1,
-        "provider_seconds": 4e-06,
+        "provider_seconds": 3e-06,
         "schema_version": 1
       }
     },
@@ -41,9 +41,9 @@
       "raw_response_relpath": "cells/v-cli__p-one/response.raw.txt",
       "request_relpath": "cells/v-cli__p-one/request.json",
       "runtime": {
-        "evaluation_seconds": 0.000198,
+        "evaluation_seconds": 0.00017,
         "judge_repeat_count": 1,
-        "provider_seconds": 3e-06,
+        "provider_seconds": 4e-06,
         "schema_version": 1
       }
     },
@@ -55,7 +55,7 @@
       "raw_response_relpath": "cells/v-cli__p-two/response.raw.txt",
       "request_relpath": "cells/v-cli__p-two/request.json",
       "runtime": {
-        "evaluation_seconds": 0.000219,
+        "evaluation_seconds": 0.000134,
         "judge_repeat_count": 1,
         "provider_seconds": 2e-06,
         "schema_version": 1
@@ -71,7 +71,7 @@
       "runtime": {
         "evaluation_seconds": 0.000198,
         "judge_repeat_count": 1,
-        "provider_seconds": 3e-06,
+        "provider_seconds": 2e-06,
         "schema_version": 1
       }
     },
@@ -83,9 +83,9 @@
       "raw_response_relpath": "cells/v-repo__p-two/response.raw.txt",
       "request_relpath": "cells/v-repo__p-two/request.json",
       "runtime": {
-        "evaluation_seconds": 0.00016,
+        "evaluation_seconds": 0.000178,
         "judge_repeat_count": 1,
-        "provider_seconds": 3e-06,
+        "provider_seconds": 5e-06,
         "schema_version": 1
       }
     }
@@ -122,14 +122,14 @@
   "rubric_ref": "fixtures/v1/rubric.json",
   "run_id": "campaign.examples.multi_suite.v1__0001",
   "runtime_summary": {
-    "browser_phase_seconds": 0.000377,
-    "duration_seconds": 0.006481,
-    "evaluation_phase_seconds": 0.001083,
-    "finished_at_utc": "2026-04-18T01:41:38Z",
+    "browser_phase_seconds": 0.000175,
+    "duration_seconds": 0.006387,
+    "evaluation_phase_seconds": 0.001011,
+    "finished_at_utc": "2026-04-18T01:58:47Z",
     "judge_phase_seconds": 0.0,
     "provider_completion_seconds": 2.1e-05,
     "schema_version": 1,
-    "started_at_utc": "2026-04-18T01:41:38Z"
+    "started_at_utc": "2026-04-18T01:58:47Z"
   },
   "schema_version": 1,
   "success_criteria": [],

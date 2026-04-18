@@ -20,6 +20,8 @@ from agent_llm_wiki_matrix.benchmark.campaign_compare_core import (
     member_run_ids_diff,
     read_json_optional,
     render_browser_evidence_member_cells_comparison_markdown,
+    render_failure_tags_compare_subsection_lines,
+    semantic_instability_rows_all_quiet,
 )
 from agent_llm_wiki_matrix.benchmark.campaign_result_pack import (
     validate_campaign_result_pack_directory,
@@ -233,16 +235,15 @@ def _portability_slice(pack: CampaignResultPackV1, side: LoadedPackSide) -> dict
 
 
 def render_campaign_result_pack_compare_markdown(data: dict[str, Any]) -> str:
-    """Markdown-first comparison report."""
+    """Markdown-first two-pack comparison report."""
     left = data["left"]
     right = data["right"]
     ident = data["identity"]
     lines = [
         "# Campaign result pack comparison",
         "",
-        "Side-by-side view of two **`campaign_result_pack`** trees (published bundles). "
-        "**Δ** columns use **right − left** when both sides are numeric. "
-        "See **`pack-compare.json`** for the full structured diff.",
+        "Two **`campaign_result_pack`** trees. **Δ** = right − left (numeric). "
+        "Structured diff: **`pack-compare.json`**.",
         "",
         f"- **Left:** `{left['label']}` — `{left['path']}` (`pack_id`: `{left['pack_id']}`)",
         f"- **Right:** `{right['label']}` — `{right['path']}` (`pack_id`: `{right['pack_id']}`)",
@@ -253,6 +254,28 @@ def render_campaign_result_pack_compare_markdown(data: dict[str, Any]) -> str:
     if isinstance(ri, dict) and ri:
         lines.append(format_reader_interpretation_markdown(ri).rstrip())
         lines.append("")
+
+    mr = data["member_runs"]
+    lines.extend(
+        [
+            "## Member run overlap",
+            "",
+            f"- **Left count:** {mr['left_count']} · **Right count:** {mr['right_count']}",
+            f"- **In both:** {len(mr['run_ids_in_both'])} · **Only left:** "
+            f"{len(mr['run_ids_only_in_left'])} · **Only right:** "
+            f"{len(mr['run_ids_only_in_right'])}",
+            (
+                "- **Run IDs only on left:** "
+                f"{', '.join(f'`{x}`' for x in mr['run_ids_only_in_left']) or '—'}"
+            ),
+            (
+                "- **Run IDs only on right:** "
+                f"{', '.join(f'`{x}`' for x in mr['run_ids_only_in_right']) or '—'}"
+            ),
+            "",
+        ],
+    )
+
     lines.extend(
         [
             "## Identity & fingerprints",
@@ -292,15 +315,16 @@ def render_campaign_result_pack_compare_markdown(data: dict[str, Any]) -> str:
         lines.append(f"| `{row['artifact_key']}` | `{lv}` | `{rv}` | {sp} |")
 
     ca = data["comparative_analysis"]
+    inst_rows = ca["semantic_instability_by_scoring_backend"]
     lines.extend(
         [
             "",
-            "## Comparative analysis (`campaign-analysis.json`)",
+            "## Analysis deltas (`campaign-analysis.json`)",
             "",
-            f"- **Left file present:** {ca['left_present']}",
-            f"- **Right file present:** {ca['right_present']}",
+            f"- **`campaign-analysis.json` on left:** {ca['left_present']} · **on right:** "
+            f"{ca['right_present']}",
             "",
-            "### Backend mean scores (pooled cells)",
+            "### Pooled backend means",
             "",
             "| backend_kind | Left | Right | Δ (R−L) |",
             "| --- | ---: | ---: | ---: |",
@@ -317,82 +341,48 @@ def render_campaign_result_pack_compare_markdown(data: dict[str, Any]) -> str:
             f"| `{row['backend_kind']}` | {lms} | {rms} | {ds} |",
         )
 
-    lines.extend(
-        [
-            "",
-            "### Semantic instability (longitudinal counts by scoring_backend)",
-            "",
-            "| scoring_backend | Left events | Right events | Δ |",
-            "| --- | ---: | ---: | ---: |",
-        ],
-    )
-    for row in ca["semantic_instability_by_scoring_backend"]:
-        d = row["delta_right_minus_left"]
-        ds = str(d) if d is not None else "—"
+    lines.extend(["", "### Semantic instability (by scoring_backend)", ""])
+    if semantic_instability_rows_all_quiet(inst_rows):
         lines.append(
-            f"| `{row['scoring_backend']}` | {row['left_unstable_events']} | "
-            f"{row['right_unstable_events']} | {ds} |",
+            "_No unstable events reported (all counts zero on both sides). "
+            "Pooled longitudinal counts only — see analysis JSON for definitions._",
         )
+    else:
+        lines.extend(
+            [
+                "| scoring_backend | Left events | Right events | Δ |",
+                "| --- | ---: | ---: | ---: |",
+            ],
+        )
+        for row in inst_rows:
+            d = row["delta_right_minus_left"]
+            ds = str(d) if d is not None else "—"
+            lines.append(
+                f"| `{row['scoring_backend']}` | {row['left_unstable_events']} | "
+                f"{row['right_unstable_events']} | {ds} |",
+            )
+
+    lines.extend(render_failure_tags_compare_subsection_lines(data["failure_tags"]))
 
     be_md = render_browser_evidence_member_cells_comparison_markdown(
         ca.get("browser_evidence_comparison"),
+        top_heading_level=3,
+        compare_compact=True,
     )
     if be_md:
         lines.extend(["", be_md.rstrip(), ""])
 
-    lines.extend(["", "## Failure tags (FT-*)", ""])
-    ft = data["failure_tags"]
-    if not ft["codes_compared"] or all(
-        x.get("left_signal_count") in (None, 0) and x.get("right_signal_count") in (None, 0)
-        for x in ft["codes_compared"]
-    ):
-        lines.append("_No FT-* signal counts on either side (or analysis missing)._")
-    else:
-        lines.extend(
-            [
-                "| Code | Left signals | Right signals | Δ |",
-                "| --- | ---: | ---: | ---: |",
-            ],
-        )
-        for row in ft["codes_compared"]:
-            if row.get("left_signal_count") is None and row.get("right_signal_count") is None:
-                continue
-            d = row["delta_right_minus_left"]
-            ds = str(d) if d is not None else "—"
-            lines.append(
-                f"| `{row['code']}` | {row['left_signal_count']} | "
-                f"{row['right_signal_count']} | {ds} |",
-            )
-    if ft["only_in_left"]:
-        lines.append("")
-        lines.append(f"- **Only left:** {', '.join(f'`{c}`' for c in ft['only_in_left'])}")
-    if ft["only_in_right"]:
-        lines.append(f"- **Only right:** {', '.join(f'`{c}`' for c in ft['only_in_right'])}")
-
-    lines.extend(["", "## Semantic summary totals (selected fields)", ""])
     sem = data["semantic_summary_totals"]
+    lines.extend(["", "### Semantic summary (selected numeric Δ)", ""])
     if sem["left_totals"] is None and sem["right_totals"] is None:
         lines.append("_No `campaign-semantic-summary.json` on both sides (or empty totals)._")
     else:
-        lines.append("See JSON for full totals; numeric Δ = right − left when both numeric.")
+        lines.append("Full totals in JSON; **Δ** = right − left when both numeric.")
         for k, v in sem.get("numeric_deltas_right_minus_left", {}).items():
             lines.append(f"- **`{k}`:** {v}")
 
-    mr = data["member_runs"]
     lines.extend(
         [
-            "",
-            "## Member runs",
-            "",
-            f"- **Left count:** {mr['left_count']} · **Right count:** {mr['right_count']}",
-            (
-                "- **Only in left:** "
-                f"{', '.join(f'`{x}`' for x in mr['run_ids_only_in_left']) or '—'}"
-            ),
-            (
-                "- **Only in right:** "
-                f"{', '.join(f'`{x}`' for x in mr['run_ids_only_in_right']) or '—'}"
-            ),
             "",
             "## Portability & completeness",
             "",

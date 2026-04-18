@@ -252,19 +252,26 @@ def render_browser_evidence_member_cells_comparison_markdown(
     be: dict[str, Any] | None,
     *,
     top_heading_level: int = 3,
+    compare_compact: bool = False,
 ) -> str:
     """Markdown subsection for pack/directory compare reports.
 
-    Use ``top_heading_level=3`` under **## Comparative analysis** (pack compare);
+    Use ``top_heading_level=3`` under **## Analysis deltas** (pack compare);
     use ``top_heading_level=2`` as a top-level section in directory compare.
+    Set ``compare_compact=True`` for shorter intros in compare reports (less repetition).
     """
     if not be or not be.get("has_any_evidence"):
         return ""
     prefix = "#" * max(1, min(top_heading_level, 6))
-    lines = [
-        f"{prefix} Browser evidence (`browser_evidence_member_cells`)",
-        "",
-        (
+    if compare_compact:
+        intro = (
+            "Per-cell **`browser_evidence_member_cells`** from each `campaign-analysis.json`: "
+            "DOM/screenshot counts, digests, extension keys (**fixture/mock** unless you ran a "
+            "live browser). **`runner`** in extension keys → inspect cell **`browser_evidence`** "
+            "JSON (**local MCP stdio** bridge, not remote IDE hosting)."
+        )
+    else:
+        intro = (
             "Deterministic **DOM excerpt counts**, **screenshot counts**, "
             "**signals/extension digests** (per cell), and **extension key** sets from each "
             "side's `campaign-analysis.json`. These reflect **fixture/mock** traces unless you "
@@ -272,7 +279,11 @@ def render_browser_evidence_member_cells_comparison_markdown(
             "under **extension keys**, inspect the cell's **`browser_evidence`** JSON for "
             "**`extensions.runner`** (e.g. **`mcp_stdio`**) — that is a **local MCP stdio** "
             "JSON bridge, not a hosted remote browser."
-        ),
+        )
+    lines = [
+        f"{prefix} Browser evidence (`browser_evidence_member_cells`)",
+        "",
+        intro,
         "",
     ]
     agg = be.get("aggregate") or {}
@@ -315,13 +326,28 @@ def render_browser_evidence_member_cells_comparison_markdown(
         lines.append("")
 
     pr = be.get("paired_rows") or []
+    nb = sum(1 for x in pr if x.get("pairing") == "both")
+    nl = sum(1 for x in pr if x.get("pairing") == "left_only")
+    nr = sum(1 for x in pr if x.get("pairing") == "right_only")
+    if compare_compact:
+        lines.append(
+            f"**Pairing** (by suite/cell/benchmark): **{nb}** both · **{nl}** left-only · "
+            f"**{nr}** right-only. Table uses `(suite_ref, cell_id, benchmark_id)`; "
+            "**Signals** / **extension digest** = captured counts and hashes (not remote MCP).",
+        )
+        lines.append("")
+    else:
+        lines.extend(
+            [
+                "**Per-cell pairing** uses `(suite_ref, cell_id, benchmark_id)`. "
+                "**Signals** = navigation/console/DOM/screenshot counts; **extension digest** "
+                "summarizes network/a11y/**trace_digest** (opaque hash of captured stdio/tooling), "
+                "not remote IDE MCP.",
+                "",
+            ],
+        )
     lines.extend(
         [
-            "**Per-cell pairing** uses `(suite_ref, cell_id, benchmark_id)`. "
-            "**Signals** = navigation/console/DOM/screenshot counts; **extension digest** "
-            "summarizes network/a11y/**trace_digest** (opaque hash of captured stdio/tooling), "
-            "not remote IDE MCP.",
-            "",
             "| suite_ref | cell_id | Pairing | L DOM | R DOM | Δ DOM | L shot | R shot | Δ shot | "
             "Runner L | Runner R | Signals (L / R) | Extension digest (L / R) |",
             "| --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | --- | --- | --- | --- |",
@@ -716,17 +742,103 @@ def build_reader_interpretation(
     }
 
 
+def semantic_instability_rows_all_quiet(rows: list[dict[str, Any]] | None) -> bool:
+    """True when every row is zero/zero with no meaningful delta (or empty list)."""
+    if not rows:
+        return True
+    for r in rows:
+        lu = int(r.get("left_unstable_events") or 0)
+        ru = int(r.get("right_unstable_events") or 0)
+        if lu != 0 or ru != 0:
+            return False
+        d = r.get("delta_right_minus_left")
+        if d is not None and d != 0:
+            return False
+    return True
+
+
+def partition_failure_tag_rows_for_display(
+    codes_compared: list[dict[str, Any]],
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+    """Split FT rows into movement vs no movement for clearer scanning."""
+    moved: list[dict[str, Any]] = []
+    quiet: list[dict[str, Any]] = []
+    for row in codes_compared:
+        lc = row.get("left_signal_count")
+        rc = row.get("right_signal_count")
+        if lc is None and rc is None:
+            continue
+        d = row.get("delta_right_minus_left")
+        if d not in (None, 0) or (lc or 0) != (rc or 0):
+            moved.append(row)
+        else:
+            quiet.append(row)
+    return moved, quiet
+
+
+def render_failure_tags_compare_subsection_lines(ft: dict[str, Any]) -> list[str]:
+    """Lines for ``### Failure tags (FT-*)`` under compare Markdown (movement first)."""
+    out: list[str] = ["", "### Failure tags (FT-*)", ""]
+    codes = ft.get("codes_compared") or []
+    if not codes or all(
+        x.get("left_signal_count") in (None, 0) and x.get("right_signal_count") in (None, 0)
+        for x in codes
+    ):
+        out.append("_No FT-* signal counts on either side (or analysis missing)._")
+        return out
+
+    moved, quiet = partition_failure_tag_rows_for_display(codes)
+    hdr = [
+        "| Code | Left signals | Right signals | Δ |",
+        "| --- | ---: | ---: | ---: |",
+    ]
+
+    def row_line(row: dict[str, Any]) -> str:
+        d = row["delta_right_minus_left"]
+        ds = str(d) if d is not None else "—"
+        return (
+            f"| `{row['code']}` | {row['left_signal_count']} | "
+            f"{row['right_signal_count']} | {ds} |"
+        )
+
+    if moved:
+        out.append("**With movement** (Δ ≠ 0 or left ≠ right counts):")
+        out.append("")
+        out.extend(hdr)
+        for row in sorted(moved, key=lambda r: str(r.get("code", ""))):
+            out.append(row_line(row))
+        out.append("")
+    if quiet:
+        out.append(
+            "**No movement** (same counts, Δ 0): "
+            + ", ".join(f"`{r['code']}`" for r in sorted(quiet, key=lambda x: str(x.get("code")))),
+        )
+        out.append("")
+    if ft.get("only_in_left"):
+        out.append(
+            f"- **Codes only on left:** {', '.join(f'`{c}`' for c in ft['only_in_left'])}",
+        )
+    if ft.get("only_in_right"):
+        out.append(
+            f"- **Codes only on right:** {', '.join(f'`{c}`' for c in ft['only_in_right'])}",
+        )
+    return out
+
+
 def format_reader_interpretation_markdown(interp: dict[str, Any]) -> str:
-    """Markdown block inserted after the report header (pack or directory compare)."""
+    """Compact orienting block after the report header (mirrors JSON ``reader_interpretation``).
+
+    Does **not** repeat instability/browser/semantic/FT tables — those appear in **Analysis
+    deltas** below. Full narrative strings remain in JSON for tooling.
+    """
     lines = [
-        "## Reader interpretation",
+        "## At a glance",
         "",
-        "> **Non-causal summary** — use this to orient; confirm in per-campaign reports and "
-        "manifests.",
+        "> **Non-causal** — orientation only; confirm in per-campaign reports, manifests, and the "
+        "**Analysis deltas** section below.",
         "",
         f"- **Evidence strength (aggregate):** **{interp.get('evidence_strength', '—')}** "
-        "(heuristic from analysis presence, member overlap, and run counts — not a power "
-        "analysis).",
+        "(heuristic — not a power analysis).",
         "",
     ]
     wc = interp.get("what_changed") or []
@@ -738,43 +850,31 @@ def format_reader_interpretation_markdown(interp: dict[str, Any]) -> str:
         lines.append("")
     axes = interp.get("dimensions_fingerprint_mismatch_axes") or []
     if axes:
-        lines.append("### Dimensions (experiment fingerprints)")
+        lines.append("### Experiment fingerprints (mismatch)")
         lines.append("")
         lines.append(
-            "Axes where digests **differ** (configuration / suite / provider / scoring / "
-            f"registry / browser): {', '.join(f'`{a}`' for a in axes)}.",
+            "Digests **differ** on: "
+            + ", ".join(f"`{a}`" for a in axes)
+            + " (configuration / suite / provider / scoring / registry / browser).",
         )
         lines.append("")
     sw = interp.get("sweep_dimensions_narrative")
     if isinstance(sw, str) and sw.strip():
-        lines.append("### Sweep dimensions (manifest)")
+        lines.append("### Sweep (manifest)")
         lines.append("")
         lines.append(sw.strip())
         lines.append("")
     fp = interp.get("fingerprint_insights_narrative")
     if isinstance(fp, str) and fp.strip():
-        lines.append("### Fingerprint axis spreads (analysis JSON)")
+        lines.append("### Fingerprint spreads (analysis)")
         lines.append("")
         lines.append(fp.strip())
         lines.append("")
 
     lines.extend(
         [
-            "### Instability (longitudinal counts)",
-            "",
-            str(interp.get("instability_narrative", "—")),
-            "",
-            "### Browser evidence (structured traces)",
-            "",
-            str(interp.get("browser_evidence_narrative", "—")),
-            "",
-            "### Semantic summary (judge rollup)",
-            "",
-            str(interp.get("semantic_summary_narrative", "—")),
-            "",
-            "### Failure tags (FT-*)",
-            "",
-            str(interp.get("failure_tags_narrative", "—")),
+            "_Instability counts, browser trace pairings, semantic rollups, and **FT-*** tables "
+            "are in **Analysis deltas** — not repeated here._",
             "",
             "### Uncertainty & limits",
             "",

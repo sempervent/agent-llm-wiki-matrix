@@ -1,8 +1,8 @@
 # Release readiness — v0.1.0
 
-The latest workflow milestone narrative is **[v0.2.1](releases/v0.2.1.md)** ([CHANGELOG.md](../CHANGELOG.md) section **[0.2.1]**): stronger campaigns and longitudinal tooling, observability, browser-evidence realism, and explicit MCP / Playwright boundaries—**default CI remains offline**; live paths stay **opt-in**.
+**Latest shipped milestone (narrative):** **[v0.2.5](releases/v0.2.5.md)** ([CHANGELOG.md](../CHANGELOG.md) section **[0.2.5]**) — publication-quality **packs** and **compare** Markdown, **validation** ergonomics, **MkDocs** **Publication & reports** nav—**default CI remains offline**; live paths stay **opt-in**.
 
-This document summarizes what **v0.1.0** is intended to deliver versus what remains **partial**, **opt-in**, or **explicitly out of scope**. Command-backed evidence lives in [docs/audits/release-readiness-audit.md](audits/release-readiness-audit.md). A finer-grained live snapshot is in [docs/audits/current-capability-status.md](audits/current-capability-status.md).
+This document’s **tables** were originally framed for **v0.1.0**; they still describe **default vs partial vs opt-in** capabilities. For **milestone-specific** scope and verification, prefer **[docs/releases/v0.2.5.md](releases/v0.2.5.md)** and **[docs/workflows/verification.md](workflows/verification.md)**. Command-backed evidence lives in [docs/audits/release-readiness-audit.md](audits/release-readiness-audit.md). A finer-grained live snapshot is in [docs/audits/current-capability-status.md](audits/current-capability-status.md).
 
 ---
 

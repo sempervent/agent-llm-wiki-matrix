@@ -1,10 +1,10 @@
 # Campaign comparative report: `campaign.examples.multi_suite.v1`
 
-Analysis uses **succeeded** member benchmark runs only. **`FT-*`** codes follow the longitudinal taxonomy (see `docs/workflows/longitudinal-reporting.md`). **Mode gaps** and **semantic instability** counts are derived from the same longitudinal pass as `reports/campaign-analysis.json`.
+**Succeeded** member runs only. **`FT-*`:** `docs/workflows/longitudinal-reporting.md`. Same longitudinal pass as `campaign-analysis.json`.
 
 ## Executive summary
 
-Skim this block first, then use the sections below for full tables and the failure atlas.
+At-a-glance; **sections below** repeat and expand each topic (including failure atlas).
 
 - **Varied sweep axes:** `suite_ref`.
 - _Note:_ `suite_ref` and `benchmark_id` sweep together — member scores by benchmark are the same grouping as by suite.
@@ -35,9 +35,9 @@ _No cells flagged as semantically unstable at configured thresholds._
 
 - `FT-ABS-LOW`×4, `FT-MODE-GAP`×2
 
-## Semantic judge variance
+## Judge variance (abbreviated)
 
-Sourced from **evaluation.json**, **evaluation_judge_provenance.json**, and **repeat_aggregation** when **N>1**. Deterministic-only cells have no judge spread.
+_Full tables: `campaign-semantic-summary.md`._
 
 | Signal | Count |
 | --- | ---: |
@@ -68,7 +68,8 @@ Sourced from **evaluation.json**, **evaluation_judge_provenance.json**, and **re
 | 2 | `cli` | -1.000000 | 0 | 0 | — | — |
 | 3 | `browser_mock` | -1.000000 | 0 | 0 | — | — |
 
-_Full tables: `campaign-semantic-summary.md` in this directory._
+
+---
 
 ## Which dimensions varied
 
@@ -205,7 +206,7 @@ _Cross-checks beyond the attribution table — grouped by **signal_class** (conf
 
 ## Browser evidence (member runs)
 
-**browser_mock** file-backed traces (`fixtures/browser_evidence/v1/`). **Playwright** is optional (`[browser]` + env). **MCP** stdio is a **local** JSON bridge to a subprocess — not IDE-hosted or remote capture (`docs/architecture/browser.md`).
+**mock** traces from `fixtures/browser_evidence/v1/`; optional **Playwright** (`[browser]`). See `docs/architecture/browser.md`.
 
 | Member cell | Evidence | Runner | Signals | DOM snap | Extension digest |
 | --- | --- | --- | --- | --- | --- |
@@ -298,7 +299,7 @@ _Notes:_ MockBrowserRunner: deterministic; no real browser.
 
 ## Provider / backend performance (mean cell score)
 
-Higher is better (simple mean of **total_weighted_score** over all cells using that **backend_kind** across member runs).
+Mean **total_weighted_score** per **backend_kind** (higher is better).
 
 | Rank | backend_kind | Mean score | Cells |
 | ---: | --- | ---: | ---: |
@@ -306,7 +307,7 @@ Higher is better (simple mean of **total_weighted_score** over all cells using t
 
 ## Scoring backends with semantic / hybrid instability
 
-Counts **cells** flagged in longitudinal semantic stability analysis (low confidence or repeat-variance thresholds), grouped by **scoring_backend** on the evaluation artifact.
+Unstable **cell** events by **scoring_backend** (longitudinal thresholds).
 
 | scoring_backend | Unstable cell events |
 | --- | ---: |
@@ -323,7 +324,7 @@ Largest spreads across **execution_mode** for the same **prompt_id** inside one 
 
 ## Top recurring failure taxonomy tags
 
-Signal counts (unique FT-* entries per code). See `docs/workflows/longitudinal-reporting.md` or `FAILURE_TAXONOMY` in `pipelines/longitudinal.py`.
+Signal counts per **FT-*** code (`docs/workflows/longitudinal-reporting.md`).
 
 | Rank | Code | Signals | Description |
 | ---: | --- | ---: | --- |

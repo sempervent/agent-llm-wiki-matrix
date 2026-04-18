@@ -72,6 +72,48 @@ def compute_pack_identity_fingerprint(pack: CampaignResultPackV1) -> str:
     return sha256_canonical(pack_identity_payload(pack))
 
 
+MembershipScope = Literal["all_runs", "subset", "unknown"]
+
+
+def derive_pack_publication_hints(
+    pack: CampaignResultPackV1,
+) -> tuple[MembershipScope, list[str]]:
+    """Derive membership scope and optional layer ids (not part of pack fingerprint)."""
+    art = pack.artifacts
+    layers: list[str] = []
+    if art.campaign_semantic_summary_json:
+        layers.append("semantic_summary")
+    if art.campaign_comparative_report_md:
+        layers.append("comparative_report")
+    if art.campaign_analysis_json:
+        layers.append("comparative_analysis")
+    if art.campaign_dry_run_json:
+        layers.append("dry_run_plan")
+    layers.sort()
+
+    crc = pack.campaign_run_count
+    imc = pack.included_member_count
+    if crc is None or imc is None:
+        return "unknown", layers
+    if crc > 0 and imc < crc:
+        return "subset", layers
+    if crc > 0 and imc == crc:
+        return "all_runs", layers
+    return "unknown", layers
+
+
+def _effective_publication_hints(
+    pack: CampaignResultPackV1,
+) -> tuple[MembershipScope, list[str]]:
+    """Use stored fields when present; otherwise derive (legacy packs)."""
+    scope, layers = derive_pack_publication_hints(pack)
+    if pack.membership_scope is not None:
+        scope = pack.membership_scope
+    if pack.optional_layers_present is not None:
+        layers = list(pack.optional_layers_present)
+    return scope, layers
+
+
 @dataclass
 class CampaignPackValidationResult:
     """Result of :func:`validate_campaign_result_pack_directory`."""
@@ -337,6 +379,10 @@ def assemble_campaign_result_pack(
     pack = pack.model_copy(
         update={"pack_identity_fingerprint": compute_pack_identity_fingerprint(pack)},
     )
+    ms, ol = derive_pack_publication_hints(pack)
+    pack = pack.model_copy(
+        update={"membership_scope": ms, "optional_layers_present": ol},
+    )
 
     data = pack.model_dump(mode="json", exclude_none=True)
     validate_json(data, load_schema("schemas/v1/campaign_result_pack.schema.json"))
@@ -347,171 +393,169 @@ def assemble_campaign_result_pack(
     return pack
 
 
+_LAYER_BLURBS: dict[str, str] = {
+    "semantic_summary": "`campaign-semantic-summary.{json,md}` — hybrid / judge rollups",
+    "comparative_report": "`reports/campaign-report.md` — narrative + fingerprint interpretation",
+    "comparative_analysis": "`reports/campaign-analysis.json` — structured analysis mirror "
+    "(not an `alwm validate` kind)",
+    "dry_run_plan": "`campaign-dry-run.json` — plan-only campaign (no executed member trees)",
+}
+
+
 def _render_pack_index_md(pack: CampaignResultPackV1) -> str:
     """Markdown overview for manual inspection and publishing."""
     art = pack.artifacts
-    has_sem = art.campaign_semantic_summary_json is not None
-    has_comp = art.campaign_comparative_report_md is not None
-    has_analysis = art.campaign_analysis_json is not None
-    has_dry = art.campaign_dry_run_json is not None
+    scope, opt_layers = _effective_publication_hints(pack)
+    crc = pack.campaign_run_count
+    imc = pack.included_member_count
     subset = (
-        pack.campaign_run_count is not None
-        and pack.included_member_count is not None
-        and pack.included_member_count < pack.campaign_run_count
+        crc is not None
+        and imc is not None
+        and imc < crc
     )
 
     lines = [
         f"# Campaign result pack: `{pack.pack_id}`",
         "",
-        f"- **campaign_id:** `{pack.campaign_id}`",
-        f"- **title:** {pack.title}",
+        f"**campaign_id:** `{pack.campaign_id}` · **title:** {pack.title}",
+        "",
+        "## For reviewers (read this first)",
         "",
         (
-            "_This directory is the **canonical outward-facing bundle** for a completed campaign: "
-            "same layout as a campaign tree, plus **`campaign-result-pack.json`** (machine index) "
-            "and this **`INDEX.md`** (human overview). **Cite, archive, or attach this pack**—"
-            "not only the raw campaign output directory._"
+            "**What this is:** A **frozen, portable slice** of a finished campaign—the same "
+            "directory layout as a harness output tree, plus **`campaign-result-pack.json`** "
+            f"(machine index) and this **`{art.index_md}`**. Use it to **review, cite, archive, "
+            "or attach** results — preferred handoff, not only the raw campaign folder."
         ),
         "",
-        "## Start here (reviewing this bundle cold)",
+        "**Suggested reading order** (about 10–20 minutes for a typical pack):",
+        "",
+        "1. **`campaign-summary.md`** — Rollups, sweep overview, headline scores.",
+        "2. **`reports/campaign-report.md`** — When present: narrative comparative report and "
+        "fingerprint-axis interpretation.",
+        "3. **`campaign-semantic-summary.md`** — When present: hybrid / judge instability and "
+        "confidence rollups.",
+        "4. **`reports/campaign-analysis.json`** — When present: machine-readable analysis mirror.",
+        "5. **`runs/runNNNN/`** — Per-run manifests, cells, matrices, and reports.",
         "",
         (
-            "You are looking at a **self-contained publication slice**: campaign-level artifacts "
-            "plus copied **`runs/runNNNN/`** member trees (or manifest-only stubs). The machine "
-            f"index is **`{art.campaign_result_pack_json}`** (`pack_identity_fingerprint`, "
-            "artifact paths, member inventory)."
+            f"**Machine index:** `{art.campaign_result_pack_json}` records "
+            "`pack_identity_fingerprint`, member inventory, optional layer paths, and "
+            "`membership_scope` / `optional_layers_present` when emitted by this tool version."
         ),
         "",
-        "**Suggested reading order**",
+        "## Scope of this bundle",
         "",
-        "1. **`campaign-summary.md`** — Rollup table, sweep overview, headline scores.",
-        (
-            "2. **`reports/campaign-report.md`** (if present) — Narrative comparative report, "
-            "fingerprint-axis interpretation, FT-* tags."
-        ),
-        (
-            "3. **`campaign-semantic-summary.md`** (if present) — Hybrid / judge semantic "
-            "instability and confidence rollups."
-        ),
-        (
-            "4. **`reports/campaign-analysis.json`** (if present) — Machine mirror of analysis "
-            "(not an `alwm validate` kind; schema version 1). "
-        ),
-        "5. **`runs/runNNNN/`** — Per-run benchmark manifests, cells, matrices, reports.",
-        "",
-        "## Pack snapshot",
-        "",
-        f"- **Pack assembled at:** `{pack.created_at}`",
+        "| | |",
+        "| --- | --- |",
     ]
-    if pack.campaign_created_at:
-        lines.append(f"- **Campaign manifest (created_at):** `{pack.campaign_created_at}`")
-    if pack.definition_source_relpath:
-        lines.append(f"- **Campaign definition:** `{pack.definition_source_relpath}`")
-    if pack.fixture_mode_force_mock is not None:
-        fm = str(pack.fixture_mode_force_mock).lower()
-        lines.append(f"- **Fixture mode (forced mock):** `{fm}`")
-    if pack.campaign_run_count is not None:
-        lines.append(f"- **Member rows on source campaign:** {pack.campaign_run_count}")
-    if pack.included_member_count is not None:
-        lines.append(f"- **Member runs in this pack:** {pack.included_member_count}")
+    if pack.member_depth == "full":
+        mdepth_cell = (
+            "`full` — full per-run trees (default; needed for longitudinal cell loads)."
+        )
+    else:
+        mdepth_cell = (
+            "`manifest` — only `manifest.json` per member (smaller; evaluations may not load)."
+        )
+    lines.append(f"| **member_depth** | {mdepth_cell} |")
+    if crc is not None and imc is not None:
+        lines.append(
+            f"| **Member runs** | **{imc}** copied **of {crc}** campaign manifest row(s) · "
+            f"`membership_scope`: **`{scope}`** |",
+        )
+    else:
+        lines.append("| **Member runs** | See **`Member runs included`** below. |")
     lines.extend(
         [
-            f"- **member_depth:** `{pack.member_depth}`",
+            f"| **Pack assembled** | `{pack.created_at}` |",
             "",
         ],
     )
-    if subset:
-        lines.extend(
-            [
-                (
-                    "> **Subset pack:** this bundle includes fewer member runs than the source "
-                    "campaign manifest (`included_member_count` < `campaign_run_count`). "
-                    "Check **Member runs included** below and **Notes** if present."
-                ),
-                "",
-            ],
+    if pack.campaign_created_at:
+        lines.append(f"- **Campaign manifest timestamp:** `{pack.campaign_created_at}`")
+    if pack.definition_source_relpath:
+        lines.append(f"- **Campaign definition:** `{pack.definition_source_relpath}`")
+    if pack.fixture_mode_force_mock is not None:
+        lines.append(
+            f"- **Fixture mode (forced mock):** `{str(pack.fixture_mode_force_mock).lower()}`",
         )
     if pack.pack_identity_fingerprint:
         lines.append(f"- **pack_identity_fingerprint:** `{pack.pack_identity_fingerprint}`")
     if pack.alwm_version:
-        lines.append(f"- **alwm_version (pack tool):** `{pack.alwm_version}`")
+        lines.append(f"- **alwm_version (assembler):** `{pack.alwm_version}`")
+    lines.append("")
+
+    if scope == "all_runs":
+        lines.append(
+            "_Every campaign manifest member row is represented in this pack "
+            "(`included_member_count` equals `campaign_run_count`)._",
+        )
+    elif scope == "subset":
+        lines.append(
+            "> **Subset:** Fewer member runs than the campaign manifest lists—filters, "
+            "`--run-index`, excluding failed members, or other selection. See **Member runs "
+            "included** and **Notes** (if any).",
+        )
+    else:
+        lines.append(
+            "_Membership scope is **unknown** from counts alone; compare `campaign_run_count` "
+            "and `included_member_count` in `campaign-result-pack.json`._",
+        )
+    lines.append("")
+
+    if subset and pack.notes is None:
+        lines.append(
+            "_Tip: add `--notes \"…\"` when assembling a subset pack so reviewers know why runs "
+            "were omitted._",
+        )
+        lines.append("")
+
     lines.extend(
         [
+            "## What is included",
             "",
-            "## Bundle completeness",
+            "**Core (always in a pack):** `manifest.json`, `campaign-summary.json`, "
+            "`campaign-summary.md`, `campaign-result-pack.json`, this index, and the member run "
+            "trees listed under **Member runs included** (or manifest stubs when "
+            "`member_depth` is `manifest`).",
             "",
-            "Which layers are present in **this** directory (paths are relative to the pack root).",
+            "**Optional layers in this directory:**",
             "",
-            "| Layer | Path(s) | In this pack | Role |",
-            "| --- | --- | ---: | --- |",
-            "| Campaign manifest | `manifest.json` | yes | Sweep definition, fingerprints, "
-            "member rows |",
-            "| Campaign summary | `campaign-summary.json`, `campaign-summary.md` | yes | Rollup; "
-            "validate `campaign_summary` |",
         ],
     )
-    lines.append(
-        "| Semantic summary | `campaign-semantic-summary.json`, `.md` | "
-        f"{'yes' if has_sem else '**no**'} | Hybrid / judge instability rollups |",
-    )
-    lines.append(
-        "| Comparative report | `reports/campaign-report.md` | "
-        f"{'yes' if has_comp else '**no**'} | Narrative report + fingerprint sections |",
-    )
-    lines.append(
-        "| Comparative analysis | `reports/campaign-analysis.json` | "
-        f"{'yes' if has_analysis else '**no**'} | Structured analysis mirror |",
-    )
-    lines.append(
-        "| Dry-run plan | `campaign-dry-run.json` | "
-        f"{'yes' if has_dry else '**no**'} | Only when the source campaign was a `--dry-run` "
-        "plan |",
-    )
+    if opt_layers:
+        for key in sorted(opt_layers):
+            lines.append(f"- {_LAYER_BLURBS.get(key, key)}")
+    else:
+        lines.append(
+            "_None beyond core summaries and members (no semantic, comparative report, analysis "
+            "JSON, or dry-run plan in this bundle)._",
+        )
+    lines.extend(["", "## Publication workflow", ""])
+
     lines.extend(
         [
-            f"| Pack manifest | `{art.campaign_result_pack_json}` | yes | "
-            f"This bundle’s machine index (`campaign_result_pack`) |",
-            f"| Human index | `{art.index_md}` | yes | You are reading it |",
+            "1. **Validate** — `alwm validate` on the pack manifest and key kinds; "
+            "`alwm benchmark campaign pack-check .` for on-disk consistency.",
+            "2. **Compare** (optional) — `alwm benchmark campaign compare-packs` vs another pack.",
+            "3. **Publish** — commit, archive, or attach this directory.",
             "",
-            "## Publication workflow",
-            "",
-            (
-                "Treat this directory as the **canonical outward-facing bundle**: what you "
-                "**archive, cite, or attach**—not only the raw campaign output directory."
-            ),
-            "",
-            "1. **Assemble** — `alwm benchmark campaign pack` from a completed campaign.",
-            "2. **Validate** — `alwm validate` (schema + kinds) and "
-            "`alwm benchmark campaign pack-check .` (paths and consistency).",
-            "3. **Compare** (optional) — `alwm benchmark campaign compare-packs` for two packs.",
-            "4. **Publish** — commit, tarball, supplement, or issue attachment.",
-            "",
-            "Step-by-step: **`docs/workflows/campaign-result-pack-publication.md`** (in the repo).",
+            "Full operator checklist: **`docs/workflows/campaign-result-pack-publication.md`** "
+            "(in the repository).",
             "",
             "## Publish-ready checklist",
             "",
-            "Before sharing outside the repo (or locking a release artifact):",
-            "",
-            "- [ ] `alwm validate campaign-result-pack.json campaign_result_pack` passes",
-            "- [ ] `alwm validate manifest.json campaign_manifest` passes",
-            "- [ ] `alwm validate campaign-summary.json campaign_summary` passes",
-            "- [ ] `alwm benchmark campaign pack-check .` passes (add `--strict` for CI gates)",
-            "- [ ] **Optional kinds:** when semantic files are present, "
-            "`alwm validate campaign-semantic-summary.json campaign_semantic_summary` passes",
-            "- [ ] **Portability:** `source_campaign_dir` is absent unless you intentionally "
-            "record absolute paths (`--record-source-abspath`)",
-            "- [ ] **Member depth:** `member_depth` is **full** unless reviewers only need "
-            "manifests (longitudinal cell loads need full trees)",
-            "- [ ] **Completeness:** comparative + semantic layers you expect show **yes** in "
-            "**Bundle completeness** above",
-            "- [ ] **Subset:** if this is a filtered pack, `notes` or PR text explains why "
-            "runs were omitted",
-            "- [ ] **Secrets:** spot-check `cells/`, `request.json`, `browser_evidence.json` for "
-            "tokens or private paths",
+            "- [ ] `alwm validate campaign-result-pack.json campaign_result_pack`",
+            "- [ ] `alwm validate manifest.json campaign_manifest`",
+            "- [ ] `alwm validate campaign-summary.json campaign_summary`",
+            "- [ ] `alwm benchmark campaign pack-check .` (`--strict` if warnings must fail CI)",
+            "- [ ] **Optional layers:** validate semantic JSON when present "
+            "(`alwm validate campaign-semantic-summary.json campaign_semantic_summary`)",
+            "- [ ] **Portability:** no accidental `source_campaign_dir` unless intended",
+            "- [ ] **Subset:** if filtered, **`notes`** or cover text explains omissions",
+            "- [ ] **Secrets:** spot-check `cells/`, `request.json`, `browser_evidence.json`",
             "",
             "## Provenance",
-            "",
-            "Summary of where this bundle came from and how it was stamped:",
             "",
         ],
     )
@@ -525,6 +569,14 @@ def _render_pack_index_md(pack: CampaignResultPackV1) -> str:
         lines.append(f"- **git_describe:** `{pack.git_describe}`")
     if pack.campaign_definition_fingerprint:
         lines.append(f"- **definition_fingerprint:** `{pack.campaign_definition_fingerprint}`")
+    if not (
+        pack.source_campaign_dir
+        or pack.source_campaign_relpath
+        or pack.git_commit_sha
+        or pack.git_describe
+        or pack.campaign_definition_fingerprint
+    ):
+        lines.append("_No source path or git pointers recorded on this pack._")
     lines.extend(["", "## Fingerprints (experiment axes)", ""])
     if pack.campaign_experiment_fingerprints is not None:
         cef = pack.campaign_experiment_fingerprints
@@ -540,35 +592,11 @@ def _render_pack_index_md(pack: CampaignResultPackV1) -> str:
         )
     else:
         lines.append("_No campaign experiment fingerprints on the source manifest._")
+
     lines.extend(
         [
             "",
-            "## Artifact inventory",
-            "",
-            "Key files mirror a normal campaign output directory:",
-            "",
-            f"- `{pack.artifacts.campaign_manifest}` — campaign manifest",
-            f"- `{pack.artifacts.campaign_summary_json}` / `{pack.artifacts.campaign_summary_md}`",
-        ],
-    )
-    if pack.artifacts.campaign_semantic_summary_json:
-        lines.append(
-            f"- `{pack.artifacts.campaign_semantic_summary_json}` — semantic / hybrid rollup",
-        )
-    if pack.artifacts.campaign_comparative_report_md:
-        lines.append(f"- `{pack.artifacts.campaign_comparative_report_md}` — comparative report")
-    if pack.artifacts.campaign_analysis_json:
-        lines.append(f"- `{pack.artifacts.campaign_analysis_json}` — comparative analysis JSON")
-    if pack.artifacts.campaign_dry_run_json:
-        lines.append(
-            f"- `{pack.artifacts.campaign_dry_run_json}` — dry-run plan "
-            "(no member `runs/` in source)",
-        )
-    lines.append(f"- `{pack.artifacts.campaign_result_pack_json}` — this pack manifest (machine)")
-    lines.extend(
-        [
-            "",
-            "### Member runs included",
+            "## Member runs included",
             "",
             "| run_index | run_id | suite | benchmark_id | manifest in pack |",
             "| ---: | --- | --- | --- | --- |",
@@ -581,52 +609,36 @@ def _render_pack_index_md(pack: CampaignResultPackV1) -> str:
         )
     if not pack.member_runs:
         lines.append("| — | — | — | — | — |")
+
     lines.extend(
         [
             "",
             "## Comparing two packs",
             "",
             "1. **Identity:** `pack_identity_fingerprint` matches when the same logical bundle "
-            "(members, artifact paths, experiment fingerprints, git pointers) was assembled; "
-            "it ignores `pack_id`, pack `created_at`, and operator `notes`.",
-            "2. **Experiment definition:** Compare `campaign_experiment_fingerprints` axes — "
-            "same six hashes mean the same sweep configuration inputs.",
-            "3. **Results:** Diff `campaign-summary.md`, `reports/campaign-report.md`, "
-            "`campaign-semantic-summary.md`, and `reports/campaign-analysis.json` side by side.",
-            (
-                "4. **Member-level:** Use `runs/runNNNN/manifest.json` and per-run trees "
-                "under each pack."
-            ),
-            "5. **Tree diff:** `diff -ru path/to/packA path/to/packB` (exclude `INDEX.md` churn if "
-            "only timestamps changed).",
+            "was assembled (ignores `pack_id`, pack `created_at`, `notes`).",
+            "2. **Experiment:** same **`campaign_experiment_fingerprints`** ⇒ same sweep inputs.",
+            "3. **Results:** diff summaries, `reports/campaign-report.md`, semantic summary, "
+            "`reports/campaign-analysis.json`.",
+            "4. **Members:** compare `runs/runNNNN/` trees.",
+            "5. **Tree:** `diff -ru packA packB` (skip `INDEX.md` if only timestamp churn).",
             "",
-            "## Validate and completeness",
-            "",
-            "Schema validation (JSON Schema + registered kinds):",
+            "## Validate",
             "",
             "```bash",
             "alwm validate campaign-result-pack.json campaign_result_pack",
             "alwm validate manifest.json campaign_manifest",
             "alwm validate campaign-summary.json campaign_summary",
-            "```",
-            "",
-            "Structural check (paths, manifest/summary consistency, portability hints):",
-            "",
-            "```bash",
             "alwm benchmark campaign pack-check .",
             "alwm benchmark campaign pack-check . --strict",
             "```",
             "",
             "## Longitudinal analysis",
             "",
-            (
-                "`alwm benchmark longitudinal` resolves globs from **`ALWM_REPO_ROOT`** "
-                "(default: current directory). Treat the pack directory as the repo root, "
-                "or pass a repo-relative glob to the pack path."
-            ),
+            "`alwm benchmark longitudinal` uses **`ALWM_REPO_ROOT`** (default: cwd). "
+            "For a standalone pack, `cd` into it or pass a repo-relative glob.",
             "",
             "```bash",
-            "# Standalone pack directory (recommended for published bundles):",
             "cd /path/to/this/pack",
             (
                 'ALWM_REPO_ROOT="$(pwd)" alwm benchmark longitudinal '
@@ -635,12 +647,9 @@ def _render_pack_index_md(pack: CampaignResultPackV1) -> str:
             "```",
             "",
             "```bash",
-            "# From a clone where the pack lives under examples/:",
-            (
-                "alwm benchmark longitudinal --runs-glob "
-                f"'examples/campaign_result_packs/my_pack/{pack.longitudinal_member_glob}' "
-                "--out-dir /tmp/out"
-            ),
+            "alwm benchmark longitudinal --runs-glob "
+            f"'examples/campaign_result_packs/<pack>/{pack.longitudinal_member_glob}' "
+            "--out-dir /tmp/out",
             "```",
             "",
         ],
@@ -648,12 +657,8 @@ def _render_pack_index_md(pack: CampaignResultPackV1) -> str:
     if pack.member_depth == "manifest":
         lines.extend(
             [
-                (
-                    "> **Note:** Member runs were copied with **`--member-depth manifest`** only. "
-                    "`alwm benchmark longitudinal` may fail to load cell evaluations because "
-                    "`evaluation.json` / `benchmark_response.json` are missing. Re-pack with "
-                    "**`--member-depth full`** (default) for full longitudinal compatibility."
-                ),
+                "> **`member_depth` is manifest-only:** may miss `evaluation.json` / per-cell "
+                "artifacts. Re-pack with **`--member-depth full`** for full cell trees.",
                 "",
             ],
         )

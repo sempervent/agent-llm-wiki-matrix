@@ -331,10 +331,9 @@ def render_campaign_semantic_judge_section_markdown(summary: CampaignSemanticSum
     t = summary.totals
     ih = summary.instability_highlights
     lines = [
-        "## Semantic judge variance",
+        "## Judge variance (abbreviated)",
         "",
-        "Sourced from **evaluation.json**, **evaluation_judge_provenance.json**, and "
-        "**repeat_aggregation** when **N>1**. Deterministic-only cells have no judge spread.",
+        "_Full tables: `campaign-semantic-summary.md`._",
         "",
         "| Signal | Count |",
         "| --- | ---: |",
@@ -388,9 +387,6 @@ def render_campaign_semantic_judge_section_markdown(summary: CampaignSemanticSum
                 f"{mr if mr is not None else '—'} | {mx if mx is not None else '—'} |",
             )
         lines.append("")
-    lines.append(
-        "_Full tables: `campaign-semantic-summary.md` in this directory._",
-    )
     lines.append("")
     return "\n".join(lines)
 
@@ -409,15 +405,11 @@ def render_campaign_semantic_summary_markdown(summary: CampaignSemanticSummaryV1
         f"- **Title:** {summary.title}",
         f"- **Created:** `{summary.created_at}`",
         "",
-        "Rolls up **semantic** and **hybrid** scoring cells: repeat-judge disagreement, "
-        "low-confidence flags, per-criterion instability, and per-axis hotspots. "
-        "**Deterministic** cells are counted but do not contribute judge spread. "
-        "Use with **`campaign-summary.md`** (run index) and **`reports/campaign-report.md`** "
-        "(full comparative narrative).",
+        "Semantic / hybrid judge rollups from member **evaluation** artifacts (deterministic "
+        "cells counted, no spread). Cross-link: **`campaign-summary.md`**, "
+        "**`reports/campaign-report.md`**.",
         "",
         "## Executive snapshot",
-        "",
-        "Counts below combine judge metadata from member-run **evaluation** artifacts.",
         "",
         "| Signal | Count |",
         "| --- | ---: |",
@@ -466,37 +458,12 @@ def render_campaign_semantic_summary_markdown(summary: CampaignSemanticSummaryV1
                 f"{sr:.6f} | {xr:.6f} | {mr:.6f} |",
             )
         lines.append("")
-    for title, block in (
-        ("### Suites", ih.unstable_suites),
-        ("### Provider axis", ih.unstable_providers),
-        ("### Execution modes", ih.unstable_execution_modes),
-    ):
-        lines.extend(
-            [
-                title,
-                "",
-                "| Rank | Axis | Instab. | Cells | Sem | Rep | LC | m_rng | x_rng | σ_tot |",
-                "| ---: | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |",
-            ],
-        )
-        for h in block:
-            mean_rng = h.mean_range_across_cells
-            max_rng = h.max_range_observed
-            stdev_mean = h.mean_total_weighted_stdev
-            lines.append(
-                f"| {h.rank} | `{h.axis_value}` | {h.instability_score:.6f} | {h.cell_rows} | "
-                f"{h.semantic_cells} | {h.repeat_judge_cells} | {h.low_confidence_cells} | "
-                f"{mean_rng if mean_rng is not None else '—'} | "
-                f"{max_rng if max_rng is not None else '—'} | "
-                f"{stdev_mean if stdev_mean is not None else '—'} |",
-            )
-        lines.append("")
     lines.extend(
         [
             "## Instability hotspots",
             "",
-            "Axes with the largest judge disagreement on repeat-judge cells "
-            "(**`mean_range_across_cells`** / **`max_range_observed`**).",
+            "Ranked by **`mean_range_across_cells`** and **`max_range_observed`** "
+            "(repeat-judge cells).",
             "",
         ],
     )

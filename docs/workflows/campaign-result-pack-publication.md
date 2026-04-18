@@ -2,9 +2,9 @@
 
 This page is the **operator checklist** for campaigns: **run → validate artifacts → assemble a result pack → validate the pack → compare (packs or raw directories) → interpret outputs → publish or share**. It complements the **field and CLI reference** in **[benchmark-campaigns.md](benchmark-campaigns.md)** (definitions, outputs, flags).
 
-**Milestone & releases:** [Roadmap v0.2.5](../roadmap/v0.2.5.md) · [Tracking v0.2.5](../tracking/v0.2.5-campaign.md) · prior ship [v0.2.4](../releases/v0.2.4.md) · [v0.2.3](../releases/v0.2.3.md).
+**Milestone & releases:** [v0.2.5 (shipped)](../releases/v0.2.5.md) · [Roadmap v0.2.5 (complete)](../roadmap/v0.2.5.md) · [Tracking v0.2.5 (closed)](../tracking/v0.2.5-campaign.md) · prior [v0.2.4](../releases/v0.2.4.md) · [v0.2.3](../releases/v0.2.3.md).
 
-**Read next for depth:** **[campaign-walkthrough.md](campaign-walkthrough.md)** (what each file is, using committed trees only). **Verification matrix** (CI vs drift vs live): **[verification.md](verification.md)**.
+**Read next for depth:** **[campaign-walkthrough.md](campaign-walkthrough.md)** (what each file is, using committed trees only). **Verification matrix** (CI vs drift vs live): **[verification.md](verification.md)**. **MkDocs:** **[Home](../index.md)** (publication table) · **[docs-site.md](docs-site.md)** (nav, `just docs-build`, CI).
 
 | Doc | Role |
 | --- | --- |
@@ -112,7 +112,7 @@ uv run alwm benchmark campaign pack-check . --strict
 
 Use **`--strict`** when warnings must fail CI. Completeness table: **[benchmark-campaigns.md](benchmark-campaigns.md)** (Result packs — “Completeness”).
 
-**Publication-readiness (reviewers):** Open **`INDEX.md`** first. It includes **Start here** (suggested reading order), **Bundle completeness** (which optional layers are present—semantic, comparative report, analysis JSON, dry-run plan), **Publish-ready checklist**, and provenance. **`campaign-result-pack.json`** lists the same optional paths (for example **`campaign_dry_run_json`** when **`campaign-dry-run.json`** was packed).
+**Publication-readiness (reviewers):** Open **`INDEX.md`** first. It includes **For reviewers (read this first)** (what the folder is, suggested reading order), **Scope of this bundle** (member counts, **`membership_scope`**, **`member_depth`**), **What is included** (core vs optional layers), **Publish-ready checklist**, and provenance. **`campaign-result-pack.json`** lists optional artifact paths (for example **`campaign_dry_run_json`**) and derived **`membership_scope`** / **`optional_layers_present`** for machines and diff tools.
 
 **Determinism:** When regenerating committed example packs, pass a fixed **`--created-at`** (for example **`1970-01-01T00:00:00Z`**) so **`created_at`** stays stable.
 
@@ -160,7 +160,7 @@ Details and highlights: **[benchmark-campaigns.md](benchmark-campaigns.md)** (co
 
 ### Single campaign or pack (human order)
 
-1. **`INDEX.md`** (pack) — **Start here** reading order, **Bundle completeness** table, **`pack_identity_fingerprint`**, provenance, **Publish-ready checklist**, validation commands, **Comparing two packs**.
+1. **`INDEX.md`** (pack) — cold-reader intro, reading order, scope (**`membership_scope`**, subset callouts), **What is included**, **`pack_identity_fingerprint`**, provenance, **Publish-ready checklist**, validation commands, **Comparing two packs**.
 2. **`campaign-summary.md`** — rollups and **At a glance** when comparative artifacts exist.
 3. **`reports/campaign-report.md`** — executive narrative, fingerprint-axis interpretation, FT-\*, browser evidence sections when present.
 4. **`campaign-semantic-summary.md`** — semantic / hybrid judge rollups when emitted.
@@ -170,7 +170,7 @@ Details and highlights: **[benchmark-campaigns.md](benchmark-campaigns.md)** (co
 
 | Section | Use |
 | --- | --- |
-| **Reader interpretation** | **`pack-compare.json`** field **`reader_interpretation`** (and the Markdown section): **non-causal** orientation — what differs (fingerprints, member overlap), instability / browser / semantic / FT-\* **narratives**, heuristic **`evidence_strength`**, and **`uncertainty_caveats`**. Use tables below for detail; do not treat **`evidence_strength`** as a statistical power estimate. |
+| **At a glance** | **`pack-compare.json`** field **`reader_interpretation`** (Markdown **`## At a glance`**): **non-causal** orientation — **what changed**, fingerprint mismatch axes, sweep/spread one-liners (directory compare), **`evidence_strength`**, **`uncertainty_caveats`**. Detailed instability / browser / semantic / FT-\* **counts** are only in **Analysis deltas** (not duplicated in At a glance). |
 | **Campaign identity & fingerprints** | Same **`campaign_id`**? Same **`pack_identity_fingerprint`** (logical bundle)? Per-axis **`campaign_experiment_fingerprints`** — matching six hashes ⇒ same sweep *inputs*. |
 | **Included artifacts** | Same relative paths for summaries, semantic files, comparative report, analysis JSON. |
 | **Comparative analysis** | Backend means, semantic instability counts, **`browser_evidence_comparison`** when browser rows exist. |
@@ -183,7 +183,7 @@ If **`campaign_definition`** or **`suite_definitions`** fingerprints differ, tre
 
 ### Campaign directory comparison (`campaign-compare-report.md`)
 
-Adds **`reader_interpretation`** (same intent as pack compare — see table above), **sweep dimensions** (which axes *vary* across member runs), and **fingerprint_axis_insights** diffs from each **`campaign-analysis.json`**, plus the same score / instability / FT-\* / browser pairing story as pack compare where applicable.
+Adds the same **`## At a glance`** + **`reader_interpretation`** JSON as pack compare (see table), **sweep dimensions** (which axes *vary* across member runs), and **fingerprint_axis_insights** diffs from each **`campaign-analysis.json`**, plus **Analysis deltas** (scores, instability, FT-\*, browser, semantic) in one block.
 
 **Manual diff:** `diff -ru` on two pack or campaign directories; ignore **`INDEX.md`** churn if only timestamps changed.
 

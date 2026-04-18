@@ -110,7 +110,32 @@
         }
       }
     },
-    "notes": { "oneOf": [{ "type": "null" }, { "type": "string" }] }
+    "notes": { "oneOf": [{ "type": "null" }, { "type": "string" }] },
+    "membership_scope": {
+      "description": "all_runs = every campaign manifest member row included; subset = fewer (filters, indices, or failures excluded); unknown = counts missing or ambiguous.",
+      "oneOf": [
+        { "type": "null" },
+        { "type": "string", "enum": ["all_runs", "subset", "unknown"] }
+      ]
+    },
+    "optional_layers_present": {
+      "description": "Optional artifact layers bundled: semantic_summary, comparative_report, comparative_analysis, dry_run_plan.",
+      "oneOf": [
+        { "type": "null" },
+        {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "semantic_summary",
+              "comparative_report",
+              "comparative_analysis",
+              "dry_run_plan"
+            ]
+          }
+        }
+      ]
+    }
   },
   "$defs": {
     "campaignExperimentFingerprints": {

@@ -25,12 +25,12 @@
 
 | Field | Value |
 | --- | --- |
-| started_at_utc | `2026-04-18T01:41:38Z` |
-| finished_at_utc | `2026-04-18T01:41:38Z` |
-| duration_seconds | 0.002140 |
+| started_at_utc | `2026-04-18T01:58:47Z` |
+| finished_at_utc | `2026-04-18T01:58:47Z` |
+| duration_seconds | 0.002019 |
 | browser_phase_seconds | 0.000000 |
-| provider_completion_seconds | 0.000006 |
-| evaluation_phase_seconds | 0.000400 |
+| provider_completion_seconds | 0.000005 |
+| evaluation_phase_seconds | 0.000444 |
 | judge_phase_seconds | 0.000000 |
 
 ### Retry and judge summary

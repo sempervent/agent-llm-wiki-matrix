@@ -50,12 +50,15 @@ def test_assemble_full_pack_validates_and_copies_runs(
     load_artifact_file(pack_dir / "campaign-result-pack.json", "campaign_result_pack")
     assert pack.pack_identity_fingerprint
     assert pack.pack_identity_fingerprint.startswith("sha256:")
+    assert pack.membership_scope == "all_runs"
+    assert "semantic_summary" in (pack.optional_layers_present or [])
     chk = validate_campaign_result_pack_directory(pack_dir)
     assert chk.ok(strict_portability=False)
     assert not chk.errors
     index_text = (pack_dir / "INDEX.md").read_text(encoding="utf-8")
-    assert "Start here (reviewing this bundle cold)" in index_text
-    assert "Bundle completeness" in index_text
+    assert "For reviewers (read this first)" in index_text
+    assert "What is included" in index_text
+    assert "membership_scope" in index_text
     assert "Publish-ready checklist" in index_text
 
 

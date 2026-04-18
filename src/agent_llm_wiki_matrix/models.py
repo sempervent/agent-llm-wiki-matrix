@@ -951,8 +951,8 @@ class CampaignResultPackV1(BaseModel):
         default=None,
         description=(
             "sha256:… canonical hash of bundled experiment identity (excludes pack assembly time, "
-            "pack_id, notes, and absolute paths). Compare across packs to see if the same "
-            "logical bundle was produced."
+            "pack_id, notes, absolute paths, membership_scope, optional_layers_present). "
+            "Compare across packs to see if the same logical bundle was produced."
         ),
     )
     campaign_definition_fingerprint: str | None = None
@@ -977,6 +977,21 @@ class CampaignResultPackV1(BaseModel):
     notes: str | None = Field(
         default=None,
         description="Optional operator notes (e.g. why runs were subset).",
+    )
+    membership_scope: Literal["all_runs", "subset", "unknown"] | None = Field(
+        default=None,
+        description=(
+            "Whether this pack includes every campaign manifest member row (all_runs), "
+            "fewer (subset—filters, --run-index, or failed runs excluded), or unknown."
+        ),
+    )
+    optional_layers_present: list[str] | None = Field(
+        default=None,
+        description=(
+            "Which optional artifact layers are bundled: semantic_summary, comparative_report, "
+            "comparative_analysis, dry_run_plan. Omitted or null on legacy packs; derive from "
+            "artifacts when null."
+        ),
     )
 
 

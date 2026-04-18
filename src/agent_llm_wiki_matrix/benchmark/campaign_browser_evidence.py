@@ -210,9 +210,8 @@ def render_campaign_browser_evidence_markdown(
     lines = [
         "## Browser evidence (member runs)",
         "",
-        "**browser_mock** file-backed traces (`fixtures/browser_evidence/v1/`). "
-        "**Playwright** is optional (`[browser]` + env). **MCP** stdio is a **local** JSON bridge "
-        "to a subprocess — not IDE-hosted or remote capture (`docs/architecture/browser.md`).",
+        "**mock** traces from `fixtures/browser_evidence/v1/`; optional **Playwright** "
+        "(`[browser]`). See `docs/architecture/browser.md`.",
         "",
     ]
     if cross:
