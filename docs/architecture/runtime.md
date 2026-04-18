@@ -28,9 +28,9 @@ See `.env.example`. Notable keys:
 ## Browser abstraction
 
 - **Offline / CI:** `MockBrowserRunner`, `FileBrowserRunner`, JSON under `fixtures/browser_evidence/v1/` (see `docs/architecture/browser.md`).
-- **CLI:** `alwm browser prompt-block <path>`, `alwm browser run-mock`, `alwm browser run-playwright` (requires `uv pip install -e '.[browser]'` and browser install via `uv run playwright install …`).
+- **CLI:** `alwm browser prompt-block <path>`, `alwm browser run-mock`, `alwm browser run-mcp` (fixture JSON only), `alwm browser run-playwright` (requires `uv pip install -e '.[browser]'` and browser install via `uv run playwright install …`).
 - **Optional live:** `PlaywrightBrowserRunner` in `browser/playwright_runner.py` maps sessions to `BrowserEvidence` (extra `[browser]`).
-- **Stub:** `MCPBrowserRunner` raises `NotImplementedError` until MCP integration lands.
+- **Partial:** `MCPBrowserRunner` loads the same fixtures as `FileBrowserRunner` when `scenario_id` or `fixture_relpath` is set; remote MCP tools are not implemented (see `docs/architecture/browser.md`).
 
 ## Docker
 

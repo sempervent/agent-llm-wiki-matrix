@@ -19,12 +19,37 @@ Stable per-axis hashes for longitudinal grouping and comparability checks.
 - **dry_run:** `False`
 - **runs:** 1
 - **succeeded / failed:** 1 / 0
-- **git_commit:** `0a2acbfcd670589ccd2ab5723382194871097525`
-- **git_describe:** `v0.1.0-1-g0a2acbf-dirty`
+- **git_commit:** `7a2c70d4ba5a143237c6fa5a0c9f0c75ae567ad5`
+- **git_describe:** `v0.2.0-dirty`
+
+## Aggregated runtime (member manifests)
+
+Sums of per-run `runtime_summary` fields for successful member runs that recorded timing.
+
+| Metric | Value |
+| --- | --- |
+| member_runs_timed | 1 |
+| total_browser_phase_seconds | 0.000000 |
+| total_provider_completion_seconds | 0.000044 |
+| total_evaluation_phase_seconds | 0.003234 |
+| total_judge_phase_seconds | 0.000000 |
+| total_judge_invocations | 0 |
+| cells_with_judge_parse_fallback | 0 |
+
 
 | # | run_id | suite | benchmark_id | eval axis | modes filter | status | mean score | cells |
 | ---: | --- | --- | --- | --- | --- | --- | ---: | ---: |
 | 0 | `campaign.examples.minimal_offline.v1__0000` | `fixtures/benchmarks/campaign_micro.v1.yaml` | `bench.fixtures.campaign.micro.v1` | suite_default | — | succeeded | 0.667276 | 1 |
+
+## Comparative reports
+
+- **Markdown:** `reports/campaign-report.md` (dimensions, backends, scoring instability, mode gaps, failure tags)
+- **JSON:** `reports/campaign-analysis.json` (machine-readable mirror)
+
+### Semantic / hybrid judge rollup
+
+- **Markdown:** `campaign-semantic-summary.md` (repeat-judge disagreement, low-confidence cells; variance by suite / provider / mode)
+- **JSON:** `campaign-semantic-summary.json` (structured aggregates)
 
 ## Longitudinal analysis
 

@@ -35,7 +35,7 @@ def test_mock_semantic_single_run_omits_repeat_metadata() -> None:
         environ={"ALWM_FIXTURE_MODE": "1"},
         judge_live=False,
     )
-    ev, prov = evaluate_with_scoring_backend(
+    ev, prov, _m = evaluate_with_scoring_backend(
         subject_ref="cells/x__y/benchmark_response.json",
         text="hello fixture",
         rubric_path=rubric_path,
@@ -62,7 +62,7 @@ def test_mock_semantic_produces_provenance_and_evaluation() -> None:
         environ={"ALWM_FIXTURE_MODE": "1"},
         judge_live=False,
     )
-    ev, prov = evaluate_with_scoring_backend(
+    ev, prov, _metrics = evaluate_with_scoring_backend(
         subject_ref="cells/x__y/benchmark_response.json",
         text="hello fixture",
         rubric_path=rubric_path,
@@ -89,7 +89,7 @@ def test_repeated_semantic_aggregation_provenance_and_low_confidence() -> None:
         environ={"ALWM_FIXTURE_MODE": "1"},
         judge_live=False,
     )
-    ev, prov = evaluate_with_scoring_backend(
+    ev, prov, _metrics = evaluate_with_scoring_backend(
         subject_ref="subj",
         text="repeat me",
         rubric_path=rubric_path,
@@ -124,7 +124,7 @@ def test_hybrid_differs_from_pure_deterministic() -> None:
         judge_live=False,
     )
     hw = EvalHybridWeights(deterministic_weight=0.5, semantic_weight=0.5)
-    _ev, prov = evaluate_with_scoring_backend(
+    _ev, prov, _m = evaluate_with_scoring_backend(
         subject_ref="subj",
         text="hybrid text",
         rubric_path=rubric_path,

@@ -1,1 +1,3 @@
-Browser-evidence interpretation (fixture-only; no live browser). The deterministic trace JSON is committed at fixtures/browser_evidence/v1/export_flow.json. Summarize the navigation sequence, list what you would capture in a BrowserEvidence-shaped summary for auditors, and note one limitation of file-backed evidence versus live Playwright traces.
+Browser-evidence interpretation (fixture-only; no live browser). The deterministic trace JSON is committed at fixtures/browser_evidence/v1/export_flow.json. It includes navigation, console lines, optional dom_excerpts (visible text / HTML snippets), screenshot metadata (viewport, mime, integrity hash), and an extensions object for structured fields.
+
+Summarize the navigation sequence; call out how dom_excerpts and screenshot metadata support grounding; list what you would still capture in a live Playwright trace; and note one limitation of fixture-only evidence versus a real browser session.

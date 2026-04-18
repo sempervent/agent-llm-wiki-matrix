@@ -23,6 +23,7 @@ from agent_llm_wiki_matrix.benchmark.live_probe import (
 )
 from agent_llm_wiki_matrix.benchmark.persistence import write_pydantic_json
 from agent_llm_wiki_matrix.browser import (
+    MCPBrowserRunner,
     MockBrowserRunner,
     PlaywrightBrowserRunner,
     evidence_to_prompt_block,
@@ -187,7 +188,7 @@ def cmd_prompts_show(prompt_id: str, registry_path: Path) -> None:
 
 @main.group("browser")
 def browser_grp() -> None:
-    """Browser evidence: mock/file fixtures, or optional Playwright (`run-playwright`)."""
+    """Browser evidence: mock/file fixtures, `run-mcp` fixture bridge, or Playwright."""
 
 
 @browser_grp.command("prompt-block")
@@ -263,6 +264,43 @@ def cmd_browser_run_playwright(
     except RuntimeError as e:
         raise click.ClickException(str(e)) from e
     except ValueError as e:
+        raise click.ClickException(str(e)) from e
+    click.echo(result.model_dump_json(indent=2))
+
+
+@browser_grp.command("run-mcp")
+@click.option(
+    "--scenario-id",
+    default=None,
+    help="Load fixtures/browser_evidence/v1/<id>.json under ALWM_REPO_ROOT.",
+)
+@click.option(
+    "--fixture",
+    "fixture_relpath",
+    default=None,
+    help="Repo-relative path to a browser_evidence JSON file.",
+)
+def cmd_browser_run_mcp(
+    scenario_id: str | None,
+    fixture_relpath: str | None,
+) -> None:
+    """Run MCPBrowserRunner (fixture-backed JSON only; remote MCP tools not wired)."""
+    repo = Path(os.environ.get("ALWM_REPO_ROOT", ".")).resolve()
+    if not scenario_id and not fixture_relpath:
+        raise click.ClickException(
+            "Specify --scenario-id or --fixture. MCPBrowserRunner loads committed "
+            "fixtures like FileBrowserRunner; remote MCP browser tools are not implemented."
+        )
+    if scenario_id and fixture_relpath:
+        raise click.ClickException("Use either --scenario-id or --fixture, not both.")
+    runner = MCPBrowserRunner(repo)
+    req = BrowserRunRequest(
+        scenario_id=scenario_id,
+        fixture_relpath=fixture_relpath,
+    )
+    try:
+        result = runner.run(req)
+    except (RuntimeError, FileNotFoundError) as e:
         raise click.ClickException(str(e)) from e
     click.echo(result.model_dump_json(indent=2))
 
@@ -475,7 +513,7 @@ def cmd_evaluate(
         max_mean_criterion_stdev=judge_max_mean_criterion_stdev,
         max_total_weighted_stdev=judge_max_total_weighted_stdev,
     )
-    ev, prov = evaluate_with_scoring_backend(
+    ev, prov, _metrics = evaluate_with_scoring_backend(
         subject_ref=subject_ref,
         text=text,
         rubric_path=rubric_abs,

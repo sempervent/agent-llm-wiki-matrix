@@ -25,7 +25,7 @@ Deliver **benchmark campaign orchestration** as a first-class, documented, schem
 
 - Benchmark harness (`run_benchmark`, benchmarks, matrices, reports)
 - JSON Schema + Pydantic alignment (`artifacts.py`)
-- `docs/workflows/benchmark-campaigns.md`, `docs/wiki/campaign-orchestration.md`, ADR `docs/adr/0001-campaign-orchestration.md`
+- `docs/workflows/benchmark-campaigns.md`, `docs/workflows/campaign-walkthrough.md`, `docs/wiki/campaign-orchestration.md`, ADR `docs/adr/0001-campaign-orchestration.md`
 
 ## Exit criteria
 

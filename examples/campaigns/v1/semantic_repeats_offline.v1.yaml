@@ -1,0 +1,13 @@
+# Offline campaign: semantic judge with N>1 repeats (aggregated disagreement in campaign-semantic-summary).
+schema_version: 1
+id: campaign.examples.semantic_repeats_offline.v1
+title: Semantic repeats offline (mock backend, judge repeats)
+suite_refs:
+  - examples/benchmarks/v1/semantic_repeats.v1.yaml
+provider_config_refs: []
+eval_scoring_options: []
+browser_configs: []
+execution_modes: null
+campaign_tags:
+  - example:campaign
+  - example:semantic

@@ -25,7 +25,7 @@ Each file below sets `taxonomy` (`task_family`, `difficulty`, `determinism`, `to
 | `suite.taxonomy.repo_governance.v1.yaml` | `repo_governance` | Registry: `bench.task.repo_governed.v1` |
 | `suite.taxonomy.runtime_config.v1.yaml` | `runtime_config` | Registry: `bench.task.runtime_config.v1` (Docker/Compose/Bake) |
 | `suite.taxonomy.documentation.v1.yaml` | `documentation` | Registry: `bench.task.markdown_synthesis.v1` |
-| `suite.taxonomy.browser_evidence.v1.yaml` | `browser_evidence` | `browser_mock` variant + registry browser task |
+| `suite.taxonomy.browser_evidence.v1.yaml` | `browser_evidence` | `browser_mock` variant + registry browser task; rubric **`browser_realism.v1`** (grounding / hallucination resistance / source fidelity) |
 | `suite.taxonomy.matrix_reasoning.v1.yaml` | `matrix_reasoning` | Two variants (`cli`, `repo_governed`) |
 | `suite.taxonomy.multi_agent_coordination.v1.yaml` | `multi_agent_coordination` | Registry: `bench.task.multi_agent_coord.v1` |
 | `suite.taxonomy.campaign_coordination.v1.yaml` | `campaign` | Inline prompts × three execution modes |

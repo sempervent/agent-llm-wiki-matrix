@@ -20,3 +20,23 @@
 
 `- `matrices/grid.json`
 - `markdown/matrix.grid.md``
+
+## Runtime observability
+
+| Field | Value |
+| --- | --- |
+| started_at_utc | `2026-04-18T00:37:21Z` |
+| finished_at_utc | `2026-04-18T00:37:21Z` |
+| duration_seconds | 0.020594 |
+| browser_phase_seconds | 0.000000 |
+| provider_completion_seconds | 0.000044 |
+| evaluation_phase_seconds | 0.003234 |
+| judge_phase_seconds | 0.000000 |
+
+### Retry and judge summary
+
+| Field | Value |
+| --- | --- |
+| retry_policy_max_attempts | None |
+| total_judge_invocations | 0 |
+| cells_with_judge_parse_fallback | 0 |

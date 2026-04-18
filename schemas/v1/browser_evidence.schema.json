@@ -44,8 +44,90 @@
     },
     "dom_snapshot_ref": {
       "type": "string",
-      "description": "Opaque id or repo-relative path to a snapshot artifact (future)"
+      "description": "Opaque id or repo-relative path to a full DOM snapshot artifact (optional; distinct from dom_excerpts)."
+    },
+    "dom_excerpts": {
+      "type": "array",
+      "description": "Fixture-backed snippets of visible text and/or HTML aligned to selectors (auditor-friendly grounding).",
+      "items": { "$ref": "#/$defs/domExcerpt" },
+      "default": []
+    },
+    "screenshots": {
+      "type": "array",
+      "description": "Metadata for captured screenshots (paths may point at committed assets or placeholders; hashes support integrity).",
+      "items": { "$ref": "#/$defs/screenshotMetadata" },
+      "default": []
+    },
+    "extensions": {
+      "description": "Optional structured JSON bag for runner-specific or experiment fields (must remain JSON-serializable).",
+      "oneOf": [{ "type": "null" }, { "type": "object", "additionalProperties": true }]
     },
     "notes": { "type": "string" }
+  },
+  "$defs": {
+    "domExcerpt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [],
+      "allOf": [
+        {
+          "anyOf": [
+            { "required": ["visible_text"] },
+            { "required": ["html_snippet"] }
+          ]
+        }
+      ],
+      "properties": {
+        "label": {
+          "type": "string",
+          "description": "Human-readable label for this excerpt (e.g. primary CTA)."
+        },
+        "selector": {
+          "type": "string",
+          "description": "CSS selector or accessibility hint when known."
+        },
+        "visible_text": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Visible text as captured from the DOM."
+        },
+        "html_snippet": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Small HTML fragment for auditors (escape carefully; fixtures should avoid PII)."
+        }
+      }
+    },
+    "screenshotMetadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [],
+      "allOf": [
+        {
+          "anyOf": [{ "required": ["relpath"] }, { "required": ["content_sha256"] }]
+        }
+      ],
+      "properties": {
+        "relpath": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Repo-relative path to an image or sidecar metadata file when committed."
+        },
+        "content_sha256": {
+          "type": "string",
+          "minLength": 8,
+          "pattern": "^[a-f0-9]{64}$",
+          "description": "Hex SHA-256 of image bytes when known (no 0x prefix)."
+        },
+        "viewport_width": { "type": "integer", "minimum": 1 },
+        "viewport_height": { "type": "integer", "minimum": 1 },
+        "mime_type": { "type": "string", "minLength": 1 },
+        "caption": { "type": "string" },
+        "captured_at": {
+          "type": "string",
+          "description": "RFC 3339 timestamp when the screenshot was taken (fixture or live)."
+        }
+      }
+    }
   }
 }

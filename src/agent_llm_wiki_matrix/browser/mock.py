@@ -11,7 +11,9 @@ from agent_llm_wiki_matrix.browser.models import (
     BrowserRunRequest,
     BrowserRunResult,
     ConsoleMessage,
+    DomExcerpt,
     NavigationStep,
+    ScreenshotMetadata,
 )
 
 
@@ -50,6 +52,28 @@ class MockBrowserRunner(BrowserRunner):
             console_messages=[
                 ConsoleMessage(level="log", text=f"mock_trace={digest}"),
             ],
+            dom_excerpts=[
+                DomExcerpt(
+                    label="mock primary surface",
+                    selector=f"[data-mock-id='{digest}']",
+                    visible_text=f"Deterministic mock excerpt for {label}",
+                ),
+            ],
+            screenshots=[
+                ScreenshotMetadata(
+                    content_sha256="0" * 64,
+                    viewport_width=1280,
+                    viewport_height=720,
+                    mime_type="image/png",
+                    caption="Mock screenshot metadata only (no binary).",
+                    captured_at="1970-01-01T00:00:00Z",
+                ),
+            ],
+            extensions={
+                "runner": "mock",
+                "trace_digest": digest,
+                "structured_capture_version": 1,
+            },
             notes="MockBrowserRunner: deterministic; no real browser.",
         )
         duration_ms = int((time.monotonic() - t0) * 1000)

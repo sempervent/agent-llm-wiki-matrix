@@ -28,9 +28,9 @@ Before writing **complete**:
 | `alwm validate` kinds | **complete** | `artifacts.py` + `tests/test_domain.py` / smoke |
 | `MockBrowserRunner` / `FileBrowserRunner` | **complete** | `tests/test_browser.py`; no network |
 | `PlaywrightBrowserRunner` | **partial** (optional) | Requires `[browser]` extra + `playwright install`; `tests/integration/` gated by `ALWM_PLAYWRIGHT_SMOKE=1` |
-| `MCPBrowserRunner` | **partial** | Fixture-backed only (`scenario_id` / `fixture_relpath`); remote MCP tools **not** wired (`browser/mcp_runner.py`); raises `RuntimeError` without fixture |
+| `MCPBrowserRunner` | **partial** | Fixture-backed only (`scenario_id` / `fixture_relpath`); remote MCP tools **not** wired (`browser/mcp_runner.py`); raises `RuntimeError` without fixture; CLI `alwm browser run-mcp`; roadmap in `docs/architecture/browser.md` |
 | `alwm benchmark run` (offline) | **complete** | `tests/test_benchmark.py`, `tests/test_benchmark_browser.py`; `browser_mock` variants run browser phase + write `browser_evidence.json` |
-| `alwm benchmark campaign run` / `plan` | **complete** | `tests/test_benchmark_campaign.py`; manifests registered in `artifacts.py`; workflow **`docs/workflows/benchmark-campaigns.md`** |
+| `alwm benchmark campaign run` (incl. `--dry-run`) | **complete** | `tests/test_benchmark_campaign.py`; manifests registered in `artifacts.py`; workflow **`docs/workflows/benchmark-campaigns.md`**, walkthrough **`docs/workflows/campaign-walkthrough.md`** |
 | Benchmark + **Playwright** | **partial** (opt-in) | Variant `browser.runner: playwright` requires `ALWM_BENCHMARK_PLAYWRIGHT=1` + `[browser]` extra; not in default CI |
 | `alwm benchmark probe` | **complete** (live) | `tests/test_live_probe.py`; integration opt-in |
 | Prompt registry CLI | **complete** | `tests/test_prompt_registry.py`. Registry content grows over time—that is data, not stubbing. |

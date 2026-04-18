@@ -97,7 +97,7 @@ For any non-trivial change (feature, fix, refactor that touches behavior or cont
 | New structured artifact type? | Add **JSON Schema** under `schemas/v1/`, model in `models.py` or the owning package, register in **`artifacts.py`**, add **fixture + example**, **pytest**. |
 | Network in tests? | **No** in default suite. Use mocks, `httpx.MockTransport`, or files under `fixtures/`. Live calls only in `tests/integration/` behind env flags. |
 | New CLI surface? | Implement in `cli.py`, document in **README** command tables and/or `docs/workflows/`, add **smoke or unit test** where feasible. Do not rename existing commands casually. |
-| Browser automation? | **Default / CI:** **`MockBrowserRunner`** and **`FileBrowserRunner`** + `BrowserEvidence` JSON—no browser binary. **Optional live:** **`PlaywrightBrowserRunner`** (`uv pip install -e '.[browser]'`, `uv run playwright install …`, `alwm browser run-playwright`); integration smoke is opt-in (`ALWM_PLAYWRIGHT_SMOKE=1`). **`MCPBrowserRunner`** remains a **stub** (`NotImplementedError`) until implemented with tests and docs—no silent half-wiring. |
+| Browser automation? | **Default / CI:** **`MockBrowserRunner`** and **`FileBrowserRunner`** + `BrowserEvidence` JSON—no browser binary. **Optional live:** **`PlaywrightBrowserRunner`** (`uv pip install -e '.[browser]'`, `uv run playwright install …`, `alwm browser run-playwright`); integration smoke is opt-in (`ALWM_PLAYWRIGHT_SMOKE=1`). **`MCPBrowserRunner`** is **partial:** fixture-backed only (`alwm browser run-mcp`, same JSON as file runner); **remote MCP browser tools are not implemented**—see `docs/architecture/browser.md`. |
 | Docker/Compose change? | Run `just compose-help`. Document new profiles in `docs/workflows/local-dev.md` or `benchmarking.md`. |
 
 ---
@@ -137,12 +137,15 @@ Prefer a campaign definition over ad hoc repeated CLI invocations when:
 - the experiment needs a shared manifest and summary
 - multiple dimensions are being swept together
 
+**Artifacts to keep consistent in docs:** campaign **`manifest.json`** (fingerprints + run index), **`campaign-summary.*`**, member **`benchmark_manifest`** trees under **`runs/`**, **six-axis** fingerprints at both campaign (`campaign_experiment_fingerprints`) and run (`comparison_fingerprints`) levels, and **longitudinal** globs on **`runs/*/manifest.json`**.
+
 Campaign-related changes must update:
 - schemas
 - artifact registration
 - CLI docs
 - README
 - wiki (`docs/wiki/campaign-orchestration.md`, index `docs/wiki/benchmark-campaigns.md`)
+- workflow walkthrough (`docs/workflows/campaign-walkthrough.md`) when user-facing steps change
 - tracking (`docs/tracking/campaign-orchestration.md`; legacy `docs/tracking/benchmark-campaign-orchestration.md` if still referenced)
 - ADR (`docs/adr/0001-campaign-orchestration.md` and/or `docs/architecture/adr/0001-benchmark-campaign-orchestration.md`)
 - CHANGELOG
@@ -159,7 +162,7 @@ Campaign-related changes must update:
 | **CLI** | Smoke the commands you changed (`alwm … --help`, one happy path). |
 | **Benchmarks** | Offline: `alwm benchmark run --definition fixtures/benchmarks/…` or `benchmarks/v1/offline`-style defs; outputs under `--output-dir` validate as artifacts (`benchmark_manifest` for `manifest.json`, per-cell kinds as today). |
 | **Live backends** | Optional: `just ollama-gptoss-setup` (Compose Ollama + **gpt-oss:20b** + probe), `just smoke-ollama-live` (minimal benchmark); `alwm benchmark probe`; `just test-integration` with `ALWM_LIVE_BENCHMARK_OLLAMA` / `ALWM_LIVE_BENCHMARK_LLAMACPP`—never required for merge by default. See `docs/workflows/benchmarking.md`. |
-| **Browser (offline)** | `alwm validate … browser_evidence`; `alwm browser prompt-block` / `run-mock` on fixtures—no browser binary. |
+| **Browser (offline)** | `alwm validate … browser_evidence`; `alwm browser prompt-block` / `run-mock` / `run-mcp` on fixtures—no browser binary. |
 | **Browser (Playwright)** | Optional extra `[browser]`; not part of default `just ci`. |
 
 **Reporting to humans:** In PRs or follow-up notes, state: scope, commands run, and known gaps (e.g. “integration not run—no local Ollama”).
@@ -192,7 +195,7 @@ Short form for PRs:
 | --- | --- |
 | **Complete** | Contract + default tests + docs/commands agree; see audit doc for evidence bar. |
 | **Partial** | Ships safely; optional deps or gaps are explicit (e.g. Playwright behind `[browser]`). |
-| **Stub** | Intentional `NotImplementedError` or reserved API—**MCP browser runner** today. |
+| **Stub** | Intentional `NotImplementedError` or reserved API—must not be described as production-ready elsewhere (see `capability-classification.md` for examples). |
 | **Documented-only** | Docs without code, or scaffolding only—fix or downgrade claims. |
 
 **Rule:** If behavior looks “real” but is not (e.g. random HTTP without adapter), downgrade to stub or complete the adapter + tests.
@@ -248,7 +251,7 @@ The **prompt registry** (`prompts/registry.yaml` + `prompts/versions/*.txt`, sch
 
 ### Browser-related work
 
-- Extend **`BrowserEvidence`** only with schema + tests + fixture. Deterministic runners: **`MockBrowserRunner`**, **`FileBrowserRunner`**. Optional live: **`PlaywrightBrowserRunner`** (`[browser]` extra, not default CI). New third-party runner: subclass `BrowserRunner`, document in `docs/architecture/browser.md`, add tests; **MCP** remains stubbed until explicitly implemented.
+- Extend **`BrowserEvidence`** only with schema + tests + fixture. Deterministic runners: **`MockBrowserRunner`**, **`FileBrowserRunner`**. Optional live: **`PlaywrightBrowserRunner`** (`[browser]` extra, not default CI). **`MCPBrowserRunner`** today is a **fixture bridge** only; remote MCP execution needs the roadmap in `docs/architecture/browser.md` plus tests before claiming **complete**.
 
 ---
 
@@ -275,7 +278,7 @@ The **prompt registry** (`prompts/registry.yaml` + `prompts/versions/*.txt`, sch
 
 - Install: see **Python environment (uv — required on the host)** — e.g. `uv pip install -e ".[dev]"` (Python 3.11+; matches `Dockerfile`). Optional Playwright: `uv pip install -e ".[browser]"` then `uv run playwright install chromium` (not required for `just ci`).
 - CI parity: `uv run just ci` (ruff, mypy, pytest; excludes `tests/integration/`).
-- CLI: `uv run alwm …` (or `alwm` after `source .venv/bin/activate`) — see `alwm --help`; registry `alwm prompts …`; benchmarks `alwm benchmark run|probe`; providers `alwm providers show`; browser `alwm browser prompt-block`, `run-mock`, `run-playwright` (requires `[browser]` + browsers).
+- CLI: `uv run alwm …` (or `alwm` after `source .venv/bin/activate`) — see `alwm --help`; registry `alwm prompts …`; benchmarks `alwm benchmark run|probe`; providers `alwm providers show`; browser `alwm browser prompt-block`, `run-mock`, `run-mcp` (fixture JSON), `run-playwright` (requires `[browser]` + browsers).
 - Images: `just docker-build` / `just docker-bake`.
 
 ## Commits

@@ -82,6 +82,9 @@
           "judge_provenance_relpath": {
             "type": ["string", "null"],
             "description": "Cell-relative path to evaluation_judge_provenance.json for semantic/hybrid scoring"
+          },
+          "runtime": {
+            "oneOf": [{ "type": "null" }, { "$ref": "#/$defs/benchmarkCellRuntime" }]
           }
         }
       }
@@ -196,9 +199,66 @@
     "comparison_fingerprints": {
       "description": "Stable configuration hashes for cross-run comparison",
       "oneOf": [{ "type": "null" }, { "$ref": "#/$defs/benchmarkComparisonFingerprints" }]
+    },
+    "runtime_summary": {
+      "description": "Wall-clock phase breakdown for the harness run (optional; omitted in older artifacts)",
+      "oneOf": [{ "type": "null" }, { "$ref": "#/$defs/benchmarkRunTimingSummary" }]
+    },
+    "retry_summary": {
+      "description": "Judge invocation and parse-fallback rollups (optional)",
+      "oneOf": [{ "type": "null" }, { "$ref": "#/$defs/benchmarkRetrySummary" }]
     }
   },
   "$defs": {
+    "benchmarkCellRuntime": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema_version"],
+      "properties": {
+        "schema_version": { "type": "integer", "const": 1 },
+        "browser_seconds": { "oneOf": [{ "type": "null" }, { "type": "number", "minimum": 0 }] },
+        "provider_seconds": { "oneOf": [{ "type": "null" }, { "type": "number", "minimum": 0 }] },
+        "evaluation_seconds": { "oneOf": [{ "type": "null" }, { "type": "number", "minimum": 0 }] },
+        "judge_seconds": { "oneOf": [{ "type": "null" }, { "type": "number", "minimum": 0 }] },
+        "judge_repeat_count": {
+          "oneOf": [{ "type": "null" }, { "type": "integer", "minimum": 1 }]
+        },
+        "judge_parse_fallback": { "oneOf": [{ "type": "null" }, { "type": "boolean" }] }
+      }
+    },
+    "benchmarkRunTimingSummary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "started_at_utc",
+        "finished_at_utc",
+        "duration_seconds"
+      ],
+      "properties": {
+        "schema_version": { "type": "integer", "const": 1 },
+        "started_at_utc": { "type": "string", "minLength": 1 },
+        "finished_at_utc": { "type": "string", "minLength": 1 },
+        "duration_seconds": { "type": "number", "minimum": 0 },
+        "browser_phase_seconds": { "type": "number", "minimum": 0, "default": 0 },
+        "provider_completion_seconds": { "type": "number", "minimum": 0, "default": 0 },
+        "evaluation_phase_seconds": { "type": "number", "minimum": 0, "default": 0 },
+        "judge_phase_seconds": { "type": "number", "minimum": 0, "default": 0 }
+      }
+    },
+    "benchmarkRetrySummary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema_version"],
+      "properties": {
+        "schema_version": { "type": "integer", "const": 1 },
+        "retry_policy_max_attempts": {
+          "oneOf": [{ "type": "null" }, { "type": "integer", "minimum": 1, "maximum": 64 }]
+        },
+        "total_judge_invocations": { "type": "integer", "minimum": 0, "default": 0 },
+        "cells_with_judge_parse_fallback": { "type": "integer", "minimum": 0, "default": 0 }
+      }
+    },
     "benchmarkComparisonFingerprints": {
       "type": "object",
       "additionalProperties": false,

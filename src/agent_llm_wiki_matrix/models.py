@@ -517,6 +517,134 @@ class CampaignGeneratedReportPaths(BaseModel):
     campaign_manifest: str = Field(default="manifest.json")
     campaign_summary_json: str = Field(default="campaign-summary.json")
     campaign_summary_md: str = Field(default="campaign-summary.md")
+    campaign_comparative_report_md: str | None = Field(
+        default=None,
+        description="Markdown comparative report path (e.g. reports/campaign-report.md).",
+    )
+    campaign_analysis_json: str | None = Field(
+        default=None,
+        description="JSON analysis mirror (e.g. reports/campaign-analysis.json).",
+    )
+    campaign_semantic_summary_json: str | None = Field(
+        default=None,
+        description="Aggregated semantic/hybrid judge variance (campaign-semantic-summary.json).",
+    )
+    campaign_semantic_summary_md: str | None = Field(
+        default=None,
+        description="Markdown rollup for semantic instability (campaign-semantic-summary.md).",
+    )
+
+
+class CampaignSemanticCellRow(BaseModel):
+    """Per-cell semantic / hybrid judge metrics for campaign-scale reporting."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    run_id: str = Field(min_length=1)
+    run_index: int = Field(ge=0)
+    suite_ref: str = Field(min_length=1)
+    provider_config_ref: str | None = Field(
+        default=None,
+        description="Campaign axis value; null means harness default providers YAML.",
+    )
+    eval_scoring_label: str = Field(min_length=1)
+    benchmark_id: str = Field(min_length=1)
+    cell_id: str = Field(min_length=1)
+    variant_id: str = Field(min_length=1)
+    prompt_id: str = Field(min_length=1)
+    execution_mode: str = Field(min_length=1)
+    backend_kind: str = Field(min_length=1)
+    scoring_backend: str = Field(min_length=1)
+    judge_repeat_count: int | None = None
+    judge_semantic_aggregation: str | None = None
+    judge_low_confidence: bool | None = None
+    repeat_aggregation_present: bool = Field(
+        default=False,
+        description="True when N>1 semantic judge runs were aggregated for this cell.",
+    )
+    max_range_across_criteria: float | None = None
+    total_weighted_stdev: float | None = None
+    mean_stdev_across_criteria: float | None = None
+    confidence_low: bool = Field(
+        default=False,
+        description="From repeat_aggregation.confidence or Evaluation.judge_low_confidence.",
+    )
+    confidence_flags: list[str] = Field(
+        default_factory=list,
+        description="Sample of threshold flags from JudgeRepeatConfidence (capped in builder).",
+    )
+
+
+class CampaignSemanticAxisRollup(BaseModel):
+    """Aggregated semantic variance along one grouping axis (suite, provider, or mode)."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    axis_kind: Literal["suite_ref", "provider_config_ref", "execution_mode"]
+    axis_value: str = Field(min_length=1)
+    cell_rows: int = Field(ge=0, description="Total cells in this bucket.")
+    semantic_cells: int = Field(
+        ge=0,
+        description="Cells with semantic_judge or hybrid scoring_backend.",
+    )
+    repeat_judge_cells: int = Field(
+        ge=0,
+        description="Cells with repeat_aggregation (N>1 judge runs).",
+    )
+    low_confidence_cells: int = Field(ge=0)
+    max_range_observed: float | None = None
+    mean_range_across_cells: float | None = Field(
+        default=None,
+        description="Mean of max_range_across_criteria where repeat block present.",
+    )
+    mean_total_weighted_stdev: float | None = None
+
+
+class CampaignSemanticTotals(BaseModel):
+    """Campaign-wide counts for deterministic vs semantic scoring paths."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    runs_scanned: int = Field(ge=0)
+    cells_total: int = Field(ge=0)
+    cells_deterministic: int = Field(ge=0)
+    cells_semantic_or_hybrid: int = Field(ge=0)
+    cells_with_repeat_judge: int = Field(
+        ge=0,
+        description="Cells where judge ran N>1 and repeat_aggregation exists.",
+    )
+    low_confidence_cells: int = Field(ge=0)
+    max_range_across_campaign: float | None = Field(
+        default=None,
+        description="Max of per-cell max_range_across_criteria (repeat judge only).",
+    )
+    mean_range_repeat_cells: float | None = Field(
+        default=None,
+        description="Mean max_range across cells with repeat_aggregation.",
+    )
+    mean_total_weighted_stdev_repeat: float | None = Field(
+        default=None,
+        description="Mean of total_weighted_stdev where repeat block present.",
+    )
+
+
+class CampaignSemanticSummaryV1(BaseModel):
+    """Structured campaign-semantic-summary.json (artifact kind campaign_semantic_summary)."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    schema_version: Literal[1] = 1
+    campaign_id: str = Field(min_length=1)
+    title: str
+    created_at: str
+    totals: CampaignSemanticTotals
+    by_suite: list[CampaignSemanticAxisRollup] = Field(default_factory=list)
+    by_provider: list[CampaignSemanticAxisRollup] = Field(default_factory=list)
+    by_execution_mode: list[CampaignSemanticAxisRollup] = Field(default_factory=list)
+    cells: list[CampaignSemanticCellRow] = Field(
+        default_factory=list,
+        description="Per-cell detail (may be large; omit in future if needed).",
+    )
 
 
 class CampaignExperimentFingerprints(BaseModel):
@@ -605,6 +733,10 @@ class BenchmarkCampaignManifest(BaseModel):
         default_factory=list,
         description="Member runs in stable order (longitudinal glob: runs/*/manifest.json).",
     )
+    aggregated_runtime: CampaignAggregatedRuntimeV1 | None = Field(
+        default=None,
+        description="Sum of member runtime_summary fields when present (optional).",
+    )
 
 
 class CampaignSummaryV1(BaseModel):
@@ -688,6 +820,73 @@ class BenchmarkRetryPolicy(BaseModel):
     backoff_seconds: float = Field(default=0.0, ge=0.0)
 
 
+class BenchmarkCellRuntimeV1(BaseModel):
+    """Per-cell wall-clock breakdown (optional; omitted in older manifests)."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    schema_version: Literal[1] = 1
+    browser_seconds: float | None = Field(default=None, ge=0.0)
+    provider_seconds: float | None = Field(default=None, ge=0.0)
+    evaluation_seconds: float | None = Field(default=None, ge=0.0)
+    judge_seconds: float | None = Field(default=None, ge=0.0)
+    judge_repeat_count: int | None = Field(default=None, ge=1)
+    judge_parse_fallback: bool | None = None
+
+
+class BenchmarkRunTimingSummaryV1(BaseModel):
+    """Aggregated phase durations for one benchmark run."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    schema_version: Literal[1] = 1
+    started_at_utc: str = Field(min_length=1)
+    finished_at_utc: str = Field(min_length=1)
+    duration_seconds: float = Field(ge=0.0)
+    browser_phase_seconds: float = Field(default=0.0, ge=0.0)
+    provider_completion_seconds: float = Field(default=0.0, ge=0.0)
+    evaluation_phase_seconds: float = Field(default=0.0, ge=0.0)
+    judge_phase_seconds: float = Field(default=0.0, ge=0.0)
+
+
+class BenchmarkRetrySummaryV1(BaseModel):
+    """Retry and judge-invocation rollups (policy metadata + observed judge repeats)."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    schema_version: Literal[1] = 1
+    retry_policy_max_attempts: int | None = Field(default=None, ge=1, le=64)
+    total_judge_invocations: int = Field(
+        default=0,
+        ge=0,
+        description="Sum of configured judge repeat counts across semantic/hybrid cells.",
+    )
+    cells_with_judge_parse_fallback: int = Field(
+        default=0,
+        ge=0,
+        description="Cells where at least one semantic judge parse used deterministic fallback.",
+    )
+
+
+class CampaignAggregatedRuntimeV1(BaseModel):
+    """Sums of member benchmark run timings for a campaign (optional)."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    schema_version: Literal[1] = 1
+    total_browser_phase_seconds: float = Field(default=0.0, ge=0.0)
+    total_provider_completion_seconds: float = Field(default=0.0, ge=0.0)
+    total_evaluation_phase_seconds: float = Field(default=0.0, ge=0.0)
+    total_judge_phase_seconds: float = Field(default=0.0, ge=0.0)
+    total_judge_invocations: int = Field(default=0, ge=0)
+    cells_with_judge_parse_fallback: int = Field(default=0, ge=0)
+    member_runs_timed: int = Field(
+        default=0,
+        ge=0,
+        description="Member runs that included runtime_summary on the benchmark manifest.",
+    )
+
+
 class BenchmarkComparisonFingerprints(BaseModel):
     """Stable SHA-256 fingerprints for comparing benchmark configurations across runs."""
 
@@ -743,6 +942,10 @@ class BenchmarkCellArtifactPaths(BaseModel):
     judge_provenance_relpath: str | None = Field(
         default=None,
         description="evaluation_judge_provenance.json when semantic_judge or hybrid scoring",
+    )
+    runtime: BenchmarkCellRuntimeV1 | None = Field(
+        default=None,
+        description="Optional wall-clock breakdown for this cell.",
     )
 
 
@@ -815,6 +1018,14 @@ class BenchmarkRunManifest(BaseModel):
         description=(
             "Stable hashes of suite, prompts, providers, scoring, browser, and prompt registry"
         ),
+    )
+    runtime_summary: BenchmarkRunTimingSummaryV1 | None = Field(
+        default=None,
+        description="Wall-clock observability for the harness run (optional for older artifacts).",
+    )
+    retry_summary: BenchmarkRetrySummaryV1 | None = Field(
+        default=None,
+        description="Judge invocations and parse-fallback counts (optional).",
     )
 
     @model_validator(mode="after")

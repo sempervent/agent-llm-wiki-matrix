@@ -2,7 +2,7 @@
 schema_version: 1
 id: bench.fixtures.browser.file.v1
 title: Browser file-runner benchmark (fixture evidence)
-rubric_ref: fixtures/v1/rubric.json
+rubric_ref: examples/dataset/rubrics/browser_realism.v1.json
 prompts:
   - id: p-one
     text: "Reply with the single word OK."

@@ -93,7 +93,7 @@ just benchmark-llamacpp    # start llama-server on the host (default :8080/v1)
 
 ## Benchmark campaigns (multi-run orchestration)
 
-**Campaigns** expand one YAML definition into many benchmark runs (suites × providers × eval scoring × browser overrides). The campaign root writes **`manifest.json`** (**`benchmark_campaign_manifest`**) plus **`campaign-summary.json`** (**`campaign_summary`**) and **`campaign-summary.md`**; each member run lives under **`runs/runNNNN/`** like a standalone **`alwm benchmark run`**.
+**Campaigns** expand one YAML definition into many benchmark runs (suites × providers × eval scoring × browser overrides). The campaign root writes **`manifest.json`** (**`campaign_manifest`** / **`benchmark_campaign_manifest`**) with **`campaign_definition_fingerprint`** and **`campaign_experiment_fingerprints`** (six axes), plus **`campaign-summary.json`** (**`campaign_summary`**) and **`campaign-summary.md`**; each member run lives under **`runs/runNNNN/`** with a normal **`benchmark_manifest`** (six-axis **`comparison_fingerprints`**). **Longitudinal** tools glob **`runs/*/manifest.json`** under the campaign directory.
 
 ```bash
 ALWM_FIXTURE_MODE=1 uv run alwm benchmark campaign run \
@@ -105,11 +105,11 @@ uv run alwm benchmark campaign run --dry-run \
   --definition examples/campaigns/v1/minimal_offline.v1.yaml \
   --output-dir /tmp/campaign-plan
 
-uv run alwm validate examples/campaign_runs/minimal_offline/manifest.json benchmark_campaign_manifest
+uv run alwm validate examples/campaign_runs/minimal_offline/manifest.json campaign_manifest
 uv run alwm validate examples/campaign_runs/minimal_offline/campaign-summary.json campaign_summary
 ```
 
-Workflow, ADR, tracking, and wiki: **`docs/workflows/benchmark-campaigns.md`**, **`docs/wiki/campaign-orchestration.md`**, **`docs/architecture/adr/0001-benchmark-campaign-orchestration.md`**, **`docs/tracking/campaign-orchestration.md`**.
+**Step-by-step (committed paths only):** **`docs/workflows/campaign-walkthrough.md`**. Workflow, ADR, tracking, wiki: **`docs/workflows/benchmark-campaigns.md`**, **`docs/wiki/campaign-orchestration.md`**, **`docs/architecture/adr/0001-benchmark-campaign-orchestration.md`**, **`docs/tracking/campaign-orchestration.md`**.
 
 ---
 
@@ -256,6 +256,7 @@ Run `just` with no arguments to list recipes. Common tasks:
 | `alwm validate <file> <kind>` | Validate JSON against schema + Pydantic (includes `browser_evidence`, `benchmark_manifest`) |
 | `alwm browser prompt-block <file>` | Load browser evidence JSON → stable prompt-sized text |
 | `alwm browser run-mock` | Run `MockBrowserRunner` (deterministic; no browser binary) |
+| `alwm browser run-mcp` | Run `MCPBrowserRunner` on committed fixture JSON (`--scenario-id` or `--fixture`); same evidence as file runner—remote MCP tools **not** implemented |
 | `alwm browser run-playwright` | Run `PlaywrightBrowserRunner` (requires `uv pip install -e ".[browser]"` and `uv run playwright install …`; not used in default CI) |
 | `alwm ingest <input_dir> <output_dir>` | Markdown pages → Thought JSON |
 | `alwm evaluate --subject … --rubric … --out …` | Deterministic rubric scoring |

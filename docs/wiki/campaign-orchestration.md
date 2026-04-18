@@ -62,6 +62,7 @@ uv run alwm benchmark campaign run --dry-run \
 
 | Topic | Location |
 | --- | --- |
+| Step-by-step walkthrough (committed `examples/`) | [docs/workflows/campaign-walkthrough.md](../workflows/campaign-walkthrough.md) |
 | Workflow & command table | [docs/workflows/benchmark-campaigns.md](../workflows/benchmark-campaigns.md) |
 | Tracking & exit criteria | [docs/tracking/campaign-orchestration.md](../tracking/campaign-orchestration.md) |
 | ADR (decision) | [docs/adr/0001-campaign-orchestration.md](../adr/0001-campaign-orchestration.md) |
@@ -70,4 +71,4 @@ uv run alwm benchmark campaign run --dry-run \
 
 ## Relationship to longitudinal reporting
 
-Member runs expose **`benchmark_manifest`** under `runs/runNNNN/`. Point **`alwm benchmark longitudinal`** at `runs/*/manifest.json` (see [longitudinal-reporting.md](../workflows/longitudinal-reporting.md)).
+Member runs expose **`benchmark_manifest`** under `runs/runNNNN/` (with **six-axis** **`comparison_fingerprints`**). Point **`alwm benchmark longitudinal`** at `runs/*/manifest.json` (see [longitudinal-reporting.md](../workflows/longitudinal-reporting.md)). The **campaign** manifest’s **`campaign_experiment_fingerprints`** group the sweep for audits; longitudinal series grouping also keys off fingerprint fields documented in that workflow.

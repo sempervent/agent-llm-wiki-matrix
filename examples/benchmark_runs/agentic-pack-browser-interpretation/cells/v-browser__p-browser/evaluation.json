@@ -3,20 +3,18 @@
   "evaluator": "pipeline",
   "id": "eval-v-browser-p-browser",
   "notes_markdown": "Benchmark cell evaluation (rubric hash on normalized response).",
-  "rubric_id": "rubric.examples.comparison.v1",
+  "rubric_id": "rubric.examples.browser_realism.v1",
   "scores": {
-    "brevity": 0.218359,
-    "grounding": 0.985397,
-    "structure": 0.018719,
-    "task_fit": 0.795818
+    "grounding": 0.649261,
+    "hallucination_resistance": 0.137319,
+    "source_fidelity": 0.482308
   },
   "scoring_backend": "deterministic",
   "subject_ref": "cells/v-browser__p-browser/benchmark_response.json",
-  "total_weighted_score": 0.504573,
+  "total_weighted_score": 0.425226,
   "weights": {
-    "brevity": 0.25,
-    "grounding": 0.25,
-    "structure": 0.25,
-    "task_fit": 0.25
+    "grounding": 0.34,
+    "hallucination_resistance": 0.33,
+    "source_fidelity": 0.33
   }
 }

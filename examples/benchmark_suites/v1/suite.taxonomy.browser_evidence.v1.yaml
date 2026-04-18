@@ -2,7 +2,7 @@
 schema_version: 1
 id: bench.examples.taxonomy.browser_evidence.v1
 title: Taxonomy — browser evidence (browser_mock execution)
-rubric_ref: examples/dataset/rubrics/comparison.v1.json
+rubric_ref: examples/dataset/rubrics/browser_realism.v1.json
 taxonomy:
   taxonomy_version: 1
   task_family: browser_evidence

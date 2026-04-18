@@ -1,0 +1,139 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/sempervent/agent-llm-wiki-matrix/schemas/v1/campaign_semantic_summary.schema.json",
+  "title": "CampaignSemanticSummaryV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "campaign_id",
+    "title",
+    "created_at",
+    "totals",
+    "by_suite",
+    "by_provider",
+    "by_execution_mode",
+    "cells"
+  ],
+  "properties": {
+    "schema_version": { "type": "integer", "const": 1 },
+    "campaign_id": { "type": "string", "minLength": 1 },
+    "title": { "type": "string" },
+    "created_at": { "type": "string", "minLength": 1 },
+    "totals": { "$ref": "#/$defs/campaignSemanticTotals" },
+    "by_suite": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/campaignSemanticAxisRollup" }
+    },
+    "by_provider": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/campaignSemanticAxisRollup" }
+    },
+    "by_execution_mode": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/campaignSemanticAxisRollup" }
+    },
+    "cells": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/campaignSemanticCellRow" }
+    }
+  },
+  "$defs": {
+    "campaignSemanticTotals": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "runs_scanned",
+        "cells_total",
+        "cells_deterministic",
+        "cells_semantic_or_hybrid",
+        "cells_with_repeat_judge",
+        "low_confidence_cells"
+      ],
+      "properties": {
+        "runs_scanned": { "type": "integer", "minimum": 0 },
+        "cells_total": { "type": "integer", "minimum": 0 },
+        "cells_deterministic": { "type": "integer", "minimum": 0 },
+        "cells_semantic_or_hybrid": { "type": "integer", "minimum": 0 },
+        "cells_with_repeat_judge": { "type": "integer", "minimum": 0 },
+        "low_confidence_cells": { "type": "integer", "minimum": 0 },
+        "max_range_across_campaign": { "oneOf": [{ "type": "null" }, { "type": "number" }] },
+        "mean_range_repeat_cells": { "oneOf": [{ "type": "null" }, { "type": "number" }] },
+        "mean_total_weighted_stdev_repeat": { "oneOf": [{ "type": "null" }, { "type": "number" }] }
+      }
+    },
+    "axisKind": {
+      "type": "string",
+      "enum": ["suite_ref", "provider_config_ref", "execution_mode"]
+    },
+    "campaignSemanticAxisRollup": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "axis_kind",
+        "axis_value",
+        "cell_rows",
+        "semantic_cells",
+        "repeat_judge_cells",
+        "low_confidence_cells"
+      ],
+      "properties": {
+        "axis_kind": { "$ref": "#/$defs/axisKind" },
+        "axis_value": { "type": "string", "minLength": 1 },
+        "cell_rows": { "type": "integer", "minimum": 0 },
+        "semantic_cells": { "type": "integer", "minimum": 0 },
+        "repeat_judge_cells": { "type": "integer", "minimum": 0 },
+        "low_confidence_cells": { "type": "integer", "minimum": 0 },
+        "max_range_observed": { "oneOf": [{ "type": "null" }, { "type": "number" }] },
+        "mean_range_across_cells": { "oneOf": [{ "type": "null" }, { "type": "number" }] },
+        "mean_total_weighted_stdev": { "oneOf": [{ "type": "null" }, { "type": "number" }] }
+      }
+    },
+    "campaignSemanticCellRow": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "run_id",
+        "run_index",
+        "suite_ref",
+        "eval_scoring_label",
+        "benchmark_id",
+        "cell_id",
+        "variant_id",
+        "prompt_id",
+        "execution_mode",
+        "backend_kind",
+        "scoring_backend",
+        "repeat_aggregation_present",
+        "confidence_low",
+        "confidence_flags"
+      ],
+      "properties": {
+        "run_id": { "type": "string", "minLength": 1 },
+        "run_index": { "type": "integer", "minimum": 0 },
+        "suite_ref": { "type": "string", "minLength": 1 },
+        "provider_config_ref": { "oneOf": [{ "type": "null" }, { "type": "string", "minLength": 1 }] },
+        "eval_scoring_label": { "type": "string", "minLength": 1 },
+        "benchmark_id": { "type": "string", "minLength": 1 },
+        "cell_id": { "type": "string", "minLength": 1 },
+        "variant_id": { "type": "string", "minLength": 1 },
+        "prompt_id": { "type": "string", "minLength": 1 },
+        "execution_mode": { "type": "string", "minLength": 1 },
+        "backend_kind": { "type": "string", "minLength": 1 },
+        "scoring_backend": { "type": "string", "minLength": 1 },
+        "judge_repeat_count": { "oneOf": [{ "type": "null" }, { "type": "integer", "minimum": 1 }] },
+        "judge_semantic_aggregation": { "oneOf": [{ "type": "null" }, { "type": "string", "minLength": 1 }] },
+        "judge_low_confidence": { "oneOf": [{ "type": "null" }, { "type": "boolean" }] },
+        "repeat_aggregation_present": { "type": "boolean" },
+        "max_range_across_criteria": { "oneOf": [{ "type": "null" }, { "type": "number" }] },
+        "total_weighted_stdev": { "oneOf": [{ "type": "null" }, { "type": "number" }] },
+        "mean_stdev_across_criteria": { "oneOf": [{ "type": "null" }, { "type": "number" }] },
+        "confidence_low": { "type": "boolean" },
+        "confidence_flags": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        }
+      }
+    }
+  }
+}

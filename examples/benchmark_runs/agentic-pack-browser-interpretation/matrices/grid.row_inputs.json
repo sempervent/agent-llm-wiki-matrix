@@ -7,12 +7,12 @@
       "evaluation_relpath": "cells/v-browser__p-browser/evaluation.json",
       "prompt_id": "p-browser",
       "row_label": "v-browser",
-      "total_weighted_score": 0.504573,
+      "total_weighted_score": 0.425226,
       "variant_id": "v-browser"
     }
   ],
-  "matrix_id": "agentic-pack-browser-interpretation-example-grid",
+  "matrix_id": "agentic-browser-refresh-grid",
   "metric": "total_weighted_rubric_score",
-  "run_id": "agentic-pack-browser-interpretation-example",
+  "run_id": "agentic-browser-refresh",
   "schema_version": 1
 }

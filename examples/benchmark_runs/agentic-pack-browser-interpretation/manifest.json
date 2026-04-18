@@ -11,6 +11,14 @@
       "request_relpath": "cells/v-browser__p-browser/request.json"
     }
   ],
+  "comparison_fingerprints": {
+    "browser_config": "sha256:934fb44f5710f6f81c14e7765ecd4fa3b191205a76a9cf852486932fbaef3ef1",
+    "prompt_registry_state": "sha256:ed58b8a9a6d7c740ee299986fb42b1873b2790f0368b2aab9f282bddf2b912d1",
+    "prompt_set": "sha256:cae57259092576ca8bd2f6d9e6a38723ee1ee9a87e6fc3dd6d2ff1983f1d4b7b",
+    "provider_config": "sha256:18867a59a6a06cae42f247de9f2681ef6a51f788c91ba5cd77b08a1675ee2084",
+    "scoring_config": "sha256:f958bcbda76ceda7438ca44922ecf99f6ef81948463ec797c7b454a29b249496",
+    "suite_definition": "sha256:810e0b1e1b763cee307b3956ba005361486d8fe308cd8ec905d3979e477e3c5b"
+  },
   "created_at": "1970-01-01T00:00:00Z",
   "definition_source_relpath": "examples/benchmark_suites/v1/agentic/suite.agentic.browser_interpretation.v1.yaml",
   "expected_artifact_kinds": [
@@ -43,8 +51,8 @@
     "backoff_seconds": 1.5,
     "max_attempts": 2
   },
-  "rubric_ref": "examples/dataset/rubrics/comparison.v1.json",
-  "run_id": "agentic-pack-browser-interpretation-example",
+  "rubric_ref": "examples/dataset/rubrics/browser_realism.v1.json",
+  "run_id": "agentic-browser-refresh",
   "schema_version": 1,
   "success_criteria": [
     "References the committed fixture path for the trace (fixtures/browser_evidence/\u2026).",

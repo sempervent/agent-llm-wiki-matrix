@@ -61,6 +61,8 @@ def test_browser_file_runner_benchmark(
     cell = out / "cells" / "v-file__p-one"
     ev = load_artifact_file(cell / "browser_evidence.json", "browser_evidence")
     assert ev.id == "evidence.export_flow.v1"
+    assert len(ev.dom_excerpts) >= 1
+    assert len(ev.screenshots) >= 1
     req = load_artifact_file(cell / "request.json", "benchmark_request")
     assert req.browser_runner == "file"
     assert "export clicked once" in req.prompt_text

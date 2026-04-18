@@ -39,7 +39,7 @@ This document is a **high-level snapshot**. For command-level evidence, see `doc
 | --- | --- | --- |
 | `MockBrowserRunner` / `FileBrowserRunner` / `BrowserEvidence` | **complete** | Default tests; no browser binary. |
 | `PlaywrightBrowserRunner` | **partial** | **opt-in:** `[browser]` extra, `alwm browser run-playwright`, `ALWM_PLAYWRIGHT_SMOKE=1`, `just verify-playwright-local`, Compose **`browser-verify`** (`Dockerfile` target `browser-test`). |
-| `MCPBrowserRunner` | **stub** | `NotImplementedError` until implemented with tests. |
+| `MCPBrowserRunner` | **partial** | Fixture-backed only (`scenario_id` / `fixture_relpath`); `alwm browser run-mcp`; remote MCP tools not wired—see `docs/architecture/browser.md`. |
 
 ## Docker / Bake
 
@@ -57,5 +57,5 @@ This document is a **high-level snapshot**. For command-level evidence, see `doc
 
 ## Intentional non-goals (current)
 
-- **MCP browser automation** — stub only.
+- **Remote MCP browser tools** — not implemented; `MCPBrowserRunner` is a fixture bridge only (roadmap in `docs/architecture/browser.md`).
 - **Default CI** — no Ollama, llama-server, or Playwright browsers required.

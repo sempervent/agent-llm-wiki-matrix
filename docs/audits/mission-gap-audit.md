@@ -73,7 +73,7 @@
 | --- | --- |
 | **Offline** | **complete:** `MockBrowserRunner`, `FileBrowserRunner`, `BrowserEvidence` validation (`tests/test_browser.py`). |
 | **Playwright** | **partial (optional):** `browser/playwright_runner.py`, `[browser]` extra; `tests/integration/test_playwright_browser.py` with `ALWM_PLAYWRIGHT_SMOKE=1`; `just verify-playwright-local`; Compose **`browser-verify`**. |
-| **Stub** | `MCPBrowserRunner` → `NotImplementedError` (`browser/stubs.py`). |
+| **MCP runner** | **partial:** `MCPBrowserRunner` delegates to `FileBrowserRunner` when `scenario_id` or `fixture_relpath` is set; `alwm browser run-mcp`; remote MCP tools not implemented (`browser/mcp_runner.py`). |
 
 ---
 
@@ -129,7 +129,7 @@ Test modules include: `test_benchmark`, `test_benchmark_cases`, `test_benchmark_
 
 1. **Live provider scheduling** — Optional scheduled/manual `just verify-live-providers` against real Ollama/llama-server; keep default CI offline (`AGENTS.md`).
 2. **Implementation log hygiene** — Mark or archive obsolete Phase-1 “Known gaps” bullets so they are not read as current.
-3. **MCP browser runner** — Implement `MCPBrowserRunner` with tests and docs, or keep explicit stub only.
+3. **Remote MCP browser tools** — Implement transport + tool mapping + tests per roadmap in `docs/architecture/browser.md`; until then capability stays **partial** (fixture bridge only).
 
 ---
 

@@ -2,11 +2,47 @@
 
 Chronological record of repository work. Latest entries first.
 
-## 2026-04-18 — v0.2.0 documentation consolidation (fingerprints)
+## 2026-04-18 — Campaign comparative reporting (Markdown + JSON)
 
-**Delivered:** **`CHANGELOG.md`** **[0.2.0]** entry (comparison + campaign experiment fingerprints, longitudinal updates). Audited **`README.md`**, **`AGENTS.md`**, **`docs/roadmap/v0.2.0.md`**, workflows (notably **`benchmarking.md`**, **`benchmark-campaigns.md`**, **`longitudinal-reporting.md`**), **`docs/architecture/data-model.md`**, **`docs/wiki/campaign-orchestration.md`**, **`docs/tracking/campaign-orchestration.md`**, **`docs/tracking/benchmark-campaign-orchestration.md`**, ADRs **`docs/adr/0001-campaign-orchestration.md`** and **`docs/architecture/adr/0001-benchmark-campaign-orchestration.md`**, **`examples/campaigns/v1/README.md`** for consistent **six-axis** `comparison_fingerprints`, **`campaign_experiment_fingerprints`**, and **`prompt_registry_state_fingerprint`** wording. Removed duplicate milestone block from **`README.md`**.
+**Delivered:** **`benchmark/campaign_reporting.py`** — after a full campaign, load **succeeded** member manifests with **`load_run_snapshots`**, run **`analyze_longitudinal`** (fixed thresholds aligned with longitudinal CLI defaults), emit **`reports/campaign-report.md`** (dimensions varied, backend means, scoring instability, mode gaps, **FT-\*** ranking, **`render_failure_atlas`**) and **`reports/campaign-analysis.json`**. **`merge_generated_report_paths`** composes with semantic-summary paths. **`campaign-summary.md`** links comparative outputs. Docs **`docs/workflows/benchmark-campaigns.md`**, **`examples/campaigns/v1/README.md`**. Tests **`tests/test_campaign_reporting.py`**. Example **`examples/campaign_runs/minimal_offline/`** regenerated.
 
-**Verification:** documentation-only pass (no code changes).
+**Verification:** `uv run just ci`.
+
+## 2026-04-17 — Browser evidence + rubric realism (fixtures; CI deterministic)
+
+**Delivered:** **`BrowserEvidence`** gains **`dom_excerpts`**, **`screenshots`** (metadata), **`extensions`**; JSON Schema + **`DomExcerpt`** / **`ScreenshotMetadata`**. **`evidence_to_prompt_block`**, **`MockBrowserRunner`**, **`fixtures/browser_evidence/v1/export_flow.json`**. Rubric **`examples/dataset/rubrics/browser_realism.v1.json`** (grounding, hallucination_resistance, source_fidelity). Wired into **`suite.taxonomy.browser_evidence.v1`**, **`suite.agentic.browser_interpretation.v1`**, **`fixtures/benchmarks/browser_file.v1.yaml`**. **`prompts/registry.yaml` 0.4.1** and **`bench.task.browser_evidence.v1`**. Regenerated **`examples/benchmark_runs/agentic-pack-browser-interpretation/`**. Docs: **`docs/architecture/browser.md`**, **`data-model.md`**, **`benchmarking.md`**, **`examples/dataset/README.md`**.
+
+**Verification:** `uv run ruff check src tests`; `uv run mypy src`; `uv run pytest tests/ --ignore=tests/integration`; `uv run alwm prompts check`.
+
+## 2026-04-17 — Benchmark runtime observability (timing + retry/judge summaries)
+
+**Delivered:** **`BenchmarkRunTimingSummaryV1`**, **`BenchmarkRetrySummaryV1`**, **`BenchmarkCellRuntimeV1`** on **`manifest.json`** (`runtime_summary`, `retry_summary`, **`cells[].runtime`**); **`CampaignAggregatedRuntimeV1`** on **`campaign_manifest`** (`aggregated_runtime`). **`runner.py`** records wall time for browser phase, provider completion, deterministic evaluation, and semantic judge phase (**`EvaluationPhaseMetrics`** + **`_run_semantic_with_repeats`** timing). **`reports/report.md`** and **`campaign-summary.md`** append Markdown tables (**`benchmark/observability.py`**). **`evaluate_with_scoring_backend`** returns **`(evaluation, provenance, metrics)`**. Schemas: **`manifest.schema.json`**, **`benchmark_campaign_manifest.schema.json`**. Tests: **`tests/test_benchmark_observability.py`**. Docs: **`docs/workflows/benchmarking.md`**.
+
+**Verification:** `uv run pytest tests/ --ignore=tests/integration`; `uv run mypy src`.
+
+## 2026-04-17 — Campaign semantic / hybrid scoring summary
+
+**Delivered:** **`campaign_semantic_summary`** artifact kind + **`schemas/v1/campaign_semantic_summary.schema.json`**; **`benchmark/campaign_semantic_summary.py`** builds **`CampaignSemanticSummaryV1`** from succeeded member runs (repeat-judge disagreement, low-confidence flags, rollups by suite / provider / execution mode). **`run_benchmark_campaign`** writes **`campaign-semantic-summary.json`** / **`.md`** and merges paths into **`generated_report_paths`** (after comparative artifacts). **`campaign-summary.md`** links the semantic rollup when present. Example definition **`examples/campaigns/v1/semantic_repeats_offline.v1.yaml`**. Tests in **`tests/test_benchmark_campaign.py`**. Docs: **`docs/workflows/benchmark-campaigns.md`**, **`examples/campaigns/v1/README.md`**.
+
+**Note:** Deterministic-only campaigns still emit a semantic summary with zero semantic cells; default scoring path is unchanged.
+
+**Verification:** `uv run ruff check src tests` and `uv run pytest`.
+
+## 2026-04-17 — MCP browser runner audit: CLI + doc alignment
+
+**Context:** `MCPBrowserRunner` was already a **fixture-backed bridge** (delegates to `FileBrowserRunner` when `scenario_id` or `fixture_relpath` is set; `RuntimeError` without—remote MCP not wired). Several docs still claimed **`NotImplementedError`** / **stub**.
+
+**Delivered:** **`alwm browser run-mcp`** (`cli.py`) with `--scenario-id` / `--fixture`; tests in **`tests/test_browser.py`**. **`docs/architecture/browser.md`** — accurate component table, **Remote MCP** section, **roadmap** list. Aligned **`AGENTS.md`**, **`README.md`**, **`docs/architecture/runtime.md`**, **`current-state.md`**, **`docs/audits/capability-classification.md`**, **`current-capability-status.md`**, **`mission-gap-audit.md`**, **`release-readiness.md`**; **`CHANGELOG.md` [Unreleased]**.
+
+**Classification:** **`MCPBrowserRunner`** = **partial** (fixture path only); remote MCP protocol execution = **documented-only** until roadmap items ship.
+
+**Verification:** `uv run just ci`.
+
+## 2026-04-18 — v0.2.0 documentation consolidation (fingerprints + campaigns)
+
+**Delivered:** **`CHANGELOG.md`** **[0.2.0]** entry (comparison + campaign experiment fingerprints, longitudinal updates) plus **Documentation** subsection (campaign walkthrough). **`docs/workflows/campaign-walkthrough.md`** — committed-example steps for **campaign manifest** vs **campaign summary** vs member **`benchmark_manifest`**, **six-axis** **`campaign_experiment_fingerprints`** vs **`comparison_fingerprints`**, and **longitudinal** globs. Audited **`README.md`**, **`AGENTS.md`**, **`docs/roadmap/v0.2.0.md`**, workflows (notably **`benchmarking.md`**, **`benchmark-campaigns.md`**, **`longitudinal-reporting.md`**), **`docs/architecture/data-model.md`**, **`docs/wiki/campaign-orchestration.md`**, **`docs/wiki/benchmark-campaigns.md`**, **`docs/tracking/campaign-orchestration.md`**, **`docs/tracking/benchmark-campaign-orchestration.md`**, **`docs/audits/capability-classification.md`**, ADRs **`docs/adr/0001-campaign-orchestration.md`** and **`docs/architecture/adr/0001-benchmark-campaign-orchestration.md`**, **`examples/campaigns/v1/README.md`** for consistent **six-axis** `comparison_fingerprints`, **`campaign_experiment_fingerprints`**, and **`prompt_registry_state_fingerprint`** wording. Removed duplicate milestone block from **`README.md`** (earlier pass).
+
+**Verification:** documentation-only pass; `uv run alwm validate examples/campaign_runs/minimal_offline/manifest.json campaign_manifest` (paths cited in walkthrough).
 
 ## 2026-04-17 — v0.2.0 fingerprints: prompt registry state + campaign experiment axes
 

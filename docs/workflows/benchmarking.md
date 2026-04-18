@@ -16,7 +16,7 @@ Versioned files live in `benchmarks/v1/` (see `benchmarks/v1/README.md`). Each f
 | `prompts[]` | Stable prompt ids and text (the shared prompt set). |
 | `variants[]` | **agent_stack** (label), **execution_mode** (`cli` \| `browser_mock` \| `repo_governed`), **backend** (`kind` + `model`), optional **`browser`** (only with `browser_mock`). |
 
-For **`cli`** and **`repo_governed`**, the same resolved prompt text is sent to the provider (with execution-mode tagging on the normalized response). For **`browser_mock`**, the harness runs a **browser evidence phase** first (`MockBrowserRunner` by default, or **`browser.runner`**: `file`, `playwright`, `mcp`), writes **`cells/.../browser_evidence.json`**, and **appends** a markdown evidence block to the prompt before calling the provider. Request/response records store the **effective** prompt (including browser context).
+For **`cli`** and **`repo_governed`**, the same resolved prompt text is sent to the provider (with execution-mode tagging on the normalized response). For **`browser_mock`**, the harness runs a **browser evidence phase** first (`MockBrowserRunner` by default, or **`browser.runner`**: `file`, `playwright`, `mcp`), writes **`cells/.../browser_evidence.json`** (navigation, console, optional **`dom_excerpts`**, **`screenshots`** metadata, **`extensions`** JSON), and **appends** a markdown evidence block to the prompt before calling the provider. Request/response records store the **effective** prompt (including browser context). Browser-focused scoring may use **`examples/dataset/rubrics/browser_realism.v1.json`** (grounding / hallucination resistance / source fidelity). **`mcp`** here is still **fixture-backed** unless remote MCP tools are implemented; see **`docs/architecture/browser.md`**.
 
 | `browser.runner` | When to use | CI / notes |
 | --- | --- | --- |
@@ -88,6 +88,18 @@ Artifacts (under `--output-dir`; lexicographic cell order in `manifest.json`):
 - `markdown/matrix.grid.md`, `markdown/matrix.pairwise.md` — rendered matrix tables.
 - `reports/report.json`, `reports/report.md` — **report** JSON + generated Markdown.
 - `manifest.json` — run summary with **cells[]** path index; may include **`definition_source_relpath`** and **`prompt_registry_effective_ref`** for reproducibility when the definition path and registry-backed prompts are known. Validate with **`alwm validate <path> benchmark_manifest`** (JSON Schema `schemas/v1/manifest.schema.json` + Pydantic `BenchmarkRunManifest`). The harness writes manifests that pass this check; older committed runs may omit optional provenance keys entirely (still valid).
+
+### Runtime observability (optional fields)
+
+Newer runs add **wall-clock metadata** (still backward compatible when omitted):
+
+| Field | Meaning |
+| --- | --- |
+| **`runtime_summary`** | `started_at_utc`, `finished_at_utc`, **`duration_seconds`**, and phase sums: **`browser_phase_seconds`**, **`provider_completion_seconds`**, **`evaluation_phase_seconds`**, **`judge_phase_seconds`**. |
+| **`retry_summary`** | Echoes **`retry_policy.max_attempts`** when present; **`total_judge_invocations`** (sum of configured semantic judge repeats across cells); **`cells_with_judge_parse_fallback`** (cells where a semantic parse fell back to deterministic mock scores). |
+| **`cells[].runtime`** | Per-cell breakdown of the same phases where applicable. |
+
+**`reports/report.md`** appends a **Runtime observability** section with the same tables. **Campaign** roots add **`aggregated_runtime`** (sums over successful member manifests) and a section in **`campaign-summary.md`**. Harness retries on provider/judge are not implemented yet; **`retry_policy`** remains metadata except for the manifest summary above.
 
 For a **full-application smoke** gate (pytest + host CLI + Docker offline benchmark + failure recovery analysis), see [smoke.md](smoke.md).
 
@@ -161,7 +173,7 @@ Tests **skip** (fixture-safe) when the flag is unset, when the HTTP probe fails 
 
 ## Campaign sweeps (multi-run)
 
-Orchestrate many benchmark runs from one definition (suites × providers × eval scoring × browser overrides): **`docs/workflows/benchmark-campaigns.md`**, CLI **`alwm benchmark campaign run`** (execute) and **`alwm benchmark campaign run --dry-run`** (plan only: **`campaign-dry-run.json`**, no member **`runs/`**). Each member run is a standard benchmark directory; aggregate index is **`manifest.json`** at the campaign root. Wiki: **`docs/wiki/campaign-orchestration.md`** (concept) and **`docs/wiki/benchmark-campaigns.md`** (index); ADR: **`docs/adr/0001-campaign-orchestration.md`** or **`docs/architecture/adr/0001-benchmark-campaign-orchestration.md`**; tracking: **`docs/tracking/campaign-orchestration.md`**.
+Orchestrate many benchmark runs from one definition (suites × providers × eval scoring × browser overrides): **`docs/workflows/benchmark-campaigns.md`**, CLI **`alwm benchmark campaign run`** (execute) and **`alwm benchmark campaign run --dry-run`** (plan only: **`campaign-dry-run.json`**, no member **`runs/`**). Each member run is a standard benchmark directory with **`benchmark_manifest`** and **six-axis** **`comparison_fingerprints`**; the campaign root **`manifest.json`** is **`campaign_manifest`** with **`campaign_definition_fingerprint`** and **`campaign_experiment_fingerprints`** (six campaign axes), plus **`campaign-summary.*`**. **Walkthrough:** **`docs/workflows/campaign-walkthrough.md`**. Wiki: **`docs/wiki/campaign-orchestration.md`** (concept) and **`docs/wiki/benchmark-campaigns.md`** (index); ADR: **`docs/adr/0001-campaign-orchestration.md`** or **`docs/architecture/adr/0001-benchmark-campaign-orchestration.md`**; tracking: **`docs/tracking/campaign-orchestration.md`**. Longitudinal: glob **`runs/*/manifest.json`** under the campaign output dir.
 
 ## Determinism
 

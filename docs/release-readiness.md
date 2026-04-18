@@ -47,7 +47,7 @@ Deliberately **not** in `just ci`: network, local daemons, or browser binaries.
 
 ## Known non-goals for v0.1.0
 
-- **MCP browser runner** — Stub only (`NotImplementedError`); not part of this release’s supported surface.
+- **Remote MCP browser tools** — Not shipped in v0.1.0; `MCPBrowserRunner` was (and remains) a **fixture bridge** only—see current **`docs/architecture/browser.md`** and **`docs/audits/capability-classification.md`**.
 - **Default CI requiring live services** — No Ollama, llama-server, or Playwright install in `just ci`.
 - **Hosted documentation site** — Docs live in-repo (`docs/`); no separate doc build is required for the tag.
 - **Semantic LLM-as-judge rubrics** — Deterministic / fixture scoring is in scope; advanced LLM scoring is future work (see [docs/audits/mission-gap-audit.md](audits/mission-gap-audit.md) follow-ups).

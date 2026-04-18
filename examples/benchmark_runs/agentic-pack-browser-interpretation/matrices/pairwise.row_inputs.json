@@ -13,8 +13,8 @@
       "variant_j": "v-browser"
     }
   ],
-  "matrix_id": "agentic-pack-browser-interpretation-example-pairwise",
+  "matrix_id": "agentic-browser-refresh-pairwise",
   "metric": "mean_abs_total_score_delta",
-  "run_id": "agentic-pack-browser-interpretation-example",
+  "run_id": "agentic-browser-refresh",
   "schema_version": 1
 }

@@ -20,7 +20,7 @@ _Last updated: 2026-04-18 (six-axis `comparison_fingerprints`, `campaign_experim
 | `schemas/v1/matrix.schema.json` | `ComparisonMatrix` | Pairwise/grid scores with labels |
 | `schemas/v1/report.schema.json` | `Report` | Human-facing narrative report |
 | `schemas/v1/note.schema.json` | _(no Pydantic model yet)_ | Lightweight wiki note (Phase 1) |
-| `schemas/v1/browser_evidence.schema.json` | `BrowserEvidence` (`browser.models`) | Navigation + console (+ optional DOM ref) for browser runs |
+| `schemas/v1/browser_evidence.schema.json` | `BrowserEvidence` (`browser.models`) | Navigation + console; optional **`dom_snapshot_ref`**; **`dom_excerpts[]`** (visible text / HTML snippets); **`screenshots[]`** (viewport, MIME, integrity hash, optional **`relpath`**); **`extensions`** JSON bag for structured runner fields |
 | `schemas/v1/benchmark_definition.schema.json` | _(YAML; Pydantic `BenchmarkDefinitionV1`)_ | Benchmark suite: rubric, prompts (inline `text` xor `prompt_ref`), variants |
 | `schemas/v1/prompt_registry.schema.json` | `PromptRegistryDocument` | `prompts/registry.yaml`: ids, paths to prompt bodies, document `version` |
 | `schemas/v1/benchmark_request.schema.json` | `BenchmarkRequestRecord` | Per-cell provider request; includes `prompt_source`, optional `prompt_registry_id`, `registry_document_version`, `prompt_source_relpath` |
@@ -29,6 +29,8 @@ _Last updated: 2026-04-18 (six-axis `comparison_fingerprints`, `campaign_experim
 | `schemas/v1/benchmark_campaign.schema.json` | `BenchmarkCampaignDefinitionV1` | Campaign sweep definition (YAML/JSON): **`suite_refs`**, sweep axes, optional **`prompt_registry_ref`**; see **`load_benchmark_campaign_definition`** |
 | `schemas/v1/benchmark_campaign_manifest.schema.json` | `BenchmarkCampaignManifest` | Campaign index (`manifest.json` at campaign root): member **`runs[]`**, optional **`campaign_definition_fingerprint`**, optional **`campaign_experiment_fingerprints`** (per-axis suite/provider/scoring/browser/registry hashes); member runs may include **`comparison_fingerprints`** copied from each child run’s `manifest.json` |
 | `schemas/v1/campaign_summary.schema.json` | `CampaignSummaryV1` | Rollup JSON (`campaign-summary.json`) aligned with the campaign manifest for dashboards |
+
+Committed campaign output example (validate + fingerprint fields): **`docs/workflows/campaign-walkthrough.md`**.
 
 ## Validation
 

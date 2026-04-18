@@ -1,0 +1,76 @@
+{
+  "backend_performance": [
+    {
+      "backend_kind": "mock",
+      "cell_count": 1,
+      "mean_score": 0.667276
+    }
+  ],
+  "campaign_id": "campaign.examples.minimal_offline.v1",
+  "dimensions": {
+    "benchmark_id": {
+      "axis": "benchmark_id",
+      "distinct_count": 1,
+      "values": [
+        "bench.fixtures.campaign.micro.v1"
+      ],
+      "varied": false
+    },
+    "browser_config_applied": {
+      "axis": "browser_config_applied",
+      "distinct_count": 1,
+      "values": [
+        "False"
+      ],
+      "varied": false
+    },
+    "eval_scoring_label": {
+      "axis": "eval_scoring_label",
+      "distinct_count": 1,
+      "values": [
+        "suite_default"
+      ],
+      "varied": false
+    },
+    "execution_modes_filter": {
+      "axis": "execution_modes_filter",
+      "distinct_count": 1,
+      "values": [
+        "\u2014"
+      ],
+      "varied": false
+    },
+    "provider_config_ref": {
+      "axis": "provider_config_ref",
+      "distinct_count": 1,
+      "values": [
+        "null (harness default)"
+      ],
+      "varied": false
+    },
+    "suite_ref": {
+      "axis": "suite_ref",
+      "distinct_count": 1,
+      "values": [
+        "fixtures/benchmarks/campaign_micro.v1.yaml"
+      ],
+      "varied": false
+    }
+  },
+  "execution_mode_gaps_top": [],
+  "failure_tag_counts": [],
+  "failure_tags_detail": {},
+  "longitudinal_thresholds": {
+    "low_score": 0.55,
+    "min_recurring": 2,
+    "min_runs_for_swing": 3,
+    "mode_gap_threshold": 0.12,
+    "regression_delta": 0.03,
+    "semantic_range_threshold": 0.22,
+    "semantic_stdev_threshold": 0.12,
+    "series_swing_threshold": 0.06
+  },
+  "schema_version": 1,
+  "semantic_instability_by_scoring_backend": [],
+  "varied_axes": []
+}

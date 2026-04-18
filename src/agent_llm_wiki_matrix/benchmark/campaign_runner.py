@@ -12,6 +12,13 @@ from pathlib import Path
 from typing import Any, Literal
 
 from agent_llm_wiki_matrix.benchmark.campaign_definitions import BenchmarkCampaignDefinitionV1
+from agent_llm_wiki_matrix.benchmark.campaign_reporting import (
+    merge_generated_report_paths,
+    write_campaign_comparative_artifacts,
+)
+from agent_llm_wiki_matrix.benchmark.campaign_semantic_summary import (
+    write_campaign_semantic_summary_artifacts,
+)
 from agent_llm_wiki_matrix.benchmark.definitions import (
     BenchmarkDefinitionV1,
     BrowserBenchConfig,
@@ -19,6 +26,9 @@ from agent_llm_wiki_matrix.benchmark.definitions import (
     load_benchmark_definition,
 )
 from agent_llm_wiki_matrix.benchmark.fingerprints import build_campaign_experiment_fingerprints
+from agent_llm_wiki_matrix.benchmark.observability import (
+    render_campaign_aggregated_runtime_markdown,
+)
 from agent_llm_wiki_matrix.benchmark.persistence import (
     write_benchmark_campaign_manifest,
     write_json_sorted,
@@ -29,6 +39,7 @@ from agent_llm_wiki_matrix.models import (
     BenchmarkCampaignManifest,
     BenchmarkCampaignRunEntry,
     BenchmarkRunManifest,
+    CampaignAggregatedRuntimeV1,
     CampaignFailureRecord,
     CampaignGeneratedReportPaths,
     CampaignRunStatusSummary,
@@ -205,6 +216,8 @@ def render_campaign_summary_markdown(manifest: BenchmarkCampaignManifest) -> str
         lines.append(f"- **git_commit:** `{manifest.git_commit_sha}`")
     if manifest.git_describe:
         lines.append(f"- **git_describe:** `{manifest.git_describe}`")
+    if manifest.aggregated_runtime is not None:
+        lines.append(render_campaign_aggregated_runtime_markdown(manifest.aggregated_runtime))
     lines.extend(
         [
             "",
@@ -230,6 +243,35 @@ def render_campaign_summary_markdown(manifest: BenchmarkCampaignManifest) -> str
         lines.extend(["", "## Failures", ""])
         for f in manifest.failures:
             lines.append(f"- **{f.run_id}** (index {f.run_index}): {f.message}")
+    if manifest.generated_report_paths:
+        gp = manifest.generated_report_paths
+        if (
+            gp.campaign_comparative_report_md
+            or gp.campaign_analysis_json
+            or gp.campaign_semantic_summary_json
+            or gp.campaign_semantic_summary_md
+        ):
+            lines.extend(["", "## Comparative reports", ""])
+            if gp.campaign_comparative_report_md:
+                lines.append(
+                    f"- **Markdown:** `{gp.campaign_comparative_report_md}` "
+                    "(dimensions, backends, scoring instability, mode gaps, failure tags)",
+                )
+            if gp.campaign_analysis_json:
+                lines.append(f"- **JSON:** `{gp.campaign_analysis_json}` (machine-readable mirror)")
+            if gp.campaign_semantic_summary_json or gp.campaign_semantic_summary_md:
+                lines.extend(["", "### Semantic / hybrid judge rollup", ""])
+                if gp.campaign_semantic_summary_md:
+                    lines.append(
+                        f"- **Markdown:** `{gp.campaign_semantic_summary_md}` "
+                        "(repeat-judge disagreement, low-confidence cells; "
+                        "variance by suite / provider / mode)",
+                    )
+                if gp.campaign_semantic_summary_json:
+                    lines.append(
+                        f"- **JSON:** `{gp.campaign_semantic_summary_json}` "
+                        "(structured aggregates)",
+                    )
     lines.extend(
         [
             "",
@@ -293,6 +335,7 @@ def run_benchmark_campaign(
 
     entries: list[BenchmarkCampaignRunEntry] = []
     failures: list[CampaignFailureRecord] = []
+    agg_rt = CampaignAggregatedRuntimeV1()
     run_index = 0
 
     planned_count = 0
@@ -380,6 +423,21 @@ def run_benchmark_campaign(
                             json.loads((run_dir / "manifest.json").read_text(encoding="utf-8")),
                         )
                         cf = member_mf.comparison_fingerprints
+                        if member_mf.runtime_summary is not None:
+                            rs = member_mf.runtime_summary
+                            agg_rt.total_browser_phase_seconds += rs.browser_phase_seconds
+                            agg_rt.total_provider_completion_seconds += (
+                                rs.provider_completion_seconds
+                            )
+                            agg_rt.total_evaluation_phase_seconds += rs.evaluation_phase_seconds
+                            agg_rt.total_judge_phase_seconds += rs.judge_phase_seconds
+                            agg_rt.member_runs_timed += 1
+                        if member_mf.retry_summary is not None:
+                            rr = member_mf.retry_summary
+                            agg_rt.total_judge_invocations += rr.total_judge_invocations
+                            agg_rt.cells_with_judge_parse_fallback += (
+                                rr.cells_with_judge_parse_fallback
+                            )
                     entries.append(
                         BenchmarkCampaignRunEntry(
                             run_index=run_index,
@@ -474,6 +532,7 @@ def run_benchmark_campaign(
     failed = sum(1 for e in entries if e.status == "failed")
     finished = _utc_now_iso()
     dur = time.perf_counter() - t0
+    aggregated_runtime = agg_rt if agg_rt.member_runs_timed > 0 else None
 
     manifest = BenchmarkCampaignManifest(
         schema_version=1,
@@ -506,6 +565,29 @@ def run_benchmark_campaign(
         git_describe=git_desc,
         inputs_snapshot=_inputs_snapshot(campaign),
         runs=entries,
+        aggregated_runtime=aggregated_runtime,
+    )
+    extra_paths = write_campaign_comparative_artifacts(repo_root, output_dir, manifest)
+    manifest = manifest.model_copy(
+        update={
+            "generated_report_paths": merge_generated_report_paths(
+                manifest.generated_report_paths,
+                extra_paths,
+            ),
+        },
+    )
+    semantic_paths = write_campaign_semantic_summary_artifacts(
+        repo_root=repo_root,
+        campaign_dir=output_dir,
+        manifest=manifest,
+    )
+    manifest = manifest.model_copy(
+        update={
+            "generated_report_paths": merge_generated_report_paths(
+                manifest.generated_report_paths,
+                semantic_paths,
+            ),
+        },
     )
     write_benchmark_campaign_manifest(output_dir / "manifest.json", manifest)
 

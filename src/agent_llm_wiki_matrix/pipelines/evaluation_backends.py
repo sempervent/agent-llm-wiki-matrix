@@ -6,6 +6,7 @@ import hashlib
 import json
 import os
 import re
+import time
 from collections.abc import Mapping
 from dataclasses import dataclass
 from pathlib import Path
@@ -37,6 +38,16 @@ from agent_llm_wiki_matrix.providers.config import ProviderConfig
 from agent_llm_wiki_matrix.providers.factory import create_provider
 
 ScoringBackendName = Literal["deterministic", "semantic_judge", "hybrid"]
+
+
+@dataclass
+class EvaluationPhaseMetrics:
+    """Wall-clock breakdown from ``evaluate_with_scoring_backend`` (one cell)."""
+
+    evaluation_seconds: float = 0.0
+    judge_seconds: float = 0.0
+    judge_repeat_count: int = 1
+    judge_parse_fallback: bool = False
 
 
 @dataclass
@@ -167,19 +178,24 @@ def _run_semantic_with_repeats(
     bool,
     str | None,
     bool | None,
+    float,
+    bool,
 ]:
     """Execute N semantic judge runs; aggregate scores and optional repeat block.
 
     Returns:
         aggregated_scores, run_records, repeat_aggregation (None if N==1),
-        raw_concat, all_parse_ok, combined_parse_error, low_confidence (None if N==1).
+        raw_concat, all_parse_ok, combined_parse_error, low_confidence (None if N==1),
+        judge_seconds, parse_fallback_used.
     """
     criterion_ids = [c.id for c in rubric.criteria]
     run_records: list[JudgeRepeatRunRecord] = []
     score_rows: list[dict[str, float]] = []
     parse_notes: list[str] = []
     all_ok = True
+    parse_fallback_used = False
 
+    t_judge0 = time.perf_counter()
     for i in range(repeat.count):
         raw, scores, ok, perr = run_semantic_judge_once(
             rubric=rubric,
@@ -189,6 +205,7 @@ def _run_semantic_with_repeats(
             run_index=i,
         )
         if not ok:
+            parse_fallback_used = True
             scores = _mock_semantic_scores(text, rubric, run_index=i)
             raw = json.dumps(
                 {"scores": scores, "rationale": "fallback after parse failure"},
@@ -225,9 +242,20 @@ def _run_semantic_with_repeats(
         )
     )
     combined_err = "; ".join(parse_notes) if parse_notes else None
+    judge_seconds = time.perf_counter() - t_judge0
 
     if repeat.count == 1:
-        return agg, run_records, None, raw_concat, all_ok, combined_err, None
+        return (
+            agg,
+            run_records,
+            None,
+            raw_concat,
+            all_ok,
+            combined_err,
+            None,
+            judge_seconds,
+            parse_fallback_used,
+        )
 
     rubric_weights = {c.id: float(c.weight) for c in rubric.criteria}
     disc = build_disagreement_summary(score_rows, criterion_ids, weights=rubric_weights)
@@ -274,7 +302,17 @@ def _run_semantic_with_repeats(
             },
         ),
     )
-    return agg, run_records, repeat_block, raw_concat, all_ok, combined_err, low
+    return (
+        agg,
+        run_records,
+        repeat_block,
+        raw_concat,
+        all_ok,
+        combined_err,
+        low,
+        judge_seconds,
+        parse_fallback_used,
+    )
 
 
 def run_semantic_judge_once(
@@ -325,7 +363,7 @@ def evaluate_with_scoring_backend(
     judge_live: bool,
     evaluation_json_relpath: str,
     judge_repeat: JudgeRepeatParams | None = None,
-) -> tuple[Evaluation, EvaluationJudgeProvenance | None]:
+) -> tuple[Evaluation, EvaluationJudgeProvenance | None, EvaluationPhaseMetrics]:
     """Dispatch to deterministic, semantic_judge, or hybrid scoring."""
     rubric_model = load_artifact_file(rubric_path, "rubric")
     if not isinstance(rubric_model, Rubric):
@@ -335,6 +373,7 @@ def evaluate_with_scoring_backend(
     weights = {c.id: float(c.weight) for c in rubric_model.criteria}
 
     if scoring_backend == "deterministic":
+        t0 = time.perf_counter()
         ev = _evaluate_text_core(
             subject_ref=subject_ref,
             text=text,
@@ -347,7 +386,13 @@ def evaluate_with_scoring_backend(
         ev2 = ev.model_copy(
             update={"scoring_backend": "deterministic", "judge_provenance_relpath": None},
         )
-        return ev2, None
+        metrics = EvaluationPhaseMetrics(
+            evaluation_seconds=round(time.perf_counter() - t0, 6),
+            judge_seconds=0.0,
+            judge_repeat_count=1,
+            judge_parse_fallback=False,
+        )
+        return ev2, None, metrics
 
     if judge_provider_cfg is None:
         msg = "semantic_judge and hybrid require judge_provider_cfg"
@@ -362,7 +407,17 @@ def evaluate_with_scoring_backend(
 
     if scoring_backend == "semantic_judge":
         repeat = judge_repeat or JudgeRepeatParams()
-        sem_scores, _, repeat_block, raw, all_ok, perr, low_conf = _run_semantic_with_repeats(
+        (
+            sem_scores,
+            _,
+            repeat_block,
+            raw,
+            all_ok,
+            perr,
+            low_conf,
+            judge_sec,
+            pfb,
+        ) = _run_semantic_with_repeats(
             rubric=rubric_model,
             text=text,
             provider_cfg=judge_provider_cfg,
@@ -409,13 +464,20 @@ def evaluate_with_scoring_backend(
             aggregation_notes=None,
             repeat_aggregation=repeat_block,
         )
-        return ev, prov
+        metrics = EvaluationPhaseMetrics(
+            evaluation_seconds=0.0,
+            judge_seconds=round(judge_sec, 6),
+            judge_repeat_count=repeat.count,
+            judge_parse_fallback=pfb,
+        )
+        return ev, prov, metrics
 
     # hybrid
     if hybrid_weights is None:
         msg = "hybrid scoring requires hybrid_weights"
         raise ValueError(msg)
     repeat = judge_repeat or JudgeRepeatParams()
+    t_det0 = time.perf_counter()
     det_ev = _evaluate_text_core(
         subject_ref=subject_ref,
         text=text,
@@ -426,7 +488,18 @@ def evaluate_with_scoring_backend(
         notes_markdown="Deterministic component for hybrid scoring.",
     )
     det_scores = dict(det_ev.scores)
-    sem_scores, _, repeat_block, raw, all_ok, perr, low_conf = _run_semantic_with_repeats(
+    det_eval_sec = round(time.perf_counter() - t_det0, 6)
+    (
+        sem_scores,
+        _,
+        repeat_block,
+        raw,
+        all_ok,
+        perr,
+        low_conf,
+        judge_sec,
+        pfb,
+    ) = _run_semantic_with_repeats(
         rubric=rubric_model,
         text=text,
         provider_cfg=judge_provider_cfg,
@@ -494,7 +567,13 @@ def evaluate_with_scoring_backend(
         aggregation_notes=agg_notes,
         repeat_aggregation=repeat_block,
     )
-    return ev, prov
+    metrics = EvaluationPhaseMetrics(
+        evaluation_seconds=det_eval_sec,
+        judge_seconds=round(judge_sec, 6),
+        judge_repeat_count=repeat.count,
+        judge_parse_fallback=pfb,
+    )
+    return ev, prov, metrics
 
 
 def judge_live_enabled(environ: Mapping[str, str] | None) -> bool:

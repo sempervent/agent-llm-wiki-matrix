@@ -1,8 +1,8 @@
 # Benchmark campaign sweeps
 
-A **campaign** runs multiple **benchmark harness** executions from one **campaign definition** file. Each member run is a normal benchmark output tree (``cells/``, ``matrices/``, ``manifest.json``), so results are **longitudinal-compatible**: point ``alwm benchmark longitudinal`` at ``runs/*/manifest.json`` under the campaign directory (see [longitudinal-reporting.md](longitudinal-reporting.md)).
+A **campaign** runs multiple **benchmark harness** executions from one **campaign definition** file. Each member run is a normal benchmark output tree (``cells/``, ``matrices/``, ``manifest.json``), so results are **longitudinal-compatible**: point ``alwm benchmark longitudinal`` at ``runs/*/manifest.json`` under the campaign directory (see [longitudinal-reporting.md](longitudinal-reporting.md)). The campaign root adds **`manifest.json`** (**campaign manifest**: **`campaign_definition_fingerprint`**, **`campaign_experiment_fingerprints`** — six axes) and **`campaign-summary.json`** / **`.md`** (**campaign summary**).
 
-**Wiki:** [docs/wiki/campaign-orchestration.md](../wiki/campaign-orchestration.md) · **Workflow (this page)** · **ADR:** [docs/architecture/adr/0001-benchmark-campaign-orchestration.md](../architecture/adr/0001-benchmark-campaign-orchestration.md) · **Tracking:** [docs/tracking/campaign-orchestration.md](../tracking/campaign-orchestration.md).
+**Walkthrough (committed examples):** [campaign-walkthrough.md](campaign-walkthrough.md) · **Wiki:** [docs/wiki/campaign-orchestration.md](../wiki/campaign-orchestration.md) · **ADR:** [docs/architecture/adr/0001-benchmark-campaign-orchestration.md](../architecture/adr/0001-benchmark-campaign-orchestration.md) · **Tracking:** [docs/tracking/campaign-orchestration.md](../tracking/campaign-orchestration.md).
 
 ## Campaign definition
 
@@ -59,13 +59,19 @@ Under ``--output-dir``:
 | ``runs/runNNNN/`` | Full per-run benchmark directory (same layout as ``alwm benchmark run``). Omitted when using ``--dry-run``. |
 | ``campaign-summary.json`` | JSON rollup (kinds ``campaign_summary`` or legacy validation path). |
 | ``campaign-summary.md`` | Markdown table for humans. |
+| ``campaign-semantic-summary.json`` | **Semantic / hybrid judge rollup** (kind ``campaign_semantic_summary``): per-cell repeat-judge disagreement and low-confidence flags, plus rollups by **suite**, **provider config**, and **execution mode**. Always written after a full run; campaigns that use only deterministic scoring still get counts (semantic cells = 0). |
+| ``campaign-semantic-summary.md`` | Human-readable mirror of the semantic summary (tables + capped list of unstable cells). |
+| ``reports/campaign-report.md`` | **Comparative report:** sweep dimensions that varied, mean score by **backend_kind**, semantic/hybrid instability by **scoring_backend**, execution-mode spreads, top **FT-\*** tags, and full failure atlas — uses ``pipelines.longitudinal`` (same taxonomy as ``alwm benchmark longitudinal``; thresholds are fixed in ``campaign_reporting`` for deterministic CI). |
+| ``reports/campaign-analysis.json`` | Machine-readable mirror of the comparative report (schema version **1** object, not a separate ``alwm validate`` kind). |
 | ``campaign-dry-run.json`` | Only for ``--dry-run``: planned run count + inputs snapshot + ``campaign_definition_fingerprint`` + ``campaign_experiment_fingerprints`` (no ``runs/`` trees). |
 
 Validate:
 
 ```bash
 uv run alwm validate examples/campaign_runs/minimal_offline/manifest.json campaign_manifest
+# equivalent: benchmark_campaign_manifest
 uv run alwm validate examples/campaign_runs/minimal_offline/campaign-summary.json campaign_summary
+uv run alwm validate examples/campaign_runs/minimal_offline/campaign-semantic-summary.json campaign_semantic_summary
 uv run alwm validate examples/campaign_runs/minimal_offline/runs/run0000/manifest.json benchmark_manifest
 ```
 
@@ -83,6 +89,6 @@ uv run alwm benchmark longitudinal \
 
 ## Examples
 
-- Definitions: ``examples/campaigns/v1/`` (including ``sweep_modes.v1.yaml``, ``multi_suite.v1.yaml``)
+- Definitions: ``examples/campaigns/v1/`` (including ``sweep_modes.v1.yaml``, ``multi_suite.v1.yaml``, ``semantic_repeats_offline.v1.yaml`` for semantic judge with ``judge_repeats`` > 1)
 - Fixture suite: ``fixtures/benchmarks/campaign_micro.v1.yaml``
 - Sample output: ``examples/campaign_runs/minimal_offline/`` (regenerate with the CLI above).

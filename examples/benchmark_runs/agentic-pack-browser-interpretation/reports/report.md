@@ -1,6 +1,6 @@
 # Report: `Report: Agentic pack — browser evidence interpretation (per-prompt scores)`
 
-- **id:** `agentic-pack-browser-interpretation-example-report`
+- **id:** `agentic-browser-refresh-report`
 - **kind:** `model_comparison`
 - **period:** `1970-01-01` → `1970-01-01`
 

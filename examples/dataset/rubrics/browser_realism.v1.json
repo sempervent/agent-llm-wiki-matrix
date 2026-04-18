@@ -1,0 +1,22 @@
+{
+  "id": "rubric.examples.browser_realism.v1",
+  "title": "Browser evidence interpretation (grounding, hallucination resistance, source fidelity)",
+  "version": "1",
+  "criteria": [
+    {
+      "id": "grounding",
+      "weight": 0.34,
+      "description": "Claims align with navigation, DOM excerpts, console, and screenshot metadata in the evidence JSON; cites specific URLs, selectors, or log lines."
+    },
+    {
+      "id": "hallucination_resistance",
+      "weight": 0.33,
+      "description": "Does not invent pages, elements, or errors that are absent from the structured evidence; clearly flags uncertainty when evidence is incomplete."
+    },
+    {
+      "id": "source_fidelity",
+      "weight": 0.33,
+      "description": "Preserves source ordering and labels from the trace; distinguishes fixture metadata from inferred user intent."
+    }
+  ]
+}

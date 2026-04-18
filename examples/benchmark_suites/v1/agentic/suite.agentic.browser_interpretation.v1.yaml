@@ -2,7 +2,7 @@
 schema_version: 1
 id: bench.agentic.pack.browser_interpretation.v1
 title: Agentic pack — browser evidence interpretation
-rubric_ref: examples/dataset/rubrics/comparison.v1.json
+rubric_ref: examples/dataset/rubrics/browser_realism.v1.json
 taxonomy:
   taxonomy_version: 1
   task_family: browser_evidence

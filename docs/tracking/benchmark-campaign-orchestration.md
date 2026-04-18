@@ -32,6 +32,7 @@ Registration: `src/agent_llm_wiki_matrix/artifacts.py`.
 | Doc | Role |
 | --- | --- |
 | [docs/workflows/benchmark-campaigns.md](../workflows/benchmark-campaigns.md) | How-to |
+| [docs/workflows/campaign-walkthrough.md](../workflows/campaign-walkthrough.md) | Committed-example walkthrough |
 | [docs/wiki/benchmark-campaigns.md](../wiki/benchmark-campaigns.md) | Wiki index |
 | [README.md](../../README.md) | Quick reference |
 | [AGENTS.md](../../AGENTS.md) | Contribution expectations for campaign changes |

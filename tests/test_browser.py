@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 from pathlib import Path
 
 import pytest
@@ -30,6 +31,12 @@ def test_load_browser_evidence_fixture() -> None:
     block = evidence_to_prompt_block(ev)
     assert "export clicked once" in block
     assert "Home" in block
+    assert len(ev.dom_excerpts) == 2
+    assert len(ev.screenshots) == 1
+    assert ev.extensions is not None
+    assert "dom_excerpts" in block
+    assert "screenshots" in block
+    assert "extensions (JSON)" in block
 
 
 def test_validate_artifact_kind_browser_evidence() -> None:
@@ -105,6 +112,7 @@ def test_cli_prompt_block() -> None:
     result = runner.invoke(main, ["browser", "prompt-block", str(path)])
     assert result.exit_code == 0
     assert "Browser evidence" in result.output
+    assert "dom_excerpts" in result.output
 
 
 def test_cli_run_mock() -> None:
@@ -112,3 +120,28 @@ def test_cli_run_mock() -> None:
     result = runner.invoke(main, ["browser", "run-mock", "--scenario-id", "x"])
     assert result.exit_code == 0
     assert "mock-evidence-x" in result.output
+
+
+def test_cli_run_mcp_scenario_id() -> None:
+    runner = CliRunner()
+    old = os.getcwd()
+    try:
+        os.chdir(_REPO)
+        result = runner.invoke(main, ["browser", "run-mcp", "--scenario-id", "export_flow"])
+    finally:
+        os.chdir(old)
+    assert result.exit_code == 0
+    assert '"runner": "mcp"' in result.output
+    assert "evidence.export_flow.v1" in result.output
+
+
+def test_cli_run_mcp_requires_target() -> None:
+    runner = CliRunner()
+    old = os.getcwd()
+    try:
+        os.chdir(_REPO)
+        result = runner.invoke(main, ["browser", "run-mcp"])
+    finally:
+        os.chdir(old)
+    assert result.exit_code != 0
+    assert "scenario-id" in result.output.lower() or "fixture" in result.output.lower()

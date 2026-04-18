@@ -83,7 +83,19 @@
           "properties": {
             "campaign_manifest": { "type": "string", "minLength": 1 },
             "campaign_summary_json": { "type": "string", "minLength": 1 },
-            "campaign_summary_md": { "type": "string", "minLength": 1 }
+            "campaign_summary_md": { "type": "string", "minLength": 1 },
+            "campaign_comparative_report_md": {
+              "oneOf": [{ "type": "null" }, { "type": "string", "minLength": 1 }]
+            },
+            "campaign_analysis_json": {
+              "oneOf": [{ "type": "null" }, { "type": "string", "minLength": 1 }]
+            },
+            "campaign_semantic_summary_json": {
+              "oneOf": [{ "type": "null" }, { "type": "string", "minLength": 1 }]
+            },
+            "campaign_semantic_summary_md": {
+              "oneOf": [{ "type": "null" }, { "type": "string", "minLength": 1 }]
+            }
           }
         }
       ]
@@ -91,6 +103,10 @@
     "git_commit_sha": { "oneOf": [{ "type": "null" }, { "type": "string", "minLength": 1 }] },
     "git_describe": { "oneOf": [{ "type": "null" }, { "type": "string", "minLength": 1 }] },
     "inputs_snapshot": { "oneOf": [{ "type": "null" }, { "type": "object" }] },
+    "aggregated_runtime": {
+      "description": "Sums of member benchmark runtime_summary fields (optional)",
+      "oneOf": [{ "type": "null" }, { "$ref": "#/$defs/campaignAggregatedRuntime" }]
+    },
     "failures": {
       "type": "array",
       "items": { "$ref": "#/$defs/campaignFailureRecord" }
@@ -249,6 +265,21 @@
           "minLength": 8,
           "pattern": "^sha256:[a-f0-9]{64}$"
         }
+      }
+    },
+    "campaignAggregatedRuntime": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema_version"],
+      "properties": {
+        "schema_version": { "type": "integer", "const": 1 },
+        "total_browser_phase_seconds": { "type": "number", "minimum": 0, "default": 0 },
+        "total_provider_completion_seconds": { "type": "number", "minimum": 0, "default": 0 },
+        "total_evaluation_phase_seconds": { "type": "number", "minimum": 0, "default": 0 },
+        "total_judge_phase_seconds": { "type": "number", "minimum": 0, "default": 0 },
+        "total_judge_invocations": { "type": "integer", "minimum": 0, "default": 0 },
+        "cells_with_judge_parse_fallback": { "type": "integer", "minimum": 0, "default": 0 },
+        "member_runs_timed": { "type": "integer", "minimum": 0, "default": 0 }
       }
     }
   }

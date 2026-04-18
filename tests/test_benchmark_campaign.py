@@ -65,6 +65,43 @@ def test_campaign_run_writes_longitudinal_compatible_tree(tmp_path: Path) -> Non
     assert cm.run_status_summary is not None
     assert cm.run_status_summary.succeeded == 1
     load_artifact_file(out / "campaign-summary.json", "campaign_summary")
+    assert (out / "campaign-semantic-summary.json").is_file()
+    assert (out / "campaign-semantic-summary.md").is_file()
+    assert (
+        cm.generated_report_paths.campaign_semantic_summary_json == "campaign-semantic-summary.json"
+    )
+    assert cm.generated_report_paths.campaign_comparative_report_md == "reports/campaign-report.md"
+    assert cm.generated_report_paths.campaign_analysis_json == "reports/campaign-analysis.json"
+    assert (out / "reports" / "campaign-report.md").is_file()
+    assert (out / "reports" / "campaign-analysis.json").is_file()
+    sem = load_artifact_file(out / "campaign-semantic-summary.json", "campaign_semantic_summary")
+    assert sem.totals.cells_total >= 1
+    assert sem.totals.cells_semantic_or_hybrid == 0
+    assert sem.totals.cells_deterministic >= 1
+
+
+def test_campaign_semantic_repeats_offline_rollups(tmp_path: Path) -> None:
+    campaign_path = _REPO / "examples/campaigns/v1/semantic_repeats_offline.v1.yaml"
+    campaign = load_benchmark_campaign_definition(campaign_path)
+    out = tmp_path / "campaign_sem"
+    manifest = run_benchmark_campaign(
+        repo_root=_REPO,
+        campaign=campaign,
+        campaign_definition_path=campaign_path,
+        output_dir=out,
+        created_at="2026-04-17T00:00:00Z",
+        fixture_mode_force_mock=True,
+    )
+    assert len(manifest.runs) == 1
+    sem = load_artifact_file(out / "campaign-semantic-summary.json", "campaign_semantic_summary")
+    assert sem.totals.runs_scanned == 1
+    assert sem.totals.cells_semantic_or_hybrid >= 1
+    assert sem.totals.cells_with_repeat_judge >= 1
+    assert len(sem.by_suite) >= 1
+    assert len(sem.by_execution_mode) >= 1
+    suite_axis = {a.axis_value: a for a in sem.by_suite}
+    assert "examples/benchmarks/v1/semantic_repeats.v1.yaml" in suite_axis
+    assert suite_axis["examples/benchmarks/v1/semantic_repeats.v1.yaml"].repeat_judge_cells >= 1
 
 
 def test_campaign_dry_run_writes_plan_without_member_runs(tmp_path: Path) -> None:

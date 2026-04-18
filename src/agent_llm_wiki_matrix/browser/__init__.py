@@ -14,7 +14,9 @@ from agent_llm_wiki_matrix.browser.models import (
     BrowserRunRequest,
     BrowserRunResult,
     ConsoleMessage,
+    DomExcerpt,
     NavigationStep,
+    ScreenshotMetadata,
 )
 from agent_llm_wiki_matrix.browser.playwright_runner import PlaywrightBrowserRunner
 
@@ -24,6 +26,8 @@ __all__ = [
     "BrowserRunResult",
     "BrowserRunner",
     "ConsoleMessage",
+    "DomExcerpt",
+    "ScreenshotMetadata",
     "MCPBrowserRunner",
     "FileBrowserRunner",
     "MockBrowserRunner",
