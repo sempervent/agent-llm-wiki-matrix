@@ -66,6 +66,34 @@ def test_browser_file_runner_benchmark(
     req = load_artifact_file(cell / "request.json", "benchmark_request")
     assert req.browser_runner == "file"
     assert "export clicked once" in req.prompt_text
+    report_md = (out / "reports" / "report.md").read_text(encoding="utf-8")
+    assert "Browser evidence (fixture summary)" in report_md
+    assert "v-file__p-one" in report_md
+    assert "evidence.export_flow.v1" in report_md
+
+
+def test_browser_checkout_fixture_benchmark(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("ALWM_FIXTURE_MODE", "1")
+    dfn = load_benchmark_definition(_REPO / "fixtures" / "benchmarks" / "browser_checkout.v1.yaml")
+    out = tmp_path / "run"
+    run_benchmark(
+        dfn,
+        repo_root=_REPO,
+        output_dir=out,
+        created_at="1970-01-01T00:00:00Z",
+        run_id="bc",
+        provider_yaml=None,
+        environ={"ALWM_FIXTURE_MODE": "1"},
+        fixture_mode_force_mock=True,
+    )
+    cell = out / "cells" / "v-checkout__p-one"
+    ev = load_artifact_file(cell / "browser_evidence.json", "browser_evidence")
+    assert ev.id == "evidence.checkout_flow.v1"
+    report_md = (out / "reports" / "report.md").read_text(encoding="utf-8")
+    assert "checkout_flow" in report_md or "evidence.checkout_flow" in report_md
 
 
 def test_playwright_runner_blocked_without_env(

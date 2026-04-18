@@ -32,6 +32,19 @@ class DomExcerpt(BaseModel):
 
     label: str | None = None
     selector: str | None = None
+    aria_role: str | None = Field(
+        default=None,
+        description="ARIA role when known (e.g. button, link, textbox).",
+    )
+    accessibility_name: str | None = Field(
+        default=None,
+        description="Accessible name / computed label for the node.",
+    )
+    dom_order: int | None = Field(
+        default=None,
+        ge=0,
+        description="Optional document order index for stable grounding (0-based).",
+    )
     visible_text: str | None = Field(
         default=None,
         description="Visible text captured from the DOM.",
@@ -62,6 +75,24 @@ class ScreenshotMetadata(BaseModel):
         default=None,
         description="Hex SHA-256 of image bytes.",
         pattern=r"^[a-f0-9]{64}$",
+    )
+    capture_scope: Literal["viewport", "full_page", "element"] | None = Field(
+        default=None,
+        description="What region was captured (viewport, full scroll, or a single element).",
+    )
+    target_selector: str | None = Field(
+        default=None,
+        description="When capture_scope is element, CSS selector or accessibility hint.",
+    )
+    sequence: int | None = Field(
+        default=None,
+        ge=0,
+        description="Order of this shot within the session (0-based).",
+    )
+    device_pixel_ratio: float | None = Field(
+        default=None,
+        gt=0.0,
+        description="Device pixel ratio when known (e.g. 2.0 for Retina).",
     )
     viewport_width: int | None = Field(default=None, ge=1)
     viewport_height: int | None = Field(default=None, ge=1)

@@ -17,19 +17,25 @@
 | Mean range (repeat cells) | — |
 | Mean σ total weighted (repeat cells) | — |
 
-## By suite
+## Instability hotspots (ranked)
+
+Slices with the **highest** judge disagreement (`mean_range_across_cells` or `max_range_observed` on repeat cells). Use these to prioritize reviews.
+
+_No semantic / hybrid cells — hotspots apply when `eval_scoring.backend` is semantic or hybrid with repeat judges._
+
+## Detailed rollups — by suite
 
 | Suite | Cells | Semantic | Repeat judge | Low conf. | Max range | Mean range | Mean σ_tot |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
 | `fixtures/benchmarks/campaign_micro.v1.yaml` | 1 | 0 | 0 | 0 | — | — | — |
 
-## By provider config (campaign axis)
+## Detailed rollups — by provider config (campaign axis)
 
 | Provider ref | Cells | Semantic | Repeat judge | Low conf. | Max range | Mean range | Mean σ_tot |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
 | `(default)` | 1 | 0 | 0 | 0 | — | — | — |
 
-## By execution mode
+## Detailed rollups — by execution mode
 
 | Mode | Cells | Semantic | Repeat judge | Low conf. | Max range | Mean range | Mean σ_tot |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |

@@ -58,11 +58,11 @@ Under ``--output-dir``:
 | ``manifest.json`` | **Campaign manifest** (kinds ``benchmark_campaign_manifest`` or ``campaign_manifest``): ``campaign_definition_fingerprint``, ``campaign_experiment_fingerprints`` (six axes), timing, git provenance, ``run_status_summary``, ``runs[]`` with per-row status and copied **six-axis** ``comparison_fingerprints``, paths to each run’s benchmark ``manifest.json``. |
 | ``runs/runNNNN/`` | Full per-run benchmark directory (same layout as ``alwm benchmark run``). Omitted when using ``--dry-run``. |
 | ``campaign-summary.json`` | JSON rollup (kinds ``campaign_summary`` or legacy validation path). |
-| ``campaign-summary.md`` | Markdown table for humans. |
+| ``campaign-summary.md`` | Markdown table for humans, plus **At a glance** when comparative artifacts ran: best/worst mean scores by sweep axis, backend leaders, semantic instability counts, mode gaps, top **FT-\*** tags, and semantic judge hotspots (when ``campaign-semantic-summary.json`` exists). |
 | ``campaign-semantic-summary.json`` | **Semantic / hybrid judge rollup** (kind ``campaign_semantic_summary``): per-cell repeat-judge disagreement and low-confidence flags, plus rollups by **suite**, **provider config**, and **execution mode**. Always written after a full run; campaigns that use only deterministic scoring still get counts (semantic cells = 0). |
 | ``campaign-semantic-summary.md`` | Human-readable mirror of the semantic summary (tables + capped list of unstable cells). |
-| ``reports/campaign-report.md`` | **Comparative report:** sweep dimensions that varied, mean score by **backend_kind**, semantic/hybrid instability by **scoring_backend**, execution-mode spreads, top **FT-\*** tags, and full failure atlas — uses ``pipelines.longitudinal`` (same taxonomy as ``alwm benchmark longitudinal``; thresholds are fixed in ``campaign_reporting`` for deterministic CI). |
-| ``reports/campaign-analysis.json`` | Machine-readable mirror of the comparative report (schema version **1** object, not a separate ``alwm validate`` kind). |
+| ``reports/campaign-report.md`` | **Comparative report:** sweep dimensions that varied; **fingerprint-axis tables** using ``group_snapshots_by`` keys (``provider_config_fingerprint``, ``scoring_config_fingerprint``, ``execution_mode``, ``prompt_registry_state_fingerprint``, ``browser_config_fingerprint``) with pooled mean scores and instability/regression counts per bucket; notes when spread correlates with judge instability; mean score by **backend_kind**; semantic/hybrid instability by **scoring_backend**; execution-mode spreads; top **FT-\*** tags; failure atlas — uses ``pipelines.longitudinal`` (same taxonomy as ``alwm benchmark longitudinal``; thresholds are fixed in ``campaign_reporting`` for deterministic CI). |
+| ``reports/campaign-analysis.json`` | Machine-readable mirror (``fingerprint_compare_axes``, ``fingerprint_axis_insights``, plus existing blocks; schema version **1** object, not a separate ``alwm validate`` kind). |
 | ``campaign-dry-run.json`` | Only for ``--dry-run``: planned run count + inputs snapshot + ``campaign_definition_fingerprint`` + ``campaign_experiment_fingerprints`` (no ``runs/`` trees). |
 
 Validate:
@@ -89,6 +89,7 @@ uv run alwm benchmark longitudinal \
 
 ## Examples
 
-- Definitions: ``examples/campaigns/v1/`` (including ``sweep_modes.v1.yaml``, ``multi_suite.v1.yaml``, ``semantic_repeats_offline.v1.yaml`` for semantic judge with ``judge_repeats`` > 1)
+- Definitions: ``examples/campaigns/v1/`` (including ``sweep_modes.v1.yaml``, ``multi_suite.v1.yaml``, ``semantic_repeats_offline.v1.yaml`` for semantic judge with ``judge_repeats`` > 1, ``fingerprint_axes_probe.v1.yaml`` for two runs that differ on **scoring_config** fingerprints)
 - Fixture suite: ``fixtures/benchmarks/campaign_micro.v1.yaml``
-- Sample output: ``examples/campaign_runs/minimal_offline/`` (regenerate with the CLI above).
+- Sample output: ``examples/campaign_runs/minimal_offline/`` (single member run; regenerate with the CLI above).
+- **Multi-run sample:** ``examples/campaign_runs/multi_suite/`` — two ``suite_ref`` values; shows **At a glance** spreads, mode-gap rows, and FT-* signals in ``campaign-summary.md`` / ``reports/campaign-report.md`` (see ``examples/campaign_runs/multi_suite/README.md``).

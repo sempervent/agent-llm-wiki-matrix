@@ -27,6 +27,9 @@
     {
       "label": "Export primary CTA",
       "selector": "button[data-testid='export']",
+      "aria_role": "button",
+      "accessibility_name": "Export",
+      "dom_order": 2,
       "visible_text": "Export",
       "html_snippet": "<button type=\"button\" data-testid=\"export\">Export</button>"
     },
@@ -39,6 +42,9 @@
   "screenshots": [
     {
       "content_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "capture_scope": "viewport",
+      "sequence": 0,
+      "device_pixel_ratio": 1.0,
       "viewport_width": 1280,
       "viewport_height": 720,
       "mime_type": "image/png",
@@ -48,7 +54,18 @@
   ],
   "extensions": {
     "fixture_profile": "export_flow.v1",
-    "structured_capture_version": 1
+    "structured_capture_version": 1,
+    "network": {
+      "requests_total": 3,
+      "failed_requests": 0,
+      "last_url": "https://example.test/settings/export",
+      "last_status_code": 200
+    },
+    "accessibility": {
+      "violations_count": 0,
+      "rules_checked": 12,
+      "notes": "Fixture summary only."
+    }
   },
   "notes": "Deterministic fixture (no PII). Matches benchmark case.browser.evidence narrative."
 }

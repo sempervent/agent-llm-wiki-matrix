@@ -270,6 +270,11 @@ def cmd_browser_run_playwright(
 
 @browser_grp.command("run-mcp")
 @click.option(
+    "--stdio",
+    is_flag=True,
+    help="Use MCP stdio transport (requires ALWM_MCP_BROWSER_COMMAND; see browser.md).",
+)
+@click.option(
     "--scenario-id",
     default=None,
     help="Load fixtures/browser_evidence/v1/<id>.json under ALWM_REPO_ROOT.",
@@ -280,24 +285,48 @@ def cmd_browser_run_playwright(
     default=None,
     help="Repo-relative path to a browser_evidence JSON file.",
 )
+@click.option(
+    "--start-url",
+    default=None,
+    help="Optional URL for MCP tool arguments (with --stdio).",
+)
+@click.option(
+    "--step",
+    "steps",
+    multiple=True,
+    help="Optional step labels for MCP tool arguments (with --stdio).",
+)
 def cmd_browser_run_mcp(
+    stdio: bool,
     scenario_id: str | None,
     fixture_relpath: str | None,
+    start_url: str | None,
+    steps: tuple[str, ...],
 ) -> None:
-    """Run MCPBrowserRunner (fixture-backed JSON only; remote MCP tools not wired)."""
+    """Run MCPBrowserRunner: fixture JSON and/or MCP stdio (see docs/architecture/browser.md)."""
     repo = Path(os.environ.get("ALWM_REPO_ROOT", ".")).resolve()
-    if not scenario_id and not fixture_relpath:
-        raise click.ClickException(
-            "Specify --scenario-id or --fixture. MCPBrowserRunner loads committed "
-            "fixtures like FileBrowserRunner; remote MCP browser tools are not implemented."
+    if stdio:
+        if scenario_id or fixture_relpath:
+            raise click.ClickException("Do not combine --stdio with --scenario-id or --fixture.")
+        if not os.environ.get("ALWM_MCP_BROWSER_COMMAND", "").strip():
+            raise click.ClickException(
+                "Set ALWM_MCP_BROWSER_COMMAND to the MCP server argv (e.g. "
+                "'python fixtures/mcp_servers/stdio_browser_evidence_server.py')."
+            )
+        req = BrowserRunRequest(start_url=start_url, steps=list(steps))
+    else:
+        if not scenario_id and not fixture_relpath:
+            raise click.ClickException(
+                "Specify --scenario-id or --fixture, or use --stdio with "
+                "ALWM_MCP_BROWSER_COMMAND for MCP stdio."
+            )
+        if scenario_id and fixture_relpath:
+            raise click.ClickException("Use either --scenario-id or --fixture, not both.")
+        req = BrowserRunRequest(
+            scenario_id=scenario_id,
+            fixture_relpath=fixture_relpath,
         )
-    if scenario_id and fixture_relpath:
-        raise click.ClickException("Use either --scenario-id or --fixture, not both.")
     runner = MCPBrowserRunner(repo)
-    req = BrowserRunRequest(
-        scenario_id=scenario_id,
-        fixture_relpath=fixture_relpath,
-    )
     try:
         result = runner.run(req)
     except (RuntimeError, FileNotFoundError) as e:

@@ -14,6 +14,7 @@ from typing import Any, Literal
 from agent_llm_wiki_matrix.benchmark.campaign_definitions import BenchmarkCampaignDefinitionV1
 from agent_llm_wiki_matrix.benchmark.campaign_reporting import (
     merge_generated_report_paths,
+    render_campaign_at_a_glance_markdown,
     write_campaign_comparative_artifacts,
 )
 from agent_llm_wiki_matrix.benchmark.campaign_semantic_summary import (
@@ -43,8 +44,10 @@ from agent_llm_wiki_matrix.models import (
     CampaignFailureRecord,
     CampaignGeneratedReportPaths,
     CampaignRunStatusSummary,
+    CampaignSemanticSummaryV1,
     CampaignSummaryV1,
 )
+from agent_llm_wiki_matrix.pipelines.longitudinal import LongitudinalAnalysis, RunSnapshot
 
 
 def _eval_label(opt: EvalScoringSpec | None) -> str:
@@ -174,7 +177,12 @@ def _utc_now_iso() -> str:
     return datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
-def render_campaign_summary_markdown(manifest: BenchmarkCampaignManifest) -> str:
+def render_campaign_summary_markdown(
+    manifest: BenchmarkCampaignManifest,
+    *,
+    longitudinal_bundle: tuple[list[RunSnapshot], LongitudinalAnalysis] | None = None,
+    semantic_summary: CampaignSemanticSummaryV1 | None = None,
+) -> str:
     """Human-readable summary for campaign-summary.md."""
     lines = [
         f"# Campaign summary: `{manifest.campaign_id}`",
@@ -218,9 +226,15 @@ def render_campaign_summary_markdown(manifest: BenchmarkCampaignManifest) -> str
         lines.append(f"- **git_describe:** `{manifest.git_describe}`")
     if manifest.aggregated_runtime is not None:
         lines.append(render_campaign_aggregated_runtime_markdown(manifest.aggregated_runtime))
+    at_a_glance = render_campaign_at_a_glance_markdown(
+        manifest,
+        longitudinal_bundle=longitudinal_bundle,
+        semantic_summary=semantic_summary,
+    )
+    lines.append("")
+    lines.append(at_a_glance.rstrip())
     lines.extend(
         [
-            "",
             (
                 "| # | run_id | suite | benchmark_id | eval axis | modes filter | "
                 "status | mean score | cells |"
@@ -525,7 +539,13 @@ def run_benchmark_campaign(
             git_describe=git_desc,
             runs=[],
         )
-        _write_campaign_summary(output_dir, summary, manifest)
+        _write_campaign_summary(
+            output_dir,
+            summary,
+            manifest,
+            longitudinal_bundle=None,
+            semantic_summary=None,
+        )
         return manifest
 
     succeeded = sum(1 for e in entries if e.status == "succeeded")
@@ -567,7 +587,11 @@ def run_benchmark_campaign(
         runs=entries,
         aggregated_runtime=aggregated_runtime,
     )
-    extra_paths = write_campaign_comparative_artifacts(repo_root, output_dir, manifest)
+    extra_paths, longitudinal_bundle = write_campaign_comparative_artifacts(
+        repo_root,
+        output_dir,
+        manifest,
+    )
     manifest = manifest.model_copy(
         update={
             "generated_report_paths": merge_generated_report_paths(
@@ -576,7 +600,7 @@ def run_benchmark_campaign(
             ),
         },
     )
-    semantic_paths = write_campaign_semantic_summary_artifacts(
+    semantic_paths, semantic_model = write_campaign_semantic_summary_artifacts(
         repo_root=repo_root,
         campaign_dir=output_dir,
         manifest=manifest,
@@ -610,7 +634,13 @@ def run_benchmark_campaign(
         git_describe=git_desc,
         runs=run_rows,
     )
-    _write_campaign_summary(output_dir, summary, manifest)
+    _write_campaign_summary(
+        output_dir,
+        summary,
+        manifest,
+        longitudinal_bundle=longitudinal_bundle,
+        semantic_summary=semantic_model,
+    )
     return manifest
 
 
@@ -618,10 +648,20 @@ def _write_campaign_summary(
     output_dir: Path,
     summary: CampaignSummaryV1,
     manifest: BenchmarkCampaignManifest,
+    *,
+    longitudinal_bundle: tuple[list[RunSnapshot], LongitudinalAnalysis] | None = None,
+    semantic_summary: CampaignSemanticSummaryV1 | None = None,
 ) -> None:
     from agent_llm_wiki_matrix.schema import load_schema, validate_json
 
     data = summary.model_dump(mode="json", exclude_none=True)
     validate_json(data, load_schema("schemas/v1/campaign_summary.schema.json"))
     write_json_sorted(output_dir / "campaign-summary.json", data)
-    write_utf8_text(output_dir / "campaign-summary.md", render_campaign_summary_markdown(manifest))
+    write_utf8_text(
+        output_dir / "campaign-summary.md",
+        render_campaign_summary_markdown(
+            manifest,
+            longitudinal_bundle=longitudinal_bundle,
+            semantic_summary=semantic_summary,
+        ),
+    )

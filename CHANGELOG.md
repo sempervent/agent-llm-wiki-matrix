@@ -9,11 +9,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- **Browser evidence (richer fixtures)** — `BrowserEvidence` supports **`dom_excerpts`**, **`screenshots`** (metadata), and **`extensions`**; prompt blocks and **`MockBrowserRunner`** include deterministic samples. Rubric **`examples/dataset/rubrics/browser_realism.v1.json`** (grounding, hallucination resistance, source fidelity). Prompt registry **0.4.1** updates **`bench.task.browser_evidence.v1`**.
-- **`alwm browser run-mcp`** — Runs `MCPBrowserRunner` on fixture JSON (`--scenario-id` or `--fixture`); documents the fixture bridge; remote MCP tools remain unimplemented (roadmap: `docs/architecture/browser.md`).
-- **Ollama (gpt-oss:20b)** — `just ollama-gptoss-setup` starts Compose Ollama, pulls **`gpt-oss:20b`**, verifies with **`alwm benchmark probe`**; **`just smoke-ollama-live`** runs a minimal live benchmark. Defaults (**`OLLAMA_MODEL`**, **`benchmarks/v1/ollama.v1.yaml`**, **`alwm benchmark probe`**) use that tag; docs include migration from the old named Docker volume to **`./.ollama-models`**.
+- **MCP stdio (protocol) path** — `MCPBrowserRunner` uses the `mcp` client for a **local** stdio server when `ALWM_MCP_BROWSER_COMMAND` is set and no fixture ids are passed; `alwm browser run-mcp --stdio`; fixture server `fixtures/mcp_servers/stdio_browser_evidence_server.py`. `mcp>=1.27` is in **`dev`** optional extras. **Not** a v0.2.0 exit criterion for IDE-hosted MCP (`docs/roadmap/v0.2.0.md`).
 
-Campaign orchestration, fingerprints, and campaign docs are recorded under **[0.2.0]** below.
+### Changed
+
+- **Campaign reporting (readability)** — **`campaign-summary.md`** includes **At a glance** (mean-score spreads by sweep axis, backend means, semantic instability counts, execution-mode gaps, top **FT-\*** tags, semantic judge rollup hints). **`reports/campaign-report.md`** leads with the same digest plus member mean-score tables and fingerprint-axis sections. **`campaign-semantic-summary.md`** adds ranked **Instability hotspots** before detailed rollups. **`campaign-analysis.json`** includes **`mean_score_extremes_by_sweep_axis`** and member mean blocks. New committed example **`examples/campaign_runs/multi_suite/`** (two suites). **No change** to default rubric scoring or harness math.
+
+- **Browser evidence (fixtures)** — **`DomExcerpt`** adds optional **`aria_role`**, **`accessibility_name`**, **`dom_order`**; **`ScreenshotMetadata`** adds **`capture_scope`**, **`target_selector`**, **`sequence`**, **`device_pixel_ratio`**. JSON Schema documents optional **`extensions.network`**, **`extensions.accessibility`**, **`extensions.performance`**. **`evidence_to_prompt_block`** renders structured extensions readably; benchmark **`reports/report.md`** appends **Browser evidence (fixture summary)** for **`browser_mock`** runs. New fixtures **`checkout_flow.json`**, **`form_validation.json`**; suites **`suite.taxonomy.browser_checkout.v1`**, **`suite.taxonomy.browser_form.v1`**, **`suite.agentic.browser_checkout.v1`**; benchmarks **`browser_checkout.v1`**, **`browser_form.v1`**. Prompt registry **0.4.2**.
+
+## [0.2.1] — 2026-04-18
+
+**Comparative campaigns and longitudinal evaluation:** this release strengthens campaign workflows, reporting, observability, and browser-evidence realism while keeping **default CI deterministic and offline** and preserving **opt-in live verification** paths.
+
+### Highlights
+
+- **Campaign documentation** — Consolidation and walkthrough improvements (see [docs/workflows/campaign-walkthrough.md](docs/workflows/campaign-walkthrough.md), [docs/wiki/benchmark-campaigns.md](docs/wiki/benchmark-campaigns.md), [docs/tracking/benchmark-campaign-orchestration.md](docs/tracking/benchmark-campaign-orchestration.md), ADR [docs/architecture/adr/0001-benchmark-campaign-orchestration.md](docs/architecture/adr/0001-benchmark-campaign-orchestration.md)).
+- **MCP browser runner** — Truthful **partial** classification: fixture-backed bridge and **`alwm browser run-mcp`** (`--scenario-id` / `--fixture`); remote MCP protocol execution remains **out of scope** until implemented and tested ([docs/architecture/browser.md](docs/architecture/browser.md)).
+- **Campaign semantic summary** — **`campaign_semantic_summary`** artifacts and reporting for judge-repeat / semantic rollups on campaign outputs ([docs/workflows/benchmark-campaigns.md](docs/workflows/benchmark-campaigns.md)).
+- **Runtime observability** — Benchmark **`manifest.json`** and campaign manifests gain timing / retry / judge-phase summaries where applicable; Markdown reports surface aggregates ([docs/workflows/benchmarking.md](docs/workflows/benchmarking.md)).
+- **Browser evidence** — Richer fixture-backed **`BrowserEvidence`**: **`dom_excerpts`**, **`screenshots`** (metadata), **`extensions`**; **`browser_realism.v1`** rubric (**grounding**, **hallucination_resistance**, **source_fidelity**); prompt registry **0.4.1** ([docs/architecture/browser.md](docs/architecture/browser.md)).
+
+### Other
+
+- **Ollama (gpt-oss:20b)** — `just ollama-gptoss-setup` / **`smoke-ollama-live`** helpers; defaults and volume migration notes for **`./.ollama-models`**.
+
+### Known boundaries
+
+- **MCP** remains **fixture-backed / partial**, not a full remote protocol implementation.
+- **Playwright** remains **optional**; not part of default **`just ci`**.
+- **Browser realism** is improved but still **bounded by deterministic fixture mode** in default pipelines.
+
+Narrative notes: [docs/releases/v0.2.1.md](docs/releases/v0.2.1.md).
 
 ## [0.2.0] — 2026-04-18
 
@@ -53,3 +79,4 @@ First tagged release: offline-first CLI, pipelines, benchmark harness, prompt re
 
 [0.1.0]: https://github.com/sempervent/agent-llm-wiki-matrix/releases/tag/v0.1.0
 [0.2.0]: https://github.com/sempervent/agent-llm-wiki-matrix/releases/tag/v0.2.0
+[0.2.1]: https://github.com/sempervent/agent-llm-wiki-matrix/releases/tag/v0.2.1

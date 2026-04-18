@@ -19,8 +19,8 @@ Stable per-axis hashes for longitudinal grouping and comparability checks.
 - **dry_run:** `False`
 - **runs:** 1
 - **succeeded / failed:** 1 / 0
-- **git_commit:** `7a2c70d4ba5a143237c6fa5a0c9f0c75ae567ad5`
-- **git_describe:** `v0.2.0-dirty`
+- **git_commit:** `6b0f29e18409a5fd78c72c3a68a15e2ee524cba4`
+- **git_describe:** `v0.2.1-dirty`
 
 ## Aggregated runtime (member manifests)
 
@@ -30,13 +30,42 @@ Sums of per-run `runtime_summary` fields for successful member runs that recorde
 | --- | --- |
 | member_runs_timed | 1 |
 | total_browser_phase_seconds | 0.000000 |
-| total_provider_completion_seconds | 0.000044 |
-| total_evaluation_phase_seconds | 0.003234 |
+| total_provider_completion_seconds | 0.000013 |
+| total_evaluation_phase_seconds | 0.002420 |
 | total_judge_phase_seconds | 0.000000 |
 | total_judge_invocations | 0 |
 | cells_with_judge_parse_fallback | 0 |
 
 
+## At a glance
+
+Quick read on **mean-score spreads** across sweep axes, **backend** leaders, **semantic instability** (when longitudinal analysis ran), **execution-mode gaps**, and **failure taxonomy** signals. See **`reports/campaign-report.md`** for the full comparative narrative and **`campaign-semantic-summary.md`** for judge-variance rollups.
+
+### Mean score — best / worst by sweep axis
+
+- Need at least two succeeded member runs with mean scores to compare axes.
+
+### Provider / backend (mean cell score)
+
+- **Best:** `mock` (0.667276 over 1 cells)
+- **Weakest:** _single backend kind in this campaign._
+
+### Semantic instability hotspots (longitudinal)
+
+_No cells flagged as semantically unstable at configured thresholds._
+
+### Execution mode gaps (within-run)
+
+_No mode-gap rows above threshold, or modes not comparable in member runs._
+
+### Top recurring failure tags (FT-*)
+
+_No FT-* signals in this pass._
+
+### Semantic / hybrid judge — axis hotspots (rollup)
+
+_All cells used deterministic scoring — no judge variance rollups._
+---
 | # | run_id | suite | benchmark_id | eval axis | modes filter | status | mean score | cells |
 | ---: | --- | --- | --- | --- | --- | --- | ---: | ---: |
 | 0 | `campaign.examples.minimal_offline.v1__0000` | `fixtures/benchmarks/campaign_micro.v1.yaml` | `bench.fixtures.campaign.micro.v1` | suite_default | — | succeeded | 0.667276 | 1 |

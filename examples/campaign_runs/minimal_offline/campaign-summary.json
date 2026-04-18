@@ -14,8 +14,8 @@
   "dry_run": false,
   "failures": [],
   "fixture_mode_force_mock": true,
-  "git_commit_sha": "7a2c70d4ba5a143237c6fa5a0c9f0c75ae567ad5",
-  "git_describe": "v0.2.0-dirty",
+  "git_commit_sha": "6b0f29e18409a5fd78c72c3a68a15e2ee524cba4",
+  "git_describe": "v0.2.1-dirty",
   "run_count": 1,
   "run_status_summary": {
     "failed": 0,
@@ -34,7 +34,7 @@
         "scoring_config": "sha256:f958bcbda76ceda7438ca44922ecf99f6ef81948463ec797c7b454a29b249496",
         "suite_definition": "sha256:a772457f2824d25d4b0e6c9219772ecc45fe305e20596091b81fac9db218308a"
       },
-      "duration_seconds": 0.023717,
+      "duration_seconds": 0.024883,
       "eval_scoring_label": "suite_default",
       "manifest_relpath": "runs/run0000/manifest.json",
       "mean_total_weighted_score": 0.667276,

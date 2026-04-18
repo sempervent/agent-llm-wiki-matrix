@@ -56,12 +56,18 @@ class MockBrowserRunner(BrowserRunner):
                 DomExcerpt(
                     label="mock primary surface",
                     selector=f"[data-mock-id='{digest}']",
+                    aria_role="button",
+                    accessibility_name=f"Mock action {label}",
+                    dom_order=0,
                     visible_text=f"Deterministic mock excerpt for {label}",
                 ),
             ],
             screenshots=[
                 ScreenshotMetadata(
                     content_sha256="0" * 64,
+                    capture_scope="viewport",
+                    sequence=0,
+                    device_pixel_ratio=1.0,
                     viewport_width=1280,
                     viewport_height=720,
                     mime_type="image/png",
@@ -73,6 +79,8 @@ class MockBrowserRunner(BrowserRunner):
                 "runner": "mock",
                 "trace_digest": digest,
                 "structured_capture_version": 1,
+                "network": {"requests_total": 0, "failed_requests": 0},
+                "accessibility": {"violations_count": 0, "rules_checked": 0},
             },
             notes="MockBrowserRunner: deterministic; no real browser.",
         )

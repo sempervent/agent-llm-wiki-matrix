@@ -16,6 +16,14 @@ alwm benchmark campaign run \
   --output-dir examples/campaign_runs/minimal_offline
 ```
 
+**Multi-suite sweep** (two fixture definitions; shows **suite_ref** variance in comparative **At a glance** and member-score tables):
+
+```bash
+uv run alwm benchmark campaign run \
+  --definition examples/campaigns/v1/multi_suite.v1.yaml \
+  --output-dir examples/campaign_runs/multi_suite
+```
+
 Plan only (no `runs/`; useful before large sweeps):
 
 ```bash
@@ -30,8 +38,10 @@ Outputs (git-friendly, longitudinal-ready):
 - `runs/runNNNN/manifest.json` — standard per-run benchmark manifests (omitted for `--dry-run`)
 - `campaign-summary.json` / `campaign-summary.md` — aggregate table
 - `campaign-semantic-summary.json` / `.md` — semantic/hybrid judge rollups (zero semantic cells when scoring is deterministic-only)
-- `reports/campaign-report.md` / `campaign-analysis.json` — comparative report (dimensions, backends, instability, mode gaps, failure tags)
+- `reports/campaign-report.md` / `campaign-analysis.json` — comparative report (**At a glance**, dimensions, member-run mean scores by axis, fingerprint comparison when applicable, backends, instability, mode gaps, failure tags)
 - `campaign-semantic-summary.json` / `campaign-semantic-summary.md` — semantic / hybrid repeat-judge variance by suite, provider, and execution mode (`alwm validate … campaign_semantic_summary`)
 - `campaign-dry-run.json` — only for `--dry-run`: planned run count + `campaign_definition_fingerprint` + `campaign_experiment_fingerprints` (no `runs/` trees)
 
 See `docs/workflows/benchmark-campaigns.md`, **`docs/workflows/campaign-walkthrough.md`** (committed `examples/campaign_runs/minimal_offline/`), `docs/wiki/campaign-orchestration.md`, `docs/wiki/benchmark-campaigns.md`, and `docs/tracking/campaign-orchestration.md`.
+
+For **fingerprint-axis** comparative tables (`reports/campaign-report.md`), see `fingerprint_axes_probe.v1.yaml` (two runs that differ on **scoring_config** fingerprints).

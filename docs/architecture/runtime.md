@@ -24,13 +24,16 @@ See `.env.example`. Notable keys:
 | `ALWM_LIVE_BENCHMARK_OLLAMA` | Set `1` to enable opt-in pytest live Ollama benchmark tests |
 | `ALWM_LIVE_BENCHMARK_LLAMACPP` | Set `1` for opt-in OpenAI-compatible benchmark tests |
 | `ALWM_PLAYWRIGHT_SMOKE` | Set `1` for opt-in Playwright integration tests |
+| `ALWM_MCP_BROWSER_COMMAND` | Optional: argv for a **local** MCP stdio server (see `docs/architecture/browser.md`) |
+| `ALWM_MCP_BROWSER_TOOL` | Optional: MCP tool name for stdio mode (default `alwm_browser_evidence`) |
+| `ALWM_MCP_BROWSER_CWD` | Optional: working directory for the MCP server process |
 
 ## Browser abstraction
 
 - **Offline / CI:** `MockBrowserRunner`, `FileBrowserRunner`, JSON under `fixtures/browser_evidence/v1/` (see `docs/architecture/browser.md`).
-- **CLI:** `alwm browser prompt-block <path>`, `alwm browser run-mock`, `alwm browser run-mcp` (fixture JSON only), `alwm browser run-playwright` (requires `uv pip install -e '.[browser]'` and browser install via `uv run playwright install …`).
+- **CLI:** `alwm browser prompt-block <path>`, `alwm browser run-mock`, `alwm browser run-mcp` (fixtures and/or `--stdio` MCP), `alwm browser run-playwright` (requires `uv pip install -e '.[browser]'` and browser install via `uv run playwright install …`).
 - **Optional live:** `PlaywrightBrowserRunner` in `browser/playwright_runner.py` maps sessions to `BrowserEvidence` (extra `[browser]`).
-- **Partial:** `MCPBrowserRunner` loads the same fixtures as `FileBrowserRunner` when `scenario_id` or `fixture_relpath` is set; remote MCP tools are not implemented (see `docs/architecture/browser.md`).
+- **Partial:** `MCPBrowserRunner` — fixtures and optional **local stdio MCP** (`ALWM_MCP_BROWSER_COMMAND`; `mcp` from **dev** extras)—see `docs/architecture/browser.md`.
 
 ## Docker
 

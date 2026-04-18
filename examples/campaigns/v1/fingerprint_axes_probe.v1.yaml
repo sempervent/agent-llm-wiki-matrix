@@ -1,0 +1,16 @@
+# Two runs: suite default scoring vs explicit deterministic + ``judge_repeats: 2`` (distinct scoring_config fingerprints).
+schema_version: 1
+id: campaign.examples.fingerprint_axes_probe.v1
+title: Example — scoring config fingerprint comparison
+suite_refs:
+  - fixtures/benchmarks/campaign_micro.v1.yaml
+provider_config_refs: []
+eval_scoring_options:
+  - null
+  - backend: deterministic
+    judge_repeats: 2
+browser_configs: []
+execution_modes: null
+campaign_tags:
+  - example:campaign
+  - axis:scoring_config_fingerprint

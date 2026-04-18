@@ -9,9 +9,9 @@
       "raw_response_relpath": "cells/v-cli__p1/response.raw.txt",
       "request_relpath": "cells/v-cli__p1/request.json",
       "runtime": {
-        "evaluation_seconds": 0.003234,
+        "evaluation_seconds": 0.00242,
         "judge_repeat_count": 1,
-        "provider_seconds": 4.4e-05,
+        "provider_seconds": 1.3e-05,
         "schema_version": 1
       }
     }
@@ -48,13 +48,13 @@
   "run_id": "campaign.examples.minimal_offline.v1__0000",
   "runtime_summary": {
     "browser_phase_seconds": 0.0,
-    "duration_seconds": 0.020594,
-    "evaluation_phase_seconds": 0.003234,
-    "finished_at_utc": "2026-04-18T00:37:21Z",
+    "duration_seconds": 0.016216,
+    "evaluation_phase_seconds": 0.00242,
+    "finished_at_utc": "2026-04-18T00:45:07Z",
     "judge_phase_seconds": 0.0,
-    "provider_completion_seconds": 4.4e-05,
+    "provider_completion_seconds": 1.3e-05,
     "schema_version": 1,
-    "started_at_utc": "2026-04-18T00:37:21Z"
+    "started_at_utc": "2026-04-18T00:45:07Z"
   },
   "schema_version": 1,
   "success_criteria": [],

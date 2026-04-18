@@ -1,0 +1,18 @@
+# Deterministic: form_validation fixture (a11y + console errors).
+schema_version: 1
+id: bench.fixtures.browser.form.v1
+title: Browser file-runner benchmark (form validation fixture)
+rubric_ref: examples/dataset/rubrics/browser_realism.v1.json
+prompts:
+  - id: p-one
+    text: "List validation signals from the trace (DOM, console, a11y) and avoid inventing fields absent from the JSON."
+variants:
+  - id: v-form
+    agent_stack: browser-form
+    execution_mode: browser_mock
+    backend:
+      kind: mock
+      model: mock-model
+    browser:
+      runner: file
+      fixture_relpath: fixtures/browser_evidence/v1/form_validation.json

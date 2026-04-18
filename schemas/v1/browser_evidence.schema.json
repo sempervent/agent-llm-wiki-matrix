@@ -59,8 +59,23 @@
       "default": []
     },
     "extensions": {
-      "description": "Optional structured JSON bag for runner-specific or experiment fields (must remain JSON-serializable).",
-      "oneOf": [{ "type": "null" }, { "type": "object", "additionalProperties": true }]
+      "description": "Optional structured JSON bag for runner-specific or experiment fields. Known keys (network, accessibility) are rendered readably in prompts; other keys remain JSON.",
+      "oneOf": [
+        { "type": "null" },
+        {
+          "type": "object",
+          "additionalProperties": true,
+          "properties": {
+            "fixture_profile": { "type": "string" },
+            "structured_capture_version": { "type": "integer" },
+            "runner": { "type": "string" },
+            "trace_digest": { "type": "string" },
+            "network": { "$ref": "#/$defs/networkSummary" },
+            "accessibility": { "$ref": "#/$defs/accessibilitySummary" },
+            "performance": { "$ref": "#/$defs/performanceHints" }
+          }
+        }
+      ]
     },
     "notes": { "type": "string" }
   },
@@ -85,6 +100,19 @@
         "selector": {
           "type": "string",
           "description": "CSS selector or accessibility hint when known."
+        },
+        "aria_role": {
+          "type": "string",
+          "description": "ARIA role when known (e.g. button, link)."
+        },
+        "accessibility_name": {
+          "type": "string",
+          "description": "Accessible name / computed label."
+        },
+        "dom_order": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Stable document-order index for grounding (optional)."
         },
         "visible_text": {
           "type": "string",
@@ -119,6 +147,26 @@
           "pattern": "^[a-f0-9]{64}$",
           "description": "Hex SHA-256 of image bytes when known (no 0x prefix)."
         },
+        "capture_scope": {
+          "type": "string",
+          "enum": ["viewport", "full_page", "element"],
+          "description": "Captured region: viewport, full scroll, or a single element."
+        },
+        "target_selector": {
+          "type": "string",
+          "minLength": 1,
+          "description": "When capture_scope is element, selector or a11y hint."
+        },
+        "sequence": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Shot order within the session (0-based)."
+        },
+        "device_pixel_ratio": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "description": "Device pixel ratio (e.g. 2.0)."
+        },
         "viewport_width": { "type": "integer", "minimum": 1 },
         "viewport_height": { "type": "integer", "minimum": 1 },
         "mime_type": { "type": "string", "minLength": 1 },
@@ -127,6 +175,36 @@
           "type": "string",
           "description": "RFC 3339 timestamp when the screenshot was taken (fixture or live)."
         }
+      }
+    },
+    "networkSummary": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Deterministic summary of network activity (fixture or live).",
+      "properties": {
+        "requests_total": { "type": "integer", "minimum": 0 },
+        "failed_requests": { "type": "integer", "minimum": 0 },
+        "last_url": { "type": "string" },
+        "last_status_code": { "type": "integer", "minimum": 100, "maximum": 599 }
+      }
+    },
+    "accessibilitySummary": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "High-level a11y signals for auditors (not a full axe report).",
+      "properties": {
+        "violations_count": { "type": "integer", "minimum": 0 },
+        "rules_checked": { "type": "integer", "minimum": 0 },
+        "notes": { "type": "string" }
+      }
+    },
+    "performanceHints": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Optional coarse timing hints (milliseconds).",
+      "properties": {
+        "dom_content_loaded_ms": { "type": "number", "minimum": 0 },
+        "largest_contentful_paint_ms": { "type": "number", "minimum": 0 }
       }
     }
   }

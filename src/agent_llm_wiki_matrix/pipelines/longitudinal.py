@@ -59,10 +59,15 @@ FAILURE_TAXONOMY: dict[str, str] = {
 }
 
 
-def _truncate_fingerprint_display(s: str, *, max_len: int = 22) -> str:
+def truncate_fingerprint_display(s: str, *, max_len: int = 22) -> str:
+    """Shorten ``sha256:…`` hashes for Markdown tables (shared with campaign reports)."""
     if len(s) <= max_len:
         return s
     return f"{s[: max_len - 1]}…"
+
+
+def _truncate_fingerprint_display(s: str, *, max_len: int = 22) -> str:
+    return truncate_fingerprint_display(s, max_len=max_len)
 
 
 def _parse_created_at(raw: str) -> datetime:

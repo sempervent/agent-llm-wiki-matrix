@@ -13,7 +13,7 @@ Capture **browser evidence** (navigation, console messages, optional DOM snapsho
 | `MockBrowserRunner` | Deterministic synthetic evidence from request fields (tests, smoke) |
 | `FileBrowserRunner` | Loads evidence from `fixtures/browser_evidence/v1/<scenario_id>.json` or a repo-relative path |
 | `PlaywrightBrowserRunner` | **Optional** live capture via Playwright (`pyproject` extra **`[browser]`**); CLI `alwm browser run-playwright`; integration tests opt-in (`ALWM_PLAYWRIGHT_SMOKE=1`) |
-| `MCPBrowserRunner` | **Partial** — same fixture loading as `FileBrowserRunner` when `scenario_id` or `fixture_relpath` is set; annotates evidence notes and uses runner id **`mcp`**. Without those fields it raises **`RuntimeError`** (remote MCP browser tools are **not** implemented). CLI: `alwm browser run-mcp`. |
+| `MCPBrowserRunner` | **Partial** — (1) same fixture loading as `FileBrowserRunner` when `scenario_id` or `fixture_relpath` is set; (2) **optional MCP stdio** when those fields are **absent** and **`ALWM_MCP_BROWSER_COMMAND`** is set: runs the official MCP client (`mcp` package, included in **`dev`** extras), calls a configurable tool (default **`alwm_browser_evidence`**), parses **JSON text** from the tool result into `BrowserEvidence`. CLI: `alwm browser run-mcp` (`--scenario-id` / `--fixture`, or `--stdio`). |
 | `load_browser_evidence` / `evidence_to_prompt_block` | Validate fixtures and format text for LLM prompts |
 
 ## Determinism
@@ -21,24 +21,35 @@ Capture **browser evidence** (navigation, console messages, optional DOM snapsho
 - Prefer **committed JSON** under `fixtures/browser_evidence/v1/` for reproducible tests.
 - `MockBrowserRunner` never performs I/O except hashing request fields.
 - Default `just ci` does **not** install Playwright or browser binaries.
+- **MCP stdio** uses a **local subprocess** (no network); CI runs a **fixture FastMCP server** at `fixtures/mcp_servers/stdio_browser_evidence_server.py`.
+
+## MCP stdio (minimal real protocol path)
+
+**Implemented:** stdio transport + `call_tool` + JSON → `BrowserEvidence` validation (`browser/mcp_stdio.py`).
+
+| Variable | Purpose |
+| --- | --- |
+| `ALWM_MCP_BROWSER_COMMAND` | Required for stdio mode: shell-parsed argv to launch the MCP server (e.g. `python fixtures/mcp_servers/stdio_browser_evidence_server.py`). |
+| `ALWM_MCP_BROWSER_TOOL` | Optional; default **`alwm_browser_evidence`**. |
+| `ALWM_MCP_BROWSER_CWD` | Optional working directory for the server process (repo-relative paths resolved against `ALWM_REPO_ROOT`). |
+
+**Contract:** the tool should return **text content** whose concatenation is a single JSON object matching **`BrowserEvidence`**. Extra arguments (`start_url`, `steps`) are passed from `BrowserRunRequest` for forward-compatible servers; the fixture server ignores them.
+
+**Dependency:** `mcp>=1.27` is listed under **`[project.optional-dependencies] dev`** and **`[dependency-groups] dev`** so `uv pip install -e ".[dev]"` / `uv sync --group dev` install it.
+
+**Not in scope (v0.2.x milestone):** Cursor/IDE-hosted MCP servers, streamable HTTP/SSE MCP to remote hosts, or vendor-specific browser tool shapes—see **`docs/roadmap/v0.2.0.md`** non-goals. The stdio path is the supported **protocol-capable** hook for future work.
+
+### Roadmap (follow-on)
+
+1. Optional **`[mcp]`** install surface for non-dev consumers (if needed).
+2. Tool discovery (`tools/list`) and mapping profiles for heterogeneous servers.
+3. Opt-in integration tests against a user-provided MCP command (env-gated, not default CI).
+
+Verification: `docs/workflows/live-verification.md`.
 
 ## Scoring (browser interpretation)
 
 Use **`examples/dataset/rubrics/browser_realism.v1.json`** when rubrics should stress **grounding** in the trace, **hallucination resistance**, and **source fidelity** to URLs/selectors/console lines. Default CI keeps **deterministic** hash-based scores unless a suite opts into semantic judging.
-
-## Remote MCP browser tools (not implemented)
-
-**Status:** **documented-only** for the MCP protocol and live tool execution. The **`MCPBrowserRunner`** name indicates the *intended* integration point for Cursor/IDE MCP browser tools; today only the fixture bridge is implemented.
-
-### Roadmap (concrete)
-
-1. **Dependency and transport** — Add an optional extra (e.g. `[mcp]`) pulling a maintained MCP client library; support stdio and/or streamable HTTP transport to a configured server command or URL.
-2. **Configuration** — Repo-local config (env + optional YAML) for server launch args, working directory, timeouts, and which tool names map to navigation vs snapshot (no invented vendor APIs; discover tools from the server where possible).
-3. **`BrowserRunRequest` contract** — Define how `start_url` / `steps` (or a new field) drive MCP tool calls; map tool results → `BrowserEvidence` (`load_browser_evidence`-compatible shape).
-4. **Tests** — Mock transport or recorded MCP frames in `fixtures/` for default CI; opt-in integration test behind an env flag (similar to Playwright).
-5. **Docs and CLI** — Extend `alwm browser run-mcp` with a documented live path; update this file and `docs/audits/capability-classification.md` to **complete** or **partial (optional)** when evidence-backed.
-
-Verification: `docs/workflows/live-verification.md`.
 
 ## Benchmark harness
 

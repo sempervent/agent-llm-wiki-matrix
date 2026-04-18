@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "agent-llm-wiki-matrix"
-version = "0.1.0"
+version = "0.2.1"
 description = "Markdown-first, git-native LLM wiki and agent comparison matrix tooling"
 readme = "README.md"
 requires-python = ">=3.11"
@@ -28,6 +28,7 @@ dev = [
     "ruff>=0.6",
     "types-PyYAML",
     "types-jsonschema",
+    "mcp>=1.27.0",
 ]
 browser = [
     "playwright>=1.40",
@@ -75,6 +76,7 @@ markers = [
 
 [dependency-groups]
 dev = [
+    "mcp>=1.27.0",
     "pytest>=9.0.3",
     "ruff>=0.15.11",
     "ty>=0.0.31",

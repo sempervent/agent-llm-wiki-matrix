@@ -202,6 +202,26 @@ def build_campaign_semantic_summary(
     )
 
 
+def _rollup_hotspot_score(a: CampaignSemanticAxisRollup) -> float:
+    """Higher = more judge disagreement / instability on this axis slice."""
+    mr = a.mean_range_across_cells
+    mx = a.max_range_observed
+    candidates = [x for x in (mr, mx) if x is not None]
+    return max(candidates) if candidates else -1.0
+
+
+def _sorted_hotspots(
+    rollups: list[CampaignSemanticAxisRollup],
+    *,
+    limit: int = 8,
+) -> list[CampaignSemanticAxisRollup]:
+    return sorted(
+        rollups,
+        key=lambda x: (_rollup_hotspot_score(x), x.axis_value),
+        reverse=True,
+    )[:limit]
+
+
 def render_campaign_semantic_summary_markdown(summary: CampaignSemanticSummaryV1) -> str:
     """Markdown view: totals, low-confidence highlights, rollups by suite/provider/mode."""
     t = summary.totals
@@ -231,14 +251,80 @@ def render_campaign_semantic_summary_markdown(summary: CampaignSemanticSummaryV1
             f"{mtw if mtw is not None else '—'} |"
         ),
         "",
-        "## By suite",
+        "## Instability hotspots (ranked)",
         "",
-        (
-            "| Suite | Cells | Semantic | Repeat judge | Low conf. | "
-            "Max range | Mean range | Mean σ_tot |"
-        ),
-        "| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |",
+        "Slices with the **highest** judge disagreement (`mean_range_across_cells` or "
+        "`max_range_observed` on repeat cells). Use these to prioritize reviews.",
+        "",
     ]
+    if t.cells_semantic_or_hybrid > 0:
+        lines.extend(
+            [
+                "### By suite",
+                "",
+                "| Rank | Suite | Mean range | Max range | Low-conf. cells |",
+                "| ---: | --- | ---: | ---: | ---: |",
+            ],
+        )
+        for i, a in enumerate(_sorted_hotspots(list(summary.by_suite)), start=1):
+            lines.append(
+                f"| {i} | `{a.axis_value}` | "
+                f"{a.mean_range_across_cells if a.mean_range_across_cells is not None else '—'} | "
+                f"{a.max_range_observed if a.max_range_observed is not None else '—'} | "
+                f"{a.low_confidence_cells} |",
+            )
+        lines.extend(
+            [
+                "",
+                "### By provider axis",
+                "",
+                "| Rank | Provider | Mean range | Max range | Low-conf. cells |",
+                "| ---: | --- | ---: | ---: | ---: |",
+            ],
+        )
+        for i, a in enumerate(_sorted_hotspots(list(summary.by_provider)), start=1):
+            lines.append(
+                f"| {i} | `{a.axis_value}` | "
+                f"{a.mean_range_across_cells if a.mean_range_across_cells is not None else '—'} | "
+                f"{a.max_range_observed if a.max_range_observed is not None else '—'} | "
+                f"{a.low_confidence_cells} |",
+            )
+        lines.extend(
+            [
+                "",
+                "### By execution mode",
+                "",
+                "| Rank | Mode | Mean range | Max range | Low-conf. cells |",
+                "| ---: | --- | ---: | ---: | ---: |",
+            ],
+        )
+        for i, a in enumerate(_sorted_hotspots(list(summary.by_execution_mode)), start=1):
+            lines.append(
+                f"| {i} | `{a.axis_value}` | "
+                f"{a.mean_range_across_cells if a.mean_range_across_cells is not None else '—'} | "
+                f"{a.max_range_observed if a.max_range_observed is not None else '—'} | "
+                f"{a.low_confidence_cells} |",
+            )
+        lines.append("")
+    else:
+        lines.extend(
+            [
+                "_No semantic / hybrid cells — hotspots apply when `eval_scoring.backend` is "
+                "semantic or hybrid with repeat judges._",
+                "",
+            ],
+        )
+    lines.extend(
+        [
+            "## Detailed rollups — by suite",
+            "",
+            (
+                "| Suite | Cells | Semantic | Repeat judge | Low conf. | "
+                "Max range | Mean range | Mean σ_tot |"
+            ),
+            "| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |",
+        ],
+    )
     for a in summary.by_suite:
         lines.append(
             f"| `{a.axis_value}` | {a.cell_rows} | {a.semantic_cells} | {a.repeat_judge_cells} | "
@@ -250,7 +336,7 @@ def render_campaign_semantic_summary_markdown(summary: CampaignSemanticSummaryV1
     lines.extend(
         [
             "",
-            "## By provider config (campaign axis)",
+            "## Detailed rollups — by provider config (campaign axis)",
             "",
             (
                 "| Provider ref | Cells | Semantic | Repeat judge | Low conf. | "
@@ -270,7 +356,7 @@ def render_campaign_semantic_summary_markdown(summary: CampaignSemanticSummaryV1
     lines.extend(
         [
             "",
-            "## By execution mode",
+            "## Detailed rollups — by execution mode",
             "",
             (
                 "| Mode | Cells | Semantic | Repeat judge | Low conf. | "
@@ -320,8 +406,8 @@ def write_campaign_semantic_summary_artifacts(
     repo_root: Path,
     campaign_dir: Path,
     manifest: BenchmarkCampaignManifest,
-) -> CampaignGeneratedReportPaths:
-    """Write campaign-semantic-summary.{json,md}; return paths for generated_report_paths."""
+) -> tuple[CampaignGeneratedReportPaths, CampaignSemanticSummaryV1]:
+    """Write campaign-semantic-summary.{json,md}; return paths and the summary model."""
     from agent_llm_wiki_matrix.schema import load_schema, validate_json
 
     _ = repo_root  # reserved for future repo-relative rewriting
@@ -343,7 +429,10 @@ def write_campaign_semantic_summary_artifacts(
         render_campaign_semantic_summary_markdown(summary),
     )
 
-    return CampaignGeneratedReportPaths(
-        campaign_semantic_summary_json="campaign-semantic-summary.json",
-        campaign_semantic_summary_md="campaign-semantic-summary.md",
+    return (
+        CampaignGeneratedReportPaths(
+            campaign_semantic_summary_json="campaign-semantic-summary.json",
+            campaign_semantic_summary_md="campaign-semantic-summary.md",
+        ),
+        summary,
     )

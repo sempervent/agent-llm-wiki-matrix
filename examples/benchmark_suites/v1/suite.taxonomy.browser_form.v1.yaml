@@ -1,0 +1,28 @@
+# Taxonomy: browser evidence — form validation + a11y alerts (single-page fixture).
+schema_version: 1
+id: bench.examples.taxonomy.browser_form.v1
+title: Taxonomy — browser form validation (fixture)
+rubric_ref: examples/dataset/rubrics/browser_realism.v1.json
+taxonomy:
+  taxonomy_version: 1
+  task_family: browser_evidence
+  difficulty: low
+  determinism: deterministic_fixture
+  tool_requirements: [browser_mock, registry, cli]
+time_budget_seconds: 120
+token_budget: 2000
+tags: [taxonomy, browser, form, accessibility]
+expected_artifact_kinds: [benchmark_request, benchmark_response, evaluation, browser_evidence]
+prompts:
+  - id: p-form
+    prompt_ref: bench.task.browser_evidence.v1
+variants:
+  - id: v-form
+    agent_stack: browser-mock
+    execution_mode: browser_mock
+    backend:
+      kind: mock
+      model: mock-model
+    browser:
+      runner: file
+      fixture_relpath: fixtures/browser_evidence/v1/form_validation.json

@@ -1,0 +1,28 @@
+# Taxonomy: browser evidence — checkout narrative (fixture-backed).
+schema_version: 1
+id: bench.examples.taxonomy.browser_checkout.v1
+title: Taxonomy — browser checkout (browser_mock, file fixture)
+rubric_ref: examples/dataset/rubrics/browser_realism.v1.json
+taxonomy:
+  taxonomy_version: 1
+  task_family: browser_evidence
+  difficulty: medium
+  determinism: deterministic_fixture
+  tool_requirements: [browser_mock, registry, cli]
+time_budget_seconds: 200
+token_budget: 2600
+tags: [taxonomy, browser, checkout, evidence]
+expected_artifact_kinds: [benchmark_request, benchmark_response, evaluation, browser_evidence]
+prompts:
+  - id: p-checkout
+    prompt_ref: bench.task.browser_evidence.v1
+variants:
+  - id: v-checkout
+    agent_stack: browser-mock
+    execution_mode: browser_mock
+    backend:
+      kind: mock
+      model: mock-model
+    browser:
+      runner: file
+      fixture_relpath: fixtures/browser_evidence/v1/checkout_flow.json

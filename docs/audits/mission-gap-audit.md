@@ -73,7 +73,7 @@
 | --- | --- |
 | **Offline** | **complete:** `MockBrowserRunner`, `FileBrowserRunner`, `BrowserEvidence` validation (`tests/test_browser.py`). |
 | **Playwright** | **partial (optional):** `browser/playwright_runner.py`, `[browser]` extra; `tests/integration/test_playwright_browser.py` with `ALWM_PLAYWRIGHT_SMOKE=1`; `just verify-playwright-local`; Compose **`browser-verify`**. |
-| **MCP runner** | **partial:** `MCPBrowserRunner` delegates to `FileBrowserRunner` when `scenario_id` or `fixture_relpath` is set; `alwm browser run-mcp`; remote MCP tools not implemented (`browser/mcp_runner.py`). |
+| **MCP runner** | **partial:** fixtures **or** local stdio MCP (`browser/mcp_runner.py`, `browser/mcp_stdio.py`, `mcp` client); `alwm browser run-mcp` (`--stdio`); IDE/remote MCP not a v0.2.0 goal (`docs/roadmap/v0.2.0.md`). |
 
 ---
 

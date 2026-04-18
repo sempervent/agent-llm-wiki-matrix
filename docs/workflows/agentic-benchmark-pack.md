@@ -49,6 +49,7 @@ Repeat for the other suite files under `examples/benchmark_suites/v1/agentic/`.
 | `suite.agentic.docs_drift_repair.v1.yaml` | Find and fix documentation drift vs canonical policy. |
 | `suite.agentic.benchmark_authoring.v1.yaml` | `BenchmarkDefinitionV1` literacy and authoring. |
 | `suite.agentic.browser_interpretation.v1.yaml` | Interpret `browser_evidence` / fixture traces (file-backed runner). |
+| `suite.agentic.browser_checkout.v1.yaml` | Checkout narrative (`checkout_flow.json`): multi-screenshot + structured **extensions**. |
 | `suite.agentic.multi_agent_coordination.v1.yaml` | Coordination, handoffs, `cli` vs `repo_governed` variants. |
 
 ## Cross-links

@@ -60,6 +60,120 @@
   "execution_mode_gaps_top": [],
   "failure_tag_counts": [],
   "failure_tags_detail": {},
+  "fingerprint_axis_insights": [
+    {
+      "axis_key": "provider_config_fingerprint",
+      "axis_title": "Provider config",
+      "distinct_groups": 1,
+      "note": "Single group on this axis \u2014 no cross-group spread.",
+      "pooled_mean_score_spread": null,
+      "varied": false
+    },
+    {
+      "axis_key": "scoring_config_fingerprint",
+      "axis_title": "Scoring config",
+      "distinct_groups": 1,
+      "note": "Single group on this axis \u2014 no cross-group spread.",
+      "pooled_mean_score_spread": null,
+      "varied": false
+    },
+    {
+      "axis_key": "execution_mode",
+      "axis_title": "Execution mode",
+      "distinct_groups": 1,
+      "note": "Single group on this axis \u2014 no cross-group spread.",
+      "pooled_mean_score_spread": null,
+      "varied": false
+    },
+    {
+      "axis_key": "prompt_registry_state_fingerprint",
+      "axis_title": "Prompt registry state",
+      "distinct_groups": 1,
+      "note": "Single group on this axis \u2014 no cross-group spread.",
+      "pooled_mean_score_spread": null,
+      "varied": false
+    },
+    {
+      "axis_key": "browser_config_fingerprint",
+      "axis_title": "Browser config",
+      "distinct_groups": 1,
+      "note": "Single group on this axis \u2014 no cross-group spread.",
+      "pooled_mean_score_spread": null,
+      "varied": false
+    }
+  ],
+  "fingerprint_compare_axes": [
+    {
+      "axis_key": "provider_config_fingerprint",
+      "axis_title": "Provider config",
+      "cell_count": 1,
+      "group_label": "sha256:4fbcb71d4546d6de7a19213a0a060a65b4c35192a1afb41b7016bedf3d728498",
+      "label_display": "sha256:4fbcb71d4546d6de7a19\u2026",
+      "mode_gap_events": 0,
+      "pooled_mean_score": 0.667276,
+      "regressions_targeting_group": 0,
+      "run_ids": [
+        "campaign.examples.minimal_offline.v1__0000"
+      ],
+      "unstable_cell_events": 0
+    },
+    {
+      "axis_key": "scoring_config_fingerprint",
+      "axis_title": "Scoring config",
+      "cell_count": 1,
+      "group_label": "sha256:f958bcbda76ceda7438ca44922ecf99f6ef81948463ec797c7b454a29b249496",
+      "label_display": "sha256:f958bcbda76ceda7438c\u2026",
+      "mode_gap_events": 0,
+      "pooled_mean_score": 0.667276,
+      "regressions_targeting_group": 0,
+      "run_ids": [
+        "campaign.examples.minimal_offline.v1__0000"
+      ],
+      "unstable_cell_events": 0
+    },
+    {
+      "axis_key": "execution_mode",
+      "axis_title": "Execution mode",
+      "cell_count": 1,
+      "group_label": "cli",
+      "label_display": "cli",
+      "mode_gap_events": 0,
+      "pooled_mean_score": 0.667276,
+      "regressions_targeting_group": 0,
+      "run_ids": [
+        "campaign.examples.minimal_offline.v1__0000"
+      ],
+      "unstable_cell_events": 0
+    },
+    {
+      "axis_key": "prompt_registry_state_fingerprint",
+      "axis_title": "Prompt registry state",
+      "cell_count": 1,
+      "group_label": "sha256:9604a174787655177b3c8c0e634e5a80348399f090bc741cac5825a8a5b128f2",
+      "label_display": "sha256:9604a174787655177b3c\u2026",
+      "mode_gap_events": 0,
+      "pooled_mean_score": 0.667276,
+      "regressions_targeting_group": 0,
+      "run_ids": [
+        "campaign.examples.minimal_offline.v1__0000"
+      ],
+      "unstable_cell_events": 0
+    },
+    {
+      "axis_key": "browser_config_fingerprint",
+      "axis_title": "Browser config",
+      "cell_count": 1,
+      "group_label": "sha256:0801b86094b64df0a6e4bb551818c221b30cdd4410397056547e695d3e75c9db",
+      "label_display": "sha256:0801b86094b64df0a6e4\u2026",
+      "mode_gap_events": 0,
+      "pooled_mean_score": 0.667276,
+      "regressions_targeting_group": 0,
+      "run_ids": [
+        "campaign.examples.minimal_offline.v1__0000"
+      ],
+      "unstable_cell_events": 0
+    }
+  ],
   "longitudinal_thresholds": {
     "low_score": 0.55,
     "min_recurring": 2,
@@ -69,6 +183,73 @@
     "semantic_range_threshold": 0.22,
     "semantic_stdev_threshold": 0.12,
     "series_swing_threshold": 0.06
+  },
+  "mean_score_extremes_by_sweep_axis": {
+    "comparable": false,
+    "member_runs_with_scores": 1,
+    "note": "Need at least two succeeded member runs with mean scores to compare axes."
+  },
+  "member_mean_score_by_dimension": {
+    "benchmark_id": {
+      "comparable_across_values": false,
+      "values": [
+        {
+          "axis_value": "bench.fixtures.campaign.micro.v1",
+          "mean_member_score": 0.667276,
+          "run_count": 1
+        }
+      ]
+    },
+    "browser_config_applied": {
+      "comparable_across_values": false,
+      "values": [
+        {
+          "axis_value": "false",
+          "mean_member_score": 0.667276,
+          "run_count": 1
+        }
+      ]
+    },
+    "eval_scoring_label": {
+      "comparable_across_values": false,
+      "values": [
+        {
+          "axis_value": "suite_default",
+          "mean_member_score": 0.667276,
+          "run_count": 1
+        }
+      ]
+    },
+    "execution_modes_filter": {
+      "comparable_across_values": false,
+      "values": [
+        {
+          "axis_value": "\u2014",
+          "mean_member_score": 0.667276,
+          "run_count": 1
+        }
+      ]
+    },
+    "provider_config_ref": {
+      "comparable_across_values": false,
+      "values": [
+        {
+          "axis_value": "null (harness default)",
+          "mean_member_score": 0.667276,
+          "run_count": 1
+        }
+      ]
+    },
+    "suite_ref": {
+      "comparable_across_values": false,
+      "values": [
+        {
+          "axis_value": "fixtures/benchmarks/campaign_micro.v1.yaml",
+          "mean_member_score": 0.667276,
+          "run_count": 1
+        }
+      ]
+    }
   },
   "schema_version": 1,
   "semantic_instability_by_scoring_backend": [],

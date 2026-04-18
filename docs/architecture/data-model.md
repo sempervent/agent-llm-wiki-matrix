@@ -20,7 +20,7 @@ _Last updated: 2026-04-18 (six-axis `comparison_fingerprints`, `campaign_experim
 | `schemas/v1/matrix.schema.json` | `ComparisonMatrix` | Pairwise/grid scores with labels |
 | `schemas/v1/report.schema.json` | `Report` | Human-facing narrative report |
 | `schemas/v1/note.schema.json` | _(no Pydantic model yet)_ | Lightweight wiki note (Phase 1) |
-| `schemas/v1/browser_evidence.schema.json` | `BrowserEvidence` (`browser.models`) | Navigation + console; optional **`dom_snapshot_ref`**; **`dom_excerpts[]`** (visible text / HTML snippets); **`screenshots[]`** (viewport, MIME, integrity hash, optional **`relpath`**); **`extensions`** JSON bag for structured runner fields |
+| `schemas/v1/browser_evidence.schema.json` | `BrowserEvidence` (`browser.models`) | Navigation + console; optional **`dom_snapshot_ref`**; **`dom_excerpts[]`** (visible text / HTML; optional **`aria_role`**, **`accessibility_name`**, **`dom_order`**); **`screenshots[]`** (**`capture_scope`**, **`target_selector`**, **`sequence`**, **`device_pixel_ratio`**, viewport, MIME, integrity hash, optional **`relpath`**); **`extensions`** (optional **`network`**, **`accessibility`**, **`performance`** summaries plus arbitrary JSON) |
 | `schemas/v1/benchmark_definition.schema.json` | _(YAML; Pydantic `BenchmarkDefinitionV1`)_ | Benchmark suite: rubric, prompts (inline `text` xor `prompt_ref`), variants |
 | `schemas/v1/prompt_registry.schema.json` | `PromptRegistryDocument` | `prompts/registry.yaml`: ids, paths to prompt bodies, document `version` |
 | `schemas/v1/benchmark_request.schema.json` | `BenchmarkRequestRecord` | Per-cell provider request; includes `prompt_source`, optional `prompt_registry_id`, `registry_document_version`, `prompt_source_relpath` |

@@ -1,8 +1,8 @@
 # Versioned prompt registry (Phase 1 skeleton).
 # Phase 2+ will add strict schema validation and semver-style IDs.
 
-version: "0.4.1"
-updated_at: "2026-04-17T00:00:00Z"
+version: "0.4.2"
+updated_at: "2026-04-17T12:00:00Z"
 prompts:
   - id: scaffold.echo.v1
     description: "Minimal echo prompt for wiring provider adapters (mock in Phase 1)."

@@ -36,7 +36,9 @@ def test_load_browser_evidence_fixture() -> None:
     assert ev.extensions is not None
     assert "dom_excerpts" in block
     assert "screenshots" in block
-    assert "extensions (JSON)" in block
+    assert "**extensions:**" in block
+    assert "network" in block
+    assert "aria_role" in block or "button" in block
 
 
 def test_validate_artifact_kind_browser_evidence() -> None:
@@ -59,6 +61,16 @@ def test_file_browser_runner_by_scenario_id() -> None:
     result = runner.run(BrowserRunRequest(scenario_id="export_flow"))
     assert result.evidence.id == "evidence.export_flow.v1"
     assert result.runner == "file"
+
+
+def test_file_browser_runner_checkout_fixture() -> None:
+    runner = FileBrowserRunner(_REPO)
+    result = runner.run(BrowserRunRequest(scenario_id="checkout_flow"))
+    assert result.evidence.id == "evidence.checkout_flow.v1"
+    assert len(result.evidence.screenshots) == 2
+    block = evidence_to_prompt_block(result.evidence)
+    assert "element" in block
+    assert "network" in block
 
 
 def test_file_browser_runner_by_fixture_relpath() -> None:
@@ -90,8 +102,9 @@ def test_playwright_runner_missing_package_raises_runtime_error() -> None:
         pytest.skip("playwright is installed; install-path not exercised")
 
 
-def test_mcp_runner_without_fixture_raises() -> None:
-    with pytest.raises(RuntimeError, match="remote MCP"):
+def test_mcp_runner_without_fixture_raises(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.delenv("ALWM_MCP_BROWSER_COMMAND", raising=False)
+    with pytest.raises(RuntimeError, match="ALWM_MCP_BROWSER_COMMAND"):
         MCPBrowserRunner(_REPO).run(BrowserRunRequest())
 
 

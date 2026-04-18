@@ -32,6 +32,11 @@ from agent_llm_wiki_matrix.benchmark.prompt_resolution import (
     resolve_benchmark_prompts,
     resolve_registry_yaml_path,
 )
+from agent_llm_wiki_matrix.browser.formatting import (
+    BrowserEvidenceReportRow,
+    browser_evidence_report_row_from_evidence,
+    render_benchmark_browser_evidence_markdown,
+)
 from agent_llm_wiki_matrix.models import (
     BenchmarkCellArtifactPaths,
     BenchmarkCellRuntimeV1,
@@ -202,6 +207,7 @@ def run_benchmark(
     sum_judge = 0.0
     total_judge_inv = 0
     cells_parse_fb = 0
+    browser_report_rows: list[BrowserEvidenceReportRow] = []
 
     variant_ids = [v.id for v in definition.variants]
     prompt_ids = [p.id for p in definition.prompts]
@@ -237,6 +243,13 @@ def run_benchmark(
                 browser_runner_name = br_result.runner
                 write_pydantic_json(cell_dir / "browser_evidence.json", br_result.evidence)
                 browser_evidence_relpath = str((rel_cell / "browser_evidence.json").as_posix())
+                browser_report_rows.append(
+                    browser_evidence_report_row_from_evidence(
+                        cell_id=base,
+                        runner=br_result.runner,
+                        evidence=br_result.evidence,
+                    ),
+                )
 
             req = CompletionRequest(
                 prompt=effective_prompt,
@@ -486,9 +499,13 @@ def run_benchmark(
         total_judge_invocations=total_judge_inv,
         cells_with_judge_parse_fallback=cells_parse_fb,
     )
-    report_body = render_report_markdown(report) + render_benchmark_runtime_markdown(
-        timing_summary,
-        retry_summary,
+    report_body = (
+        render_report_markdown(report)
+        + render_benchmark_browser_evidence_markdown(browser_report_rows)
+        + render_benchmark_runtime_markdown(
+            timing_summary,
+            retry_summary,
+        )
     )
     report_md_path.write_text(report_body, encoding="utf-8")
 

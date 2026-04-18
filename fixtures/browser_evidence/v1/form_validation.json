@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "id": "evidence.form_validation.v1",
+  "title": "Abstract trace: signup form with validation errors",
+  "navigation_sequence": [
+    {
+      "url": "https://example.test/signup",
+      "title": "Sign up",
+      "action": "navigate"
+    }
+  ],
+  "console_messages": [
+    { "level": "error", "text": "validation failed: email" }
+  ],
+  "dom_excerpts": [
+    {
+      "label": "Email error",
+      "selector": "#email-error",
+      "aria_role": "alert",
+      "accessibility_name": "Email format invalid",
+      "dom_order": 0,
+      "visible_text": "Enter a valid email address."
+    },
+    {
+      "label": "Submit",
+      "selector": "button[type=submit]",
+      "aria_role": "button",
+      "accessibility_name": "Create account",
+      "dom_order": 1,
+      "visible_text": "Create account"
+    }
+  ],
+  "screenshots": [
+    {
+      "content_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "capture_scope": "viewport",
+      "sequence": 0,
+      "viewport_width": 1280,
+      "viewport_height": 720,
+      "mime_type": "image/png",
+      "caption": "Fixture: form state after failed submit.",
+      "captured_at": "1970-01-01T00:00:00Z"
+    }
+  ],
+  "extensions": {
+    "fixture_profile": "form_validation.v1",
+    "structured_capture_version": 1,
+    "accessibility": {
+      "violations_count": 2,
+      "rules_checked": 8,
+      "notes": "Focus order vs DOM order mismatch (fixture)."
+    }
+  },
+  "notes": "Stress a11y roles + console errors without navigation churn."
+}

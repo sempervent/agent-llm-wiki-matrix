@@ -2,6 +2,32 @@
 
 Chronological record of repository work. Latest entries first.
 
+## 2026-04-18 — Campaign reporting readability (at-a-glance + member-score rollups)
+
+**Delivered:** **`campaign_reporting`** — **`## At a glance`** lead section and **member-run mean score** tables on **`reports/campaign-report.md`**; **`member_mean_score_by_dimension`** in **`campaign-analysis.json`** (alongside existing **`mean_score_extremes_by_sweep_axis`**). **`campaign-summary.md`** embeds **`render_campaign_at_a_glance_markdown`** when longitudinal + semantic bundles are available after a full run. **`write_campaign_comparative_artifacts`** returns **`(paths, longitudinal_bundle)`** so the summary avoids a second analysis pass. **`campaign_semantic_summary.md`** already surfaces ranked instability hotspots; comparative narrative cross-links remain. Docs **`docs/workflows/benchmark-campaigns.md`**; log entry. Tests **`tests/test_campaign_reporting.py`**. Regenerated **`examples/campaign_runs/minimal_offline/`** and added **`examples/campaign_runs/multi_suite/`** (multi-suite sweep example).
+
+**Verification:** `uv run just ci`.
+
+**Note:** Scoring defaults unchanged; reporting-only.
+
+## 2026-04-17 — MCP stdio protocol path (local subprocess; v0.2.0 non-goal for IDE MCP)
+
+**Delivered:** **`browser/mcp_stdio.py`** — MCP client `call_tool` over **stdio** (`mcp` SDK), JSON text → **`BrowserEvidence`**. **`MCPBrowserRunner`** — fixture path first; if **`ALWM_MCP_BROWSER_COMMAND`** is set and no `scenario_id`/`fixture_relpath`, runs stdio path. **`fixtures/mcp_servers/stdio_browser_evidence_server.py`** (FastMCP) for tests. **`alwm browser run-mcp --stdio`**. **`mcp>=1.27`** added to **`[project.optional-dependencies] dev`** (alongside **`[dependency-groups] dev`**). Docs: **`docs/architecture/browser.md`**, **`runtime.md`**, **`docs/roadmap/v0.2.0.md`** (non-goal: IDE-hosted MCP), **`capability-classification.md`**, **`AGENTS.md`**, **`README.md`**, **`CHANGELOG.md` [Unreleased]**, **`.env.example`**.
+
+**Verification:** `uv run pytest tests/test_browser.py`; `uv run ruff` / `mypy` on touched modules.
+
+## 2026-04-17 — Browser benchmark realism (fixtures; prompts + report table)
+
+**Delivered:** Extended **`BrowserEvidence`** / schema: **a11y** fields on **`dom_excerpts`**, **screenshot** scope/sequence/DPR; **`extensions`** **`$defs`** for **network** / **accessibility** / **performance**. **`evidence_to_prompt_block`** + **`render_benchmark_browser_evidence_markdown`**; **`run_benchmark`** appends browser summary to **`reports/report.md`**. Fixtures **`checkout_flow.json`**, **`form_validation.json`**; suites **`suite.taxonomy.browser_checkout.v1`**, **`suite.taxonomy.browser_form.v1`**, **`suite.agentic.browser_checkout.v1`**; **`fixtures/benchmarks/browser_checkout.v1.yaml`**, **`browser_form.v1.yaml`**. **`prompts/registry.yaml` 0.4.2**; **`bench.task.browser_evidence.v1`** (honest MCP / optional Playwright wording). Docs **`docs/architecture/browser.md`**, **`benchmarking.md`**, **`data-model.md`**, **`examples/browser_evidence/v1/README.md`**. Tests **`tests/test_browser.py`**, **`test_benchmark_browser.py`**, **`test_benchmark_taxonomy.py`**.
+
+**Verification:** `uv run ruff check src tests`; `uv run mypy src`; `uv run pytest tests/ --ignore=tests/integration`.
+
+## 2026-04-17 — Campaign fingerprint-axis comparison (longitudinal keys)
+
+**Delivered:** **`benchmark/campaign_fingerprint_compare.py`** — **`group_snapshots_by`** on provider / scoring config / execution mode / prompt registry / browser fingerprint keys; pooled mean scores; instability, regression, and mode-gap counts per bucket; narrative **insights** when an axis varies. Wired into **`campaign_reporting`** (`fingerprint_compare_axes`, `fingerprint_axis_insights` in JSON; Markdown section in **`reports/campaign-report.md`**). **`truncate_fingerprint_display`** exposed from **`pipelines/longitudinal.py`**. Example **`examples/campaigns/v1/fingerprint_axes_probe.v1.yaml`**. Tests **`tests/test_campaign_reporting.py`**. Docs **`docs/workflows/benchmark-campaigns.md`**, **`docs/workflows/longitudinal-reporting.md`**, **`examples/campaigns/v1/README.md`**.
+
+**Verification:** `uv run ruff check src tests`; `uv run mypy src`; `uv run pytest`.
+
 ## 2026-04-18 — Campaign comparative reporting (Markdown + JSON)
 
 **Delivered:** **`benchmark/campaign_reporting.py`** — after a full campaign, load **succeeded** member manifests with **`load_run_snapshots`**, run **`analyze_longitudinal`** (fixed thresholds aligned with longitudinal CLI defaults), emit **`reports/campaign-report.md`** (dimensions varied, backend means, scoring instability, mode gaps, **FT-\*** ranking, **`render_failure_atlas`**) and **`reports/campaign-analysis.json`**. **`merge_generated_report_paths`** composes with semantic-summary paths. **`campaign-summary.md`** links comparative outputs. Docs **`docs/workflows/benchmark-campaigns.md`**, **`examples/campaigns/v1/README.md`**. Tests **`tests/test_campaign_reporting.py`**. Example **`examples/campaign_runs/minimal_offline/`** regenerated.

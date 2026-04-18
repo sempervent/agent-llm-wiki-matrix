@@ -1,0 +1,90 @@
+{
+  "schema_version": 1,
+  "id": "evidence.checkout_flow.v1",
+  "title": "Abstract trace: Cart → Checkout → Confirm",
+  "navigation_sequence": [
+    {
+      "url": "https://example.test/cart",
+      "title": "Cart",
+      "action": "navigate"
+    },
+    {
+      "url": "https://example.test/checkout",
+      "title": "Checkout",
+      "action": "navigate"
+    },
+    {
+      "url": "https://example.test/checkout/confirm",
+      "title": "Order confirmed",
+      "action": "submit"
+    }
+  ],
+  "console_messages": [
+    { "level": "log", "text": "payment tokenization: ok" },
+    { "level": "warn", "text": "third-party analytics blocked in fixture profile" }
+  ],
+  "dom_snapshot_ref": "snapshot.checkout.v1",
+  "dom_excerpts": [
+    {
+      "label": "Pay now",
+      "selector": "button#pay",
+      "aria_role": "button",
+      "accessibility_name": "Pay now",
+      "dom_order": 0,
+      "visible_text": "Pay now",
+      "html_snippet": "<button type=\"submit\" id=\"pay\">Pay now</button>"
+    },
+    {
+      "label": "Order total",
+      "selector": "[data-testid='order-total']",
+      "aria_role": "statictext",
+      "accessibility_name": "Order total",
+      "dom_order": 1,
+      "visible_text": "$42.00"
+    }
+  ],
+  "screenshots": [
+    {
+      "content_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "capture_scope": "viewport",
+      "sequence": 0,
+      "device_pixel_ratio": 2.0,
+      "viewport_width": 390,
+      "viewport_height": 844,
+      "mime_type": "image/png",
+      "caption": "Fixture: mobile viewport before submit.",
+      "captured_at": "1970-01-01T00:00:01Z"
+    },
+    {
+      "content_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "capture_scope": "element",
+      "sequence": 1,
+      "target_selector": "button#pay",
+      "viewport_width": 390,
+      "viewport_height": 844,
+      "mime_type": "image/png",
+      "caption": "Fixture: focused element capture (metadata only).",
+      "captured_at": "1970-01-01T00:00:02Z"
+    }
+  ],
+  "extensions": {
+    "fixture_profile": "checkout_flow.v1",
+    "structured_capture_version": 1,
+    "network": {
+      "requests_total": 14,
+      "failed_requests": 1,
+      "last_url": "https://example.test/checkout/confirm",
+      "last_status_code": 200
+    },
+    "accessibility": {
+      "violations_count": 1,
+      "rules_checked": 24,
+      "notes": "One color-contrast issue on secondary link (fixture)."
+    },
+    "performance": {
+      "dom_content_loaded_ms": 420.5,
+      "largest_contentful_paint_ms": 890.0
+    }
+  },
+  "notes": "Deterministic checkout narrative for browser benchmark realism (no PII, no binaries)."
+}

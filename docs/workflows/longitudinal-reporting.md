@@ -60,6 +60,8 @@ Each **`manifest.json`** written by `alwm benchmark run` includes optional **`co
 
 Use `group_snapshots_by(snapshots, key)` with `key` in `git_ref`, `release_tag`, `provider_fingerprint`, `scoring_backend`, `execution_mode`, `task_family`, or **`suite_definition_fingerprint`**, **`prompt_set_fingerprint`**, **`provider_config_fingerprint`**, **`scoring_config_fingerprint`**, **`browser_config_fingerprint`**, **`prompt_registry_state_fingerprint`** (from manifest; unknown when fingerprints are missing). Place optional `run_context.json` beside each run’s `manifest.json` (see `schemas/v1/benchmark_run_context.schema.json`); taxonomy comes from the manifest when recorded.
 
+**Campaign runs:** after `alwm benchmark campaign run`, `reports/campaign-analysis.json` and `reports/campaign-report.md` reuse the same keys (subset documented in `benchmark/campaign_fingerprint_compare.py`) to compare member runs by fingerprint bucket and to call out score spread vs judge instability — see [benchmark-campaigns.md](benchmark-campaigns.md).
+
 ## Data sources
 
 - **Manifest** — run metadata, cell paths, and **`comparison_fingerprints`** when produced by a current harness.

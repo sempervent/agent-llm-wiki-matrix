@@ -10,14 +10,14 @@ The repository is a **docs-first** workspace for an LLM wiki and comparison matr
 
 | Component | Status | Notes |
 | --- | --- | --- |
-| CLI (`alwm`) | Implemented | Core: `version`, `info`, `validate`, `ingest`, `evaluate`, `compare`, `report`. Benchmarks: `benchmark run`, `benchmark probe`. Prompts: `prompts check`, `list`, `show`. Providers: `providers show`. Browser: `browser prompt-block`, `run-mock`, `run-mcp` (fixture bridge), `run-playwright` (Playwright requires optional `[browser]` extra) |
+| CLI (`alwm`) | Implemented | Core: `version`, `info`, `validate`, `ingest`, `evaluate`, `compare`, `report`. Benchmarks: `benchmark run`, `benchmark probe`. Prompts: `prompts check`, `list`, `show`. Providers: `providers show`. Browser: `browser prompt-block`, `run-mock`, `run-mcp` (fixtures / `--stdio` MCP), `run-playwright` (Playwright requires optional `[browser]` extra) |
 | JSON Schema + Pydantic | Implemented | Thought, Event, Experiment, Evaluation, Matrix, Report, **Rubric**, **BenchmarkResponse** |
 | Wiki `WikiNote` schema | Implemented | `note.schema.json`; examples still JSON-only |
 | Prompt registry | Implemented | `prompts/registry.yaml` + `alwm prompts check|list|show`; schema `schemas/v1/prompt_registry.schema.json` |
 | Markdown templates | Implemented | `templates/matrix.md`, `templates/report.md`, weekly stub |
 | Provider layer | Implemented | Mock / Ollama / OpenAI-compatible HTTP; YAML/env config |
 | Pipelines | Implemented | Ingest → evaluate → compare → report; **benchmark run** (responses → evals → grid + pairwise matrices + report) |
-| Browser evidence layer | Implemented | **Offline:** `MockBrowserRunner`, `FileBrowserRunner`, JSON fixtures. **Optional live:** `PlaywrightBrowserRunner` (`[browser]` extra). **Partial:** `MCPBrowserRunner` — same fixtures as file runner, MCP-labeled; remote MCP tools not wired |
+| Browser evidence layer | Implemented | **Offline:** `MockBrowserRunner`, `FileBrowserRunner`, JSON fixtures. **Optional live:** `PlaywrightBrowserRunner` (`[browser]` extra). **Partial:** `MCPBrowserRunner` — fixtures and/or local **stdio MCP** (`mcp` in **dev** extras) |
 
 ## Runtime
 

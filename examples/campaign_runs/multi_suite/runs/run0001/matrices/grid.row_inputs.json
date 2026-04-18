@@ -1,0 +1,58 @@
+{
+  "benchmark_id": "bench.offline.v1",
+  "created_at": "1970-01-01T00:00:00Z",
+  "entries": [
+    {
+      "col_label": "p-one",
+      "evaluation_relpath": "cells/v-cli__p-one/evaluation.json",
+      "prompt_id": "p-one",
+      "row_label": "v-cli",
+      "total_weighted_score": 0.843873,
+      "variant_id": "v-cli"
+    },
+    {
+      "col_label": "p-two",
+      "evaluation_relpath": "cells/v-cli__p-two/evaluation.json",
+      "prompt_id": "p-two",
+      "row_label": "v-cli",
+      "total_weighted_score": 0.106266,
+      "variant_id": "v-cli"
+    },
+    {
+      "col_label": "p-one",
+      "evaluation_relpath": "cells/v-browser__p-one/evaluation.json",
+      "prompt_id": "p-one",
+      "row_label": "v-browser",
+      "total_weighted_score": 0.306161,
+      "variant_id": "v-browser"
+    },
+    {
+      "col_label": "p-two",
+      "evaluation_relpath": "cells/v-browser__p-two/evaluation.json",
+      "prompt_id": "p-two",
+      "row_label": "v-browser",
+      "total_weighted_score": 0.652089,
+      "variant_id": "v-browser"
+    },
+    {
+      "col_label": "p-one",
+      "evaluation_relpath": "cells/v-repo__p-one/evaluation.json",
+      "prompt_id": "p-one",
+      "row_label": "v-repo",
+      "total_weighted_score": 0.065653,
+      "variant_id": "v-repo"
+    },
+    {
+      "col_label": "p-two",
+      "evaluation_relpath": "cells/v-repo__p-two/evaluation.json",
+      "prompt_id": "p-two",
+      "row_label": "v-repo",
+      "total_weighted_score": 0.229465,
+      "variant_id": "v-repo"
+    }
+  ],
+  "matrix_id": "campaign.examples.multi_suite.v1__0001-grid",
+  "metric": "total_weighted_rubric_score",
+  "run_id": "campaign.examples.multi_suite.v1__0001",
+  "schema_version": 1
+}

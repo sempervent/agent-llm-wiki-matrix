@@ -3,13 +3,17 @@
 Markdown-first, git-native **LLM wiki + comparison matrix** system for capturing ideas, experiments, evaluations, prompts, and reports as structured files. It supports reproducible benchmarking of multiple agent stacks and model backends (including local models via **Ollama** or switchable **OpenAI-compatible / llama.cpp** HTTP servers).
 
 **Repository:** [github.com/sempervent/agent-llm-wiki-matrix](https://github.com/sempervent/agent-llm-wiki-matrix)  
-**Changelog:** [CHANGELOG.md](CHANGELOG.md) (includes **[0.2.0]**) · **v0.1.0 notes:** [docs/releases/v0.1.0.md](docs/releases/v0.1.0.md) · **Release scope:** [docs/release-readiness.md](docs/release-readiness.md)
+**Changelog:** [CHANGELOG.md](CHANGELOG.md) (includes **[0.2.1]**) · **v0.2.1 notes:** [docs/releases/v0.2.1.md](docs/releases/v0.2.1.md) · **v0.1.0 notes:** [docs/releases/v0.1.0.md](docs/releases/v0.1.0.md) · **Release scope:** [docs/release-readiness.md](docs/release-readiness.md)
 
 Contributors and coding agents should follow **`AGENTS.md`** for the full operating manual (contribution loop, decision rules, prompt registry policy, verification expectations, **multi-agent parallel work**, capability labels). Parallel agents: see **`docs/workflows/multi-agent-parallel.md`**.
 
-## Current milestone (v0.2.0)
+## Current milestone (v0.2.1)
 
-**Comparative campaigns and longitudinal evaluation:** prioritize campaign orchestration, **stable fingerprints** (suite, prompts, providers, scoring, browser, and **prompt registry state**), browser-backed benchmarking with deterministic fixtures, longitudinal regression analysis, and auditable semantic or hybrid scoring. Details: **[docs/roadmap/v0.2.0.md](docs/roadmap/v0.2.0.md)** (aligned with **`AGENTS.md`**). Dashboard and cloud features are out of scope for this pass.
+**Comparative campaigns and longitudinal evaluation:** v0.2.1 tightens **campaign docs and walkthroughs**, **campaign semantic summaries**, **runtime observability** on benchmark and campaign runs, **truthful MCP (fixture-only) classification** with **`alwm browser run-mcp`**, and **richer browser evidence** plus a **browser realism** rubric—while keeping **default CI offline** and **opt-in** live or Playwright paths. Release notes: **[docs/releases/v0.2.1.md](docs/releases/v0.2.1.md)** · changelog: **[CHANGELOG.md](CHANGELOG.md)**. Roadmap context: **[docs/roadmap/v0.2.0.md](docs/roadmap/v0.2.0.md)**. Dashboard and cloud features remain out of scope for this pass.
+
+### What changed since v0.2.0
+
+v0.2.0 established **six-axis fingerprints** (`comparison_fingerprints` / `campaign_experiment_fingerprints`) and **longitudinal** reporting columns. **v0.2.1** adds on top: **campaign documentation consolidation** (walkthrough, wiki, tracking, ADR), **`campaign-semantic-summary.*`** rollups (artifact kind **`campaign_semantic_summary`**; deterministic-only campaigns may still show **zero semantic cells**), **runtime / retry / judge-phase observability** in manifests and Markdown, **truthful MCP scope** (**`alwm browser run-mcp`** = fixture bridge only), and **richer `BrowserEvidence`** plus **`browser_realism.v1`** rubric dimensions—without changing the **offline default CI** contract.
 
 ## Goals
 
@@ -93,23 +97,25 @@ just benchmark-llamacpp    # start llama-server on the host (default :8080/v1)
 
 ## Benchmark campaigns (multi-run orchestration)
 
-**Campaigns** expand one YAML definition into many benchmark runs (suites × providers × eval scoring × browser overrides). The campaign root writes **`manifest.json`** (**`campaign_manifest`** / **`benchmark_campaign_manifest`**) with **`campaign_definition_fingerprint`** and **`campaign_experiment_fingerprints`** (six axes), plus **`campaign-summary.json`** (**`campaign_summary`**) and **`campaign-summary.md`**; each member run lives under **`runs/runNNNN/`** with a normal **`benchmark_manifest`** (six-axis **`comparison_fingerprints`**). **Longitudinal** tools glob **`runs/*/manifest.json`** under the campaign directory.
+**Campaigns** expand one YAML definition into many benchmark runs (suites × providers × eval scoring × browser overrides). The campaign root writes **`manifest.json`** (**`campaign_manifest`** / **`benchmark_campaign_manifest`**) with **`campaign_definition_fingerprint`** and **`campaign_experiment_fingerprints`** (six axes), **`campaign-summary.json`** (**`campaign_summary`**) / **`campaign-summary.md`**, and typically **`campaign-semantic-summary.json`** / **`.md`** (artifact kind **`campaign_semantic_summary`**: repeat-judge / semantic instability rollups—**counts may be zero** when all member runs use deterministic scoring only). Manifests may also record **timing / retry / judge-phase** summaries and **`generated_report_paths`** for comparative + semantic artifacts (details: **`docs/workflows/benchmarking.md`**). Each member run lives under **`runs/runNNNN/`** with **`benchmark_manifest`** (**`comparison_fingerprints`**). Point **`alwm benchmark longitudinal`** at **`runs/*/manifest.json`** for regression-style bundles.
 
 ```bash
 ALWM_FIXTURE_MODE=1 uv run alwm benchmark campaign run \
   --definition examples/campaigns/v1/minimal_offline.v1.yaml \
   --output-dir examples/campaign_runs/minimal_offline
 
-# Plan sweep size without executing member runs (writes campaign-dry-run.json)
-uv run alwm benchmark campaign run --dry-run \
+# Plan sweep only (no member runs/): either command writes campaign-dry-run.json + top-level manifest
+uv run alwm benchmark campaign plan \
   --definition examples/campaigns/v1/minimal_offline.v1.yaml \
   --output-dir /tmp/campaign-plan
+# equivalent: uv run alwm benchmark campaign run --dry-run …
 
 uv run alwm validate examples/campaign_runs/minimal_offline/manifest.json campaign_manifest
 uv run alwm validate examples/campaign_runs/minimal_offline/campaign-summary.json campaign_summary
+# when present: uv run alwm validate …/campaign-semantic-summary.json campaign_semantic_summary
 ```
 
-**Step-by-step (committed paths only):** **`docs/workflows/campaign-walkthrough.md`**. Workflow, ADR, tracking, wiki: **`docs/workflows/benchmark-campaigns.md`**, **`docs/wiki/campaign-orchestration.md`**, **`docs/architecture/adr/0001-benchmark-campaign-orchestration.md`**, **`docs/tracking/campaign-orchestration.md`**.
+**Step-by-step (committed paths):** **`docs/workflows/campaign-walkthrough.md`**. Full field reference: **`docs/workflows/benchmark-campaigns.md`**. Index / tracking: **`docs/wiki/benchmark-campaigns.md`**, **`docs/wiki/campaign-orchestration.md`**, **`docs/tracking/benchmark-campaign-orchestration.md`**, **`docs/tracking/campaign-orchestration.md`**, ADR **`docs/architecture/adr/0001-benchmark-campaign-orchestration.md`**.
 
 ---
 
@@ -256,7 +262,7 @@ Run `just` with no arguments to list recipes. Common tasks:
 | `alwm validate <file> <kind>` | Validate JSON against schema + Pydantic (includes `browser_evidence`, `benchmark_manifest`) |
 | `alwm browser prompt-block <file>` | Load browser evidence JSON → stable prompt-sized text |
 | `alwm browser run-mock` | Run `MockBrowserRunner` (deterministic; no browser binary) |
-| `alwm browser run-mcp` | Run `MCPBrowserRunner` on committed fixture JSON (`--scenario-id` or `--fixture`); same evidence as file runner—remote MCP tools **not** implemented |
+| `alwm browser run-mcp` | `MCPBrowserRunner`: fixture JSON (`--scenario-id` / `--fixture`) or MCP stdio (`--stdio` + `ALWM_MCP_BROWSER_COMMAND`); see `docs/architecture/browser.md` |
 | `alwm browser run-playwright` | Run `PlaywrightBrowserRunner` (requires `uv pip install -e ".[browser]"` and `uv run playwright install …`; not used in default CI) |
 | `alwm ingest <input_dir> <output_dir>` | Markdown pages → Thought JSON |
 | `alwm evaluate --subject … --rubric … --out …` | Deterministic rubric scoring |
@@ -264,7 +270,9 @@ Run `just` with no arguments to list recipes. Common tasks:
 | `alwm report --matrix … --out-json … --out-md …` | Matrix → report JSON + Markdown |
 | `alwm providers show` | Print resolved provider config (API keys redacted) |
 | `alwm benchmark probe` | Check Ollama + OpenAI-compatible HTTP APIs (for live runs) |
-| `alwm benchmark run --definition … --output-dir … [--prompt-registry PATH]` | Full harness: responses → evals → matrices + report; `browser_mock` variants run the browser abstraction and write `browser_evidence.json`; Playwright requires `ALWM_BENCHMARK_PLAYWRIGHT=1` + `[browser]` extra |
+| `alwm benchmark run --definition … --output-dir … [--prompt-registry PATH]` | Full harness: responses → evals → matrices + report; manifests may include **timing / retry / judge-phase** summaries; `browser_mock` variants run the browser phase and write **`browser_evidence.json`** (fixtures by default); Playwright requires `ALWM_BENCHMARK_PLAYWRIGHT=1` + `[browser]` extra |
+| `alwm benchmark campaign run` / `alwm benchmark campaign plan` | Multi-suite campaign sweep; **`plan`** or **`run --dry-run`** plans without member **`runs/`**; see **`docs/workflows/benchmark-campaigns.md`** |
+| `alwm benchmark longitudinal --runs-glob … --out-dir …` | Longitudinal Markdown + `summary.json` from benchmark manifests (glob relative to repo root) |
 | `alwm prompts check` / `list` / `show <id>` | Validate and read `prompts/registry.yaml` (paths relative to repo root) |
 
 ## Repository layout

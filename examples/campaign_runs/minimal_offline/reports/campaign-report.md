@@ -2,6 +2,31 @@
 
 Aggregates **succeeded** member runs under this campaign directory. Regression-style **`FT-*`** signals use the same taxonomy as longitudinal analysis (adjacent run order in the campaign manifest when the same benchmark cell appears in multiple runs). Within-run mode gaps and judge instability apply per snapshot.
 
+## At a glance
+
+- **Varied sweep axes:** _none — single configuration path in this campaign._
+
+### Mean member score — best / worst by axis
+
+- _Need at least two succeeded member runs with mean scores to compare axes._
+
+### Backend (mean cell score across the campaign)
+
+- **Best:** `mock` (0.667276 over 1 cells)
+- **Weakest:** _only one backend kind present._
+
+### Semantic / hybrid instability (longitudinal)
+
+_No cells flagged as semantically unstable at configured thresholds._
+
+### Execution mode gaps (within-run)
+
+_No mode-gap rows above threshold (or modes not comparable in member runs)._
+
+### Top recurring failure tags (FT-*)
+
+_No FT-* signals in this pass._
+
 ## Which dimensions varied
 
 | Axis | Distinct values | Varied |
@@ -12,6 +37,54 @@ Aggregates **succeeded** member runs under this campaign directory. Regression-s
 | `execution_modes_filter` | 1 (—) | no |
 | `provider_config_ref` | 1 (null (harness default)) | no |
 | `suite_ref` | 1 (fixtures/benchmarks/campaign_micro.v1.yaml) | no |
+
+## Member-run mean score by sweep value
+
+Each row is the mean of **mean_total_weighted_score** for member runs at that sweep value (equal weight per run). Only axes with **more than one** distinct value are shown.
+
+_No axis had more than one distinct value among runs with scores._
+
+## Fingerprint axes (longitudinal grouping keys)
+
+Each **succeeded** member run is grouped using the same keys as ``group_snapshots_by`` in ``pipelines/longitudinal`` (``provider_config_fingerprint``, ``scoring_config_fingerprint``, ``execution_mode``, ``prompt_registry_state_fingerprint``, ``browser_config_fingerprint``). **Pooled mean** is the mean of all cell **total_weighted_score** values in that group. **Unstable** counts longitudinal **FT-JUDGE-UNSTABLE**-class rows for runs in the group. **Regressions→** counts **to_run** edges (score dropped vs the prior run for the same benchmark cell) whose destination run lies in this group.
+
+### Provider config (`provider_config_fingerprint`)
+
+| Group (short) | run_ids | Pooled mean | Cells | Unstable | Regressions→ | Mode gaps |
+| --- | --- | ---: | ---: | ---: | ---: | ---: |
+| `sha256:4fbcb71d4546d6de7a19…` | `campaign.examples.minimal_offline.v1__0000` | 0.667276 | 1 | 0 | 0 | 0 |
+
+### Scoring config (`scoring_config_fingerprint`)
+
+| Group (short) | run_ids | Pooled mean | Cells | Unstable | Regressions→ | Mode gaps |
+| --- | --- | ---: | ---: | ---: | ---: | ---: |
+| `sha256:f958bcbda76ceda7438c…` | `campaign.examples.minimal_offline.v1__0000` | 0.667276 | 1 | 0 | 0 | 0 |
+
+### Execution mode (`execution_mode`)
+
+| Group (short) | run_ids | Pooled mean | Cells | Unstable | Regressions→ | Mode gaps |
+| --- | --- | ---: | ---: | ---: | ---: | ---: |
+| `cli` | `campaign.examples.minimal_offline.v1__0000` | 0.667276 | 1 | 0 | 0 | 0 |
+
+### Prompt registry state (`prompt_registry_state_fingerprint`)
+
+| Group (short) | run_ids | Pooled mean | Cells | Unstable | Regressions→ | Mode gaps |
+| --- | --- | ---: | ---: | ---: | ---: | ---: |
+| `sha256:9604a174787655177b3c…` | `campaign.examples.minimal_offline.v1__0000` | 0.667276 | 1 | 0 | 0 | 0 |
+
+### Browser config (`browser_config_fingerprint`)
+
+| Group (short) | run_ids | Pooled mean | Cells | Unstable | Regressions→ | Mode gaps |
+| --- | --- | ---: | ---: | ---: | ---: | ---: |
+| `sha256:0801b86094b64df0a6e4…` | `campaign.examples.minimal_offline.v1__0000` | 0.667276 | 1 | 0 | 0 | 0 |
+
+### Correlation-style notes (score vs instability)
+
+- **Provider config:** Single group on this axis — no cross-group spread.
+- **Scoring config:** Single group on this axis — no cross-group spread.
+- **Execution mode:** Single group on this axis — no cross-group spread.
+- **Prompt registry state:** Single group on this axis — no cross-group spread.
+- **Browser config:** Single group on this axis — no cross-group spread.
 
 ## Provider / backend performance (mean cell score)
 

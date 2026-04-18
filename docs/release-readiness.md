@@ -1,5 +1,7 @@
 # Release readiness — v0.1.0
 
+The latest workflow milestone narrative is **[v0.2.1](releases/v0.2.1.md)** ([CHANGELOG.md](../CHANGELOG.md) section **[0.2.1]**): stronger campaigns and longitudinal tooling, observability, browser-evidence realism, and explicit MCP / Playwright boundaries—**default CI remains offline**; live paths stay **opt-in**.
+
 This document summarizes what **v0.1.0** is intended to deliver versus what remains **partial**, **opt-in**, or **explicitly out of scope**. Command-backed evidence lives in [docs/audits/release-readiness-audit.md](audits/release-readiness-audit.md). A finer-grained live snapshot is in [docs/audits/current-capability-status.md](audits/current-capability-status.md).
 
 ---
@@ -47,7 +49,7 @@ Deliberately **not** in `just ci`: network, local daemons, or browser binaries.
 
 ## Known non-goals for v0.1.0
 
-- **Remote MCP browser tools** — Not shipped in v0.1.0; `MCPBrowserRunner` was (and remains) a **fixture bridge** only—see current **`docs/architecture/browser.md`** and **`docs/audits/capability-classification.md`**.
+- **Remote / IDE-hosted MCP browser integrations** — Not a historical v0.1.0 deliverable. Current tree adds **local stdio MCP** (optional; `docs/architecture/browser.md`); milestone non-goals: **`docs/roadmap/v0.2.0.md`**.
 - **Default CI requiring live services** — No Ollama, llama-server, or Playwright install in `just ci`.
 - **Hosted documentation site** — Docs live in-repo (`docs/`); no separate doc build is required for the tag.
 - **Semantic LLM-as-judge rubrics** — Deterministic / fixture scoring is in scope; advanced LLM scoring is future work (see [docs/audits/mission-gap-audit.md](audits/mission-gap-audit.md) follow-ups).

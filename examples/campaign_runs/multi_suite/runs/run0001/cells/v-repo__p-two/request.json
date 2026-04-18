@@ -1,0 +1,13 @@
+{
+  "benchmark_id": "bench.offline.v1",
+  "cell_id": "v-repo__p-two",
+  "created_at": "1970-01-01T00:00:00Z",
+  "id": "req__campaign.examples.multi_suite.v1__0001__v-repo__p-two",
+  "model": "mock-model",
+  "prompt_id": "p-two",
+  "prompt_source": "inline",
+  "prompt_text": "Name one benefit of small benchmark fixtures.",
+  "run_id": "campaign.examples.multi_suite.v1__0001",
+  "schema_version": 1,
+  "variant_id": "v-repo"
+}

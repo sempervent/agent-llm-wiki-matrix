@@ -18,9 +18,11 @@ This repository is **agent-llm-wiki-matrix**: a markdown-first, git-native syste
 | **Operations are discoverable** | `README.md`, `docs/workflows/`, `docs/architecture/`, and this file tell a contributor how to run, verify, and extend the system. |
 | **Claims match evidence** | Features are labeled with the taxonomy in `docs/audits/capability-classification.md`; **complete** is not used without tests/commands to back it. |
 
-## v0.2.0 focus
+## v0.2.1 focus
 
-Current milestone priority is to strengthen the repository as a comparative experiment platform. Roadmap details: **`docs/roadmap/v0.2.0.md`**.
+**Release notes:** **[docs/releases/v0.2.1.md](docs/releases/v0.2.1.md)** · **[CHANGELOG.md](CHANGELOG.md)** section **[0.2.1]**. v0.2.1 strengthens **comparative campaigns** and **longitudinal evaluation**: campaign documentation and walkthroughs, truthful **MCP** (fixture-backed) classification with **`alwm browser run-mcp`**, **campaign semantic summary** artifacts, **runtime observability** on benchmark and campaign runs, and **richer browser evidence** with a **browser realism** rubric—while keeping **default CI deterministic and offline** and **opt-in** live verification.
+
+Roadmap arc (v0.2.x): **`docs/roadmap/v0.2.0.md`**.
 
 Prefer work that improves:
 - campaign orchestration and campaign-level reporting
@@ -31,7 +33,7 @@ Prefer work that improves:
 
 Avoid expanding unrelated feature surface until these areas are coherent.
 
-Contract summary for shipped fingerprint fields: **[CHANGELOG.md](CHANGELOG.md)** section **[0.2.0]** (six-axis **`comparison_fingerprints`** on benchmark runs; six-axis **`campaign_experiment_fingerprints`** on campaign manifests and summaries).
+Contract summary: **[CHANGELOG.md](CHANGELOG.md)** **[0.2.0]** (six-axis **`comparison_fingerprints`** on benchmark runs; six-axis **`campaign_experiment_fingerprints`** on campaign manifests and summaries) and **[0.2.1]** (observability, campaign semantic summaries, browser evidence, MCP fixture scope).
 
 ---
 
@@ -97,7 +99,7 @@ For any non-trivial change (feature, fix, refactor that touches behavior or cont
 | New structured artifact type? | Add **JSON Schema** under `schemas/v1/`, model in `models.py` or the owning package, register in **`artifacts.py`**, add **fixture + example**, **pytest**. |
 | Network in tests? | **No** in default suite. Use mocks, `httpx.MockTransport`, or files under `fixtures/`. Live calls only in `tests/integration/` behind env flags. |
 | New CLI surface? | Implement in `cli.py`, document in **README** command tables and/or `docs/workflows/`, add **smoke or unit test** where feasible. Do not rename existing commands casually. |
-| Browser automation? | **Default / CI:** **`MockBrowserRunner`** and **`FileBrowserRunner`** + `BrowserEvidence` JSON—no browser binary. **Optional live:** **`PlaywrightBrowserRunner`** (`uv pip install -e '.[browser]'`, `uv run playwright install …`, `alwm browser run-playwright`); integration smoke is opt-in (`ALWM_PLAYWRIGHT_SMOKE=1`). **`MCPBrowserRunner`** is **partial:** fixture-backed only (`alwm browser run-mcp`, same JSON as file runner); **remote MCP browser tools are not implemented**—see `docs/architecture/browser.md`. |
+| Browser automation? | **Default / CI:** **`MockBrowserRunner`** and **`FileBrowserRunner`** + `BrowserEvidence` JSON—no browser binary. **Optional live:** **`PlaywrightBrowserRunner`** (`uv pip install -e '.[browser]'`, `uv run playwright install …`, `alwm browser run-playwright`); integration smoke is opt-in (`ALWM_PLAYWRIGHT_SMOKE=1`). **`MCPBrowserRunner`** is **partial:** fixtures and/or **local stdio MCP** (`alwm browser run-mcp`, `mcp` in **`dev`** extras, `ALWM_MCP_BROWSER_COMMAND`); **IDE-hosted/remote MCP** is not a v0.2.0 goal—see `docs/architecture/browser.md` and `docs/roadmap/v0.2.0.md`. |
 | Docker/Compose change? | Run `just compose-help`. Document new profiles in `docs/workflows/local-dev.md` or `benchmarking.md`. |
 
 ---
@@ -161,6 +163,7 @@ Campaign-related changes must update:
 | **Full-stack smoke** | Optional pre-release: `just smoke` (`scripts/smoke.sh`) — pytest `-m smoke`, host `alwm` benchmark + campaign, Docker Compose + offline benchmark; failure recovery analysis on errors. `SMOKE_SKIP_DOCKER=1` if Docker unavailable. See `docs/workflows/smoke.md`. |
 | **CLI** | Smoke the commands you changed (`alwm … --help`, one happy path). |
 | **Benchmarks** | Offline: `alwm benchmark run --definition fixtures/benchmarks/…` or `benchmarks/v1/offline`-style defs; outputs under `--output-dir` validate as artifacts (`benchmark_manifest` for `manifest.json`, per-cell kinds as today). |
+| **Campaigns (offline)** | `uv run alwm benchmark campaign run` or `plan` (or `run --dry-run`) to a temp dir; validate **`campaign_manifest`** / **`campaign_summary`**; **`campaign_semantic_summary`** when the run emits it (deterministic-only campaigns may still produce the file with zero semantic cells). |
 | **Live backends** | Optional: `just ollama-gptoss-setup` (Compose Ollama + **gpt-oss:20b** + probe), `just smoke-ollama-live` (minimal benchmark); `alwm benchmark probe`; `just test-integration` with `ALWM_LIVE_BENCHMARK_OLLAMA` / `ALWM_LIVE_BENCHMARK_LLAMACPP`—never required for merge by default. See `docs/workflows/benchmarking.md`. |
 | **Browser (offline)** | `alwm validate … browser_evidence`; `alwm browser prompt-block` / `run-mock` / `run-mcp` on fixtures—no browser binary. |
 | **Browser (Playwright)** | Optional extra `[browser]`; not part of default `just ci`. |
@@ -251,7 +254,7 @@ The **prompt registry** (`prompts/registry.yaml` + `prompts/versions/*.txt`, sch
 
 ### Browser-related work
 
-- Extend **`BrowserEvidence`** only with schema + tests + fixture. Deterministic runners: **`MockBrowserRunner`**, **`FileBrowserRunner`**. Optional live: **`PlaywrightBrowserRunner`** (`[browser]` extra, not default CI). **`MCPBrowserRunner`** today is a **fixture bridge** only; remote MCP execution needs the roadmap in `docs/architecture/browser.md` plus tests before claiming **complete**.
+- Extend **`BrowserEvidence`** only with schema + tests + fixture. Deterministic runners: **`MockBrowserRunner`**, **`FileBrowserRunner`**. Optional live: **`PlaywrightBrowserRunner`** (`[browser]` extra, not default CI). **`MCPBrowserRunner`**: fixtures + optional **stdio MCP** client (`browser/mcp_stdio.py`); not **complete** for arbitrary IDE MCP servers—see `docs/architecture/browser.md`.
 
 ---
 
@@ -263,6 +266,8 @@ The **prompt registry** (`prompts/registry.yaml` + `prompts/versions/*.txt`, sch
 | `docs/audits/` | Capability taxonomy, mission/gap audits |
 | `docs/workflows/` | How-to including **multi-agent-parallel.md** |
 | `docs/examples/` | Pointer doc for repo-root **`examples/`** |
+| `docs/wiki/` | Short topic indexes (e.g. **`benchmark-campaigns.md`**, **`campaign-orchestration.md`**) |
+| `docs/tracking/` | Contract checklists (e.g. **`benchmark-campaign-orchestration.md`**) |
 | `schemas/` | JSON Schema (`schemas/v1/`) |
 | `templates/` | Markdown report templates |
 | `prompts/` | Versioned prompts + `registry.yaml` |
@@ -278,8 +283,8 @@ The **prompt registry** (`prompts/registry.yaml` + `prompts/versions/*.txt`, sch
 
 - Install: see **Python environment (uv — required on the host)** — e.g. `uv pip install -e ".[dev]"` (Python 3.11+; matches `Dockerfile`). Optional Playwright: `uv pip install -e ".[browser]"` then `uv run playwright install chromium` (not required for `just ci`).
 - CI parity: `uv run just ci` (ruff, mypy, pytest; excludes `tests/integration/`).
-- CLI: `uv run alwm …` (or `alwm` after `source .venv/bin/activate`) — see `alwm --help`; registry `alwm prompts …`; benchmarks `alwm benchmark run|probe`; providers `alwm providers show`; browser `alwm browser prompt-block`, `run-mock`, `run-mcp` (fixture JSON), `run-playwright` (requires `[browser]` + browsers).
-- Images: `just docker-build` / `just docker-bake`.
+- CLI: `uv run alwm …` (or `alwm` after `source .venv/bin/activate`) — see `alwm --help`; registry **`alwm prompts …`**; pipelines **`ingest`**, **`evaluate`**, **`compare`**, **`report`**; benchmarks **`alwm benchmark run`**, **`probe`**, **`longitudinal`**, **`campaign run`** (optional **`--dry-run`**), **`campaign plan`**; providers **`alwm providers show`**; browser **`alwm browser prompt-block`**, **`run-mock`**, **`run-mcp`** (committed fixture JSON only—remote MCP not implemented), **`run-playwright`** (requires **`[browser]`** + browsers). Campaign / observability / semantic summaries: **`docs/workflows/benchmark-campaigns.md`**, **`docs/workflows/benchmarking.md`** (do not imply remote MCP or live browser is “complete” without the evidence in **`docs/audits/capability-classification.md`**).
+- Images: `just docker-build` / `just docker-bake` (host **`just`** is separate from **`uv`**; recipes call **`uv run`** internally).
 
 ## Commits
 
