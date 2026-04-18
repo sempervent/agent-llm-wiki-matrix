@@ -1,0 +1,4578 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Markdown-first LLM wiki, comparison matrices, benchmarks, and campaign publication tooling">
+      
+      
+        <meta name="author" content="Joshua Grant">
+      
+      
+      
+        <link rel="prev" href="../release-readiness/">
+      
+      
+        <link rel="next" href="../contributing/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>Implementation log - agent-llm-wiki-matrix</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#implementation-log" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="agent-llm-wiki-matrix" class="md-header__button md-logo" aria-label="agent-llm-wiki-matrix" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            agent-llm-wiki-matrix
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Implementation log
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/sempervent/agent-llm-wiki-matrix" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href=".." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../workflows/campaign-result-pack-publication/" class="md-tabs__link">
+          
+  
+  
+  Publication (v0.2.5)
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../workflows/agentic-benchmark-pack/" class="md-tabs__link">
+          
+  
+  
+  Workflows
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../roadmap/v0.2.5/" class="md-tabs__link">
+          
+  
+  
+  Roadmap & milestones
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../releases/v0.2.4/" class="md-tabs__link">
+          
+  
+  
+  Releases
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../architecture/current-state/" class="md-tabs__link">
+          
+  
+  
+  Architecture
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../audits/capability-classification/" class="md-tabs__link">
+          
+  
+  
+  Audits
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../tracking/campaign-orchestration/" class="md-tabs__link">
+          
+  
+  
+  Tracking
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../wiki/benchmark-campaigns/" class="md-tabs__link">
+          
+  
+  
+  Wiki
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../adr/0001-campaign-orchestration/" class="md-tabs__link">
+          
+  
+  
+  ADRs
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../examples/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Examples index
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../release-readiness/" class="md-tabs__link">
+          
+  
+  
+  Project
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="https://github.com/sempervent/agent-llm-wiki-matrix/blob/main/CHANGELOG.md" class="md-tabs__link">
+          
+  
+  
+  Repository on GitHub
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="agent-llm-wiki-matrix" class="md-nav__button md-logo" aria-label="agent-llm-wiki-matrix" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    agent-llm-wiki-matrix
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/sempervent/agent-llm-wiki-matrix" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Publication (v0.2.5)
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Publication (v0.2.5)
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../workflows/campaign-result-pack-publication/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Checklist: run → pack → publish
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tracking/v0.2.5-campaign/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tracking v0.2.5 (merge order)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../workflows/benchmark-campaigns/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Benchmark campaigns (CLI & outputs)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../workflows/campaign-walkthrough/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Campaign walkthrough (examples)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../workflows/reporting/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reporting pipeline (matrices, alwm report)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../workflows/verification/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CI & drift (verification matrix)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../workflows/longitudinal-reporting/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Longitudinal & regression reporting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../audits/v0.2.4-publication-workflow-audit/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Evidence audit (publication gaps)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Workflows
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Workflows
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../workflows/agentic-benchmark-pack/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agentic benchmark pack
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../workflows/benchmarking/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Benchmarking
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../workflows/live-verification/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Live verification
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../workflows/local-dev/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Local development
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../workflows/multi-agent-parallel/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Multi-agent parallel
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../workflows/smoke/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Smoke tests
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../workflows/walkthrough-v0.1.0/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Walkthrough v0.1.0
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../workflows/docs-site/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Documentation site (handbook)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Roadmap & milestones
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Roadmap & milestones
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../roadmap/v0.2.5/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    v0.2.5 (active)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../roadmap/v0.2.4/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    v0.2.4
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../roadmap/v0.2.3/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    v0.2.3
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../roadmap/v0.2.0/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    v0.2.0
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Releases
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Releases
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../releases/v0.2.4/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    v0.2.4
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../releases/v0.2.3/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    v0.2.3
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../releases/v0.2.2/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    v0.2.2
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../releases/v0.2.1/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    v0.2.1
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../releases/v0.1.0/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    v0.1.0
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Architecture
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../architecture/current-state/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Current state
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../architecture/data-model/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Data model
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../architecture/evaluation-pipeline/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Evaluation pipeline
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../architecture/browser/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Browser
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../architecture/runtime/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Runtime
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../architecture/target-state/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Target state
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../architecture/adr/0001-benchmark-campaign-orchestration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ADR 0001 (benchmark campaigns)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Audits
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Audits
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../audits/capability-classification/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Capability classification
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../audits/current-capability-status/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Current capability status
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../audits/mission-gap-audit/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Mission gap
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../audits/release-readiness-audit/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Release readiness audit
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../audits/schema-drift-contracts-inventory/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Schema drift inventory
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../audits/schema-runtime-hardening-2026-04-18/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Schema/runtime hardening notes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_8" >
+        
+          
+          <label class="md-nav__link" for="__nav_8" id="__nav_8_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tracking
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Tracking
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tracking/campaign-orchestration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Campaign orchestration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tracking/benchmark-campaign-orchestration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Benchmark campaign orchestration (legacy)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tracking/v0.2.4-campaign/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    v0.2.4 tracking (closed)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tracking/v0.2.3-campaign/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    v0.2.3 tracking (closed)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_9" >
+        
+          
+          <label class="md-nav__link" for="__nav_9" id="__nav_9_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Wiki
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Wiki
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../wiki/benchmark-campaigns/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Index: benchmark campaigns
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../wiki/campaign-orchestration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Index: campaign orchestration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_10" >
+        
+          
+          <label class="md-nav__link" for="__nav_10" id="__nav_10_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ADRs
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_10_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_10">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    ADRs
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adr/0001-campaign-orchestration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ADR 0001 (alternate path under docs/adr)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Examples index
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_12" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_12" id="__nav_12_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Project
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_12_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_12">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Project
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../release-readiness/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Release readiness
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Implementation log
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Implementation log
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-17-milestone-rollover-v024-shipped-v025-active" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-17 — Milestone rollover: v0.2.4 shipped, v0.2.5 active
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-19-mkdocs-findings-polish-nav-dedup-reporting-in-publication" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-19 — MkDocs findings polish (nav dedup, reporting in Publication)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-19-mkdocs-handbook-docs-sitemd-and-documented-verification-findings" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-19 — MkDocs handbook (docs-site.md) and documented verification findings
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-19-mkdocs-nav-polish-github-actions-docs-workflow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-19 — MkDocs nav polish + GitHub Actions docs workflow
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-19-mkdocs-documentation-site-v024" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-19 — MkDocs documentation site (v0.2.4)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-19-campaign-comparison-markdown-publication-readability" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-19 — Campaign / comparison Markdown (publication readability)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-17-packcampaign-compare-reader-interpretation-json-markdown" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-17 — Pack/campaign compare: reader interpretation JSON + Markdown
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-19-campaign-result-pack-reviewer-first-index-optional-dry-run-path" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-19 — Campaign result pack: reviewer-first INDEX + optional dry-run path
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-19-milestone-rollover-v023-shipped-v024-active" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-19 — Milestone rollover: v0.2.3 shipped, v0.2.4 active
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-19-packdirectory-compare-browser-evidence-pairing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-19 — Pack/directory compare: browser evidence pairing
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-19-campaign-to-campaign-comparison-directories" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-19 — Campaign-to-campaign comparison (directories)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-19-fingerprint-interpretation-evidence-strength-explicit-uncertainty" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-19 — Fingerprint interpretation: evidence strength + explicit uncertainty
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-18-campaign-result-pack-publication-workflow-docs-index" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-18 — Campaign result pack publication workflow (docs + INDEX)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-18-fingerprint-interpretation-attribution-uncertainty" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-18 — Fingerprint interpretation: attribution + uncertainty
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-18-browser-reporting-signals-extension-digests-campaign-contrast" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-18 — Browser reporting: signals, extension digests, campaign contrast
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-18-campaign-result-pack-comparison-cli-artifacts" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-18 — Campaign result pack comparison (CLI + artifacts)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-18-verification-surface-docs-canonical-fallback-live" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-18 — Verification surface (docs): canonical, fallback, live
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-18-report-markdown-readability-campaign-benchmark-no-scoring-change" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-18 — Report Markdown readability (campaign + benchmark; no scoring change)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-18-fingerprint-axis-interpretation-campaign-longitudinal" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-18 — Fingerprint axis interpretation (campaign + longitudinal)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-18-schemaruntime-drift-verification-committed-trees" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-18 — Schema/runtime drift verification (committed trees)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-18-mcp-stdio-docs-browser-realism-claims" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-18 — MCP stdio docs + browser realism claims
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-18-campaign-semantic-judge-confidence-instability-criteria-axes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-18 — Campaign semantic judge: confidence + instability (criteria + axes)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-18-browser-evidence-reporting-legible-markdown-traces-suite" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-18 — Browser evidence reporting (legible Markdown + traces suite)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-18-campaign-examples-result-pack-follow-up-schema-drift" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-18 — Campaign examples + result pack follow-up (schema drift)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-18-campaign-result-packs-cli-artifact-example" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-18 — Campaign result packs (CLI + artifact + example)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-18-schema-runtime-drift-hardening-committed-artifacts" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-18 — Schema / runtime drift hardening (committed artifacts)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-18-campaign-reporting-readability-at-a-glance-member-score-rollups" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-18 — Campaign reporting readability (at-a-glance + member-score rollups)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-17-mcp-stdio-protocol-path-local-subprocess-v020-non-goal-for-ide-mcp" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-17 — MCP stdio protocol path (local subprocess; v0.2.0 non-goal for IDE MCP)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-17-browser-benchmark-realism-fixtures-prompts-report-table" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-17 — Browser benchmark realism (fixtures; prompts + report table)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-17-campaign-fingerprint-axis-comparison-longitudinal-keys" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-17 — Campaign fingerprint-axis comparison (longitudinal keys)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-18-campaign-comparative-reporting-markdown-json" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-18 — Campaign comparative reporting (Markdown + JSON)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-17-browser-evidence-rubric-realism-fixtures-ci-deterministic" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-17 — Browser evidence + rubric realism (fixtures; CI deterministic)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-17-benchmark-runtime-observability-timing-retryjudge-summaries" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-17 — Benchmark runtime observability (timing + retry/judge summaries)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-17-campaign-semantic-hybrid-scoring-summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-17 — Campaign semantic / hybrid scoring summary
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-17-mcp-browser-runner-audit-cli-doc-alignment" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-17 — MCP browser runner audit: CLI + doc alignment
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-18-v020-documentation-consolidation-fingerprints-campaigns" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-18 — v0.2.0 documentation consolidation (fingerprints + campaigns)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-17-v020-fingerprints-prompt-registry-state-campaign-experiment-axes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-17 — v0.2.0 fingerprints: prompt registry state + campaign experiment axes
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-17-ollama-gpt-oss20b-first-class-workflow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-17 — Ollama gpt-oss:20b first-class workflow
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-17-campaign-orchestration-dry-run-wiki-adr-tracking" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-17 — Campaign orchestration: dry-run, wiki, ADR, tracking
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-17-benchmark-comparison-fingerprints-manifest-campaign" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-17 — Benchmark comparison fingerprints (manifest + campaign)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-17-benchmark-campaign-sweeps" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-17 — Benchmark campaign sweeps
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-17-agentic-benchmark-pack-cross-system-evaluation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-17 — Agentic benchmark pack (cross-system evaluation)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-17-uv-canonical-workflow-enforced-in-docs-justfile" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-17 — uv canonical workflow (enforced in docs + justfile)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-17-repeated-semantic-judge-aggregation-disagreement-low-confidence-flags" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-17 — Repeated semantic judge: aggregation, disagreement, low-confidence flags
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-17-longitudinal-benchmark-reporting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-17 — Longitudinal benchmark reporting
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-17-semantic-and-hybrid-rubric-scoring-optional" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-17 — Semantic and hybrid rubric scoring (optional)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-17-browser-backed-benchmark-execution" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-17 — Browser-backed benchmark execution
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-17-benchmark-corpus-expansion-taxonomy-metadata-eight-tagged-suites" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-17 — Benchmark corpus expansion: taxonomy metadata + eight tagged suites
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-17-v010-release-preparation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-17 — v0.1.0 release preparation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-17-post-merge-stabilization-parallel-tracks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-17 — Post-merge stabilization (parallel tracks)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-17-benchmark-manifest-json-schema-benchmark_manifest-artifact-kind" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-17 — Benchmark manifest: JSON Schema + benchmark_manifest artifact kind
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-17-benchmark-expansion-registry-suites-comparison-rubric-manifest-provenance" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-17 — Benchmark expansion: registry suites, comparison rubric, manifest provenance
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-17-runtime-hardening-live-verification-paths" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-17 — Runtime hardening: live verification paths
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-17-governance-agents-manual-multi-agent-workflow-capability-audit" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-17 — Governance: AGENTS manual, multi-agent workflow, capability audit
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-17-agentsmd-operating-manual" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-17 — AGENTS.md operating manual
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-17-registry-backed-benchmark-prompts" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-17 — Registry-backed benchmark prompts
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-17-live-benchmark-verification-compose-opt-in-integration-tests" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-17 — Live benchmark verification (Compose + opt-in integration tests)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-17-mission-gap-audit-prompt-registry-cli" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-17 — Mission gap audit + prompt registry CLI
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-17-browser-execution-abstraction" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-17 — Browser execution abstraction
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-17-benchmark-run-artifact-persistence" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-17 — Benchmark run artifact persistence
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-17-replace-makefile-with-justfile" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-17 — Replace Makefile with justfile
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-17-benchmark-case-schema-v1-task-examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-17 — Benchmark case schema (v1) + task examples
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-17-phase-5-complete-benchmark-harness" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-17 — Phase 5 complete (benchmark harness)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-17-phase-4-complete-pipelines-compose-test-image" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-17 — Phase 4 complete (pipelines + Compose test image)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-17-phase-3-complete-provider-abstraction" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-17 — Phase 3 complete (provider abstraction)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-17-phase-2-complete-domain-models-schemas" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-17 — Phase 2 complete (domain models + schemas)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-17-phase-1-complete-scaffold" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-17 — Phase 1 complete (scaffold)
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../contributing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contributing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_13" >
+        
+          
+          <label class="md-nav__link" for="__nav_13" id="__nav_13_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Repository on GitHub
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_13_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_13">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Repository on GitHub
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://github.com/sempervent/agent-llm-wiki-matrix/blob/main/CHANGELOG.md" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Changelog
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://github.com/sempervent/agent-llm-wiki-matrix/blob/main/README.md" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    README
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://github.com/sempervent/agent-llm-wiki-matrix/blob/main/AGENTS.md" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    AGENTS
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-17-milestone-rollover-v024-shipped-v025-active" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-17 — Milestone rollover: v0.2.4 shipped, v0.2.5 active
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-19-mkdocs-findings-polish-nav-dedup-reporting-in-publication" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-19 — MkDocs findings polish (nav dedup, reporting in Publication)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-19-mkdocs-handbook-docs-sitemd-and-documented-verification-findings" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-19 — MkDocs handbook (docs-site.md) and documented verification findings
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-19-mkdocs-nav-polish-github-actions-docs-workflow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-19 — MkDocs nav polish + GitHub Actions docs workflow
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-19-mkdocs-documentation-site-v024" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-19 — MkDocs documentation site (v0.2.4)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-19-campaign-comparison-markdown-publication-readability" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-19 — Campaign / comparison Markdown (publication readability)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-17-packcampaign-compare-reader-interpretation-json-markdown" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-17 — Pack/campaign compare: reader interpretation JSON + Markdown
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-19-campaign-result-pack-reviewer-first-index-optional-dry-run-path" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-19 — Campaign result pack: reviewer-first INDEX + optional dry-run path
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-19-milestone-rollover-v023-shipped-v024-active" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-19 — Milestone rollover: v0.2.3 shipped, v0.2.4 active
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-19-packdirectory-compare-browser-evidence-pairing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-19 — Pack/directory compare: browser evidence pairing
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-19-campaign-to-campaign-comparison-directories" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-19 — Campaign-to-campaign comparison (directories)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-19-fingerprint-interpretation-evidence-strength-explicit-uncertainty" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-19 — Fingerprint interpretation: evidence strength + explicit uncertainty
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-18-campaign-result-pack-publication-workflow-docs-index" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-18 — Campaign result pack publication workflow (docs + INDEX)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-18-fingerprint-interpretation-attribution-uncertainty" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-18 — Fingerprint interpretation: attribution + uncertainty
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-18-browser-reporting-signals-extension-digests-campaign-contrast" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-18 — Browser reporting: signals, extension digests, campaign contrast
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-18-campaign-result-pack-comparison-cli-artifacts" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-18 — Campaign result pack comparison (CLI + artifacts)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-18-verification-surface-docs-canonical-fallback-live" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-18 — Verification surface (docs): canonical, fallback, live
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-18-report-markdown-readability-campaign-benchmark-no-scoring-change" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-18 — Report Markdown readability (campaign + benchmark; no scoring change)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-18-fingerprint-axis-interpretation-campaign-longitudinal" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-18 — Fingerprint axis interpretation (campaign + longitudinal)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-18-schemaruntime-drift-verification-committed-trees" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-18 — Schema/runtime drift verification (committed trees)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-18-mcp-stdio-docs-browser-realism-claims" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-18 — MCP stdio docs + browser realism claims
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-18-campaign-semantic-judge-confidence-instability-criteria-axes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-18 — Campaign semantic judge: confidence + instability (criteria + axes)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-18-browser-evidence-reporting-legible-markdown-traces-suite" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-18 — Browser evidence reporting (legible Markdown + traces suite)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-18-campaign-examples-result-pack-follow-up-schema-drift" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-18 — Campaign examples + result pack follow-up (schema drift)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-18-campaign-result-packs-cli-artifact-example" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-18 — Campaign result packs (CLI + artifact + example)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-18-schema-runtime-drift-hardening-committed-artifacts" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-18 — Schema / runtime drift hardening (committed artifacts)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-18-campaign-reporting-readability-at-a-glance-member-score-rollups" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-18 — Campaign reporting readability (at-a-glance + member-score rollups)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-17-mcp-stdio-protocol-path-local-subprocess-v020-non-goal-for-ide-mcp" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-17 — MCP stdio protocol path (local subprocess; v0.2.0 non-goal for IDE MCP)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-17-browser-benchmark-realism-fixtures-prompts-report-table" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-17 — Browser benchmark realism (fixtures; prompts + report table)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-17-campaign-fingerprint-axis-comparison-longitudinal-keys" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-17 — Campaign fingerprint-axis comparison (longitudinal keys)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-18-campaign-comparative-reporting-markdown-json" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-18 — Campaign comparative reporting (Markdown + JSON)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-17-browser-evidence-rubric-realism-fixtures-ci-deterministic" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-17 — Browser evidence + rubric realism (fixtures; CI deterministic)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-17-benchmark-runtime-observability-timing-retryjudge-summaries" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-17 — Benchmark runtime observability (timing + retry/judge summaries)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-17-campaign-semantic-hybrid-scoring-summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-17 — Campaign semantic / hybrid scoring summary
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-17-mcp-browser-runner-audit-cli-doc-alignment" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-17 — MCP browser runner audit: CLI + doc alignment
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-18-v020-documentation-consolidation-fingerprints-campaigns" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-18 — v0.2.0 documentation consolidation (fingerprints + campaigns)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-17-v020-fingerprints-prompt-registry-state-campaign-experiment-axes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-17 — v0.2.0 fingerprints: prompt registry state + campaign experiment axes
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-17-ollama-gpt-oss20b-first-class-workflow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-17 — Ollama gpt-oss:20b first-class workflow
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-17-campaign-orchestration-dry-run-wiki-adr-tracking" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-17 — Campaign orchestration: dry-run, wiki, ADR, tracking
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-17-benchmark-comparison-fingerprints-manifest-campaign" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-17 — Benchmark comparison fingerprints (manifest + campaign)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-17-benchmark-campaign-sweeps" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-17 — Benchmark campaign sweeps
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-17-agentic-benchmark-pack-cross-system-evaluation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-17 — Agentic benchmark pack (cross-system evaluation)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-17-uv-canonical-workflow-enforced-in-docs-justfile" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-17 — uv canonical workflow (enforced in docs + justfile)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-17-repeated-semantic-judge-aggregation-disagreement-low-confidence-flags" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-17 — Repeated semantic judge: aggregation, disagreement, low-confidence flags
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-17-longitudinal-benchmark-reporting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-17 — Longitudinal benchmark reporting
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-17-semantic-and-hybrid-rubric-scoring-optional" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-17 — Semantic and hybrid rubric scoring (optional)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-17-browser-backed-benchmark-execution" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-17 — Browser-backed benchmark execution
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-17-benchmark-corpus-expansion-taxonomy-metadata-eight-tagged-suites" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-17 — Benchmark corpus expansion: taxonomy metadata + eight tagged suites
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-17-v010-release-preparation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-17 — v0.1.0 release preparation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-17-post-merge-stabilization-parallel-tracks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-17 — Post-merge stabilization (parallel tracks)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-17-benchmark-manifest-json-schema-benchmark_manifest-artifact-kind" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-17 — Benchmark manifest: JSON Schema + benchmark_manifest artifact kind
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-17-benchmark-expansion-registry-suites-comparison-rubric-manifest-provenance" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-17 — Benchmark expansion: registry suites, comparison rubric, manifest provenance
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-17-runtime-hardening-live-verification-paths" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-17 — Runtime hardening: live verification paths
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-17-governance-agents-manual-multi-agent-workflow-capability-audit" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-17 — Governance: AGENTS manual, multi-agent workflow, capability audit
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-17-agentsmd-operating-manual" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-17 — AGENTS.md operating manual
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-17-registry-backed-benchmark-prompts" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-17 — Registry-backed benchmark prompts
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-17-live-benchmark-verification-compose-opt-in-integration-tests" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-17 — Live benchmark verification (Compose + opt-in integration tests)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-17-mission-gap-audit-prompt-registry-cli" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-17 — Mission gap audit + prompt registry CLI
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-17-browser-execution-abstraction" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-17 — Browser execution abstraction
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-17-benchmark-run-artifact-persistence" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-17 — Benchmark run artifact persistence
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-17-replace-makefile-with-justfile" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-17 — Replace Makefile with justfile
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-17-benchmark-case-schema-v1-task-examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-17 — Benchmark case schema (v1) + task examples
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-17-phase-5-complete-benchmark-harness" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-17 — Phase 5 complete (benchmark harness)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-17-phase-4-complete-pipelines-compose-test-image" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-17 — Phase 4 complete (pipelines + Compose test image)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-17-phase-3-complete-provider-abstraction" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-17 — Phase 3 complete (provider abstraction)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-17-phase-2-complete-domain-models-schemas" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-17 — Phase 2 complete (domain models + schemas)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026-04-17-phase-1-complete-scaffold" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-17 — Phase 1 complete (scaffold)
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="implementation-log">Implementation log<a class="headerlink" href="#implementation-log" title="Permanent link">&para;</a></h1>
+<p>Chronological record of repository work. Latest entries first.</p>
+<h2 id="2026-04-17-milestone-rollover-v024-shipped-v025-active">2026-04-17 — Milestone rollover: v0.2.4 shipped, v0.2.5 active<a class="headerlink" href="#2026-04-17-milestone-rollover-v024-shipped-v025-active" title="Permanent link">&para;</a></h2>
+<p><strong>Delivered:</strong> <strong><a href="../CHANGELOG.md">CHANGELOG.md</a></strong> — <strong><code>[0.2.4]</code></strong> section; empty <strong><code>[Unreleased]</code></strong> for new work. <strong><code>docs/roadmap/v0.2.4.md</code></strong>, <strong><code>docs/tracking/v0.2.4-campaign.md</code></strong> — <strong>complete</strong> / <strong>closed</strong> with pointers to <strong><code>docs/releases/v0.2.4.md</code></strong>. <strong><code>docs/roadmap/v0.2.5.md</code></strong>, <strong><code>docs/tracking/v0.2.5-campaign.md</code></strong> — active focus (evidence packs + report readability). <strong><code>README.md</code></strong>, <strong><code>AGENTS.md</code></strong> — <strong>Latest shipped</strong> <strong>v0.2.4</strong>, <strong>in-flight</strong> <strong>v0.2.5</strong>. <strong><code>mkdocs.yml</code></strong>, <strong><code>docs/index.md</code></strong>, <strong><code>docs/workflows/{verification,campaign-result-pack-publication}.md</code></strong>, <strong><code>docs/releases/v0.2.{2,3}.md</code></strong> — milestone pointers. <strong><code>pyproject.toml</code></strong>, <strong><code>agent_llm_wiki_matrix.__init__</code></strong> → <strong>0.2.5</strong>; example <strong><code>alwm_version</code></strong> in <strong><code>examples/campaign_result_packs/{minimal_offline,multi_suite}/</code></strong> → <strong>0.2.4</strong> (assembler at <strong>v0.2.4</strong> tag).</p>
+<p><strong>Verification:</strong> <code>uv run alwm version</code> → <strong>0.2.5</strong>; <code>uv run just ci</code>; <code>uv run --extra docs mkdocs build --strict</code> (optional).</p>
+<h2 id="2026-04-19-mkdocs-findings-polish-nav-dedup-reporting-in-publication">2026-04-19 — MkDocs findings polish (nav dedup, reporting in Publication)<a class="headerlink" href="#2026-04-19-mkdocs-findings-polish-nav-dedup-reporting-in-publication" title="Permanent link">&para;</a></h2>
+<p><strong>Delivered:</strong> <strong><code>mkdocs.yml</code></strong> — <strong>Publication (v0.2.4)</strong> labels clarified; <strong><code>workflows/reporting.md</code></strong> added to Publication; duplicate <strong><code>tracking/v0.2.4-campaign.md</code></strong> removed from <strong>Tracking</strong> nav; <strong><code>reporting</code></strong> removed from generic <strong>Workflows</strong> list (single nav path). <strong><code>docs/index.md</code></strong> — publication table row for reporting + handbook link in tip; <strong><code>docs/workflows/docs-site.md</code></strong> — findings updated (CI parity, dedup, reporting cross-links).</p>
+<p><strong>Verification:</strong> <code>uv run --extra docs mkdocs build --strict</code> — success (~0.7s).</p>
+<h2 id="2026-04-19-mkdocs-handbook-docs-sitemd-and-documented-verification-findings">2026-04-19 — MkDocs handbook (<code>docs-site.md</code>) and documented verification findings<a class="headerlink" href="#2026-04-19-mkdocs-handbook-docs-sitemd-and-documented-verification-findings" title="Permanent link">&para;</a></h2>
+<p><strong>Delivered:</strong> Canonical workflow doc <strong><code>docs/workflows/docs-site.md</code></strong> (local <strong><code>just docs</code></strong> / <strong><code>just docs-build</code></strong>, <strong><code>mkdocs.yml</code></strong> <strong><code>nav:</code></strong>, CI, <strong>implementation/verification findings</strong>: succeeded vs awkward vs deferred, hard-to-surface pages, <strong>agent conventions</strong>). Removed duplicate <strong><code>mkdocs-site.md</code></strong>; <strong><code>mkdocs.yml</code></strong> nav points to <strong><code>docs-site.md</code></strong>. Updates: <strong><code>README.md</code></strong>, <strong><code>AGENTS.md</code></strong> (MkDocs sync bullets), <strong><code>docs/roadmap/v0.2.4.md</code></strong> (MkDocs status table), <strong><code>docs/tracking/v0.2.4-campaign.md</code></strong> (findings section), cross-links. <strong><code>.gitignore</code></strong> comment.</p>
+<p><strong>Verification (recorded in docs-site):</strong> <code>uv sync --extra dev --extra docs</code>; <code>uv run --extra docs mkdocs build --strict</code> — <strong>success</strong> (~1s); <code>mkdocs serve</code> smoke <strong>HTTP 200</strong> on <code>/</code>; <strong><code>GET /workflows/docs-site/</code></strong> <strong>200</strong> after nav update. Material <strong>MkDocs 2.0</strong> banner present (informational). <strong><code>uv run just ci</code></strong> — success.</p>
+<h2 id="2026-04-19-mkdocs-nav-polish-github-actions-docs-workflow">2026-04-19 — MkDocs nav polish + GitHub Actions docs workflow<a class="headerlink" href="#2026-04-19-mkdocs-nav-polish-github-actions-docs-workflow" title="Permanent link">&para;</a></h2>
+<p><strong>Delivered:</strong> <strong><code>mkdocs.yml</code></strong> — <strong>Publication (v0.2.4)</strong> nav (checklist first; audit listed once; labels); <strong>Roadmap &amp; milestones</strong> includes <strong>v0.2.4 (active)</strong>. <strong><code>docs/index.md</code></strong> — tip callout + tables. Cross-links on <strong><code>campaign-result-pack-publication.md</code></strong>, <strong><code>verification.md</code></strong>, <strong><code>benchmark-campaigns.md</code></strong>, <strong><code>roadmap/v0.2.4.md</code></strong>. Handbook later consolidated as <strong><code>docs/workflows/docs-site.md</code></strong>. <strong><code>.github/workflows/docs.yml</code></strong> — <code>uv sync --frozen --extra docs</code>, <code>mkdocs build --strict</code>, artifact, <strong><code>gh-pages</code></strong> on <strong><code>main</code></strong>.</p>
+<p><strong>Verification:</strong> <code>uv run --extra docs mkdocs build --strict</code>; <code>uv run just ci</code>.</p>
+<h2 id="2026-04-19-mkdocs-documentation-site-v024">2026-04-19 — MkDocs documentation site (v0.2.4)<a class="headerlink" href="#2026-04-19-mkdocs-documentation-site-v024" title="Permanent link">&para;</a></h2>
+<p><strong>Delivered:</strong> <strong><code>mkdocs.yml</code></strong> (Material theme, <strong><code>nav</code></strong>: publication block, workflows, roadmaps, releases, architecture, audits, tracking, wiki, ADRs, external links). <strong><code>docs/index.md</code></strong>, <strong><code>docs/contributing.md</code></strong>, later <strong><code>docs/workflows/docs-site.md</code></strong>. <strong><code>pyproject.toml</code></strong> optional <strong><code>[docs]</code></strong> extra (<code>mkdocs&gt;=1.6,&lt;2</code>, <code>mkdocs-material</code>, <code>pymdown-extensions</code>); <strong><code>just docs</code></strong>, <strong><code>just docs-build</code></strong>. <strong><code>.gitignore</code></strong>: <strong><code>/site/</code></strong>. Updates: <strong><code>README.md</code></strong>, <strong><code>AGENTS.md</code></strong>, <strong><code>docs/workflows/verification.md</code></strong>, <strong><code>docs/roadmap/v0.2.4.md</code></strong>, <strong><code>docs/tracking/v0.2.4-campaign.md</code></strong>. <strong><code>uv.lock</code></strong>.</p>
+<p><strong>Verification:</strong> <code>uv run --extra docs mkdocs build --strict</code>; <code>uv run just ci</code>.</p>
+<h2 id="2026-04-19-campaign-comparison-markdown-publication-readability">2026-04-19 — Campaign / comparison Markdown (publication readability)<a class="headerlink" href="#2026-04-19-campaign-comparison-markdown-publication-readability" title="Permanent link">&para;</a></h2>
+<p><strong>Delivered:</strong> Tighter headings and reader-oriented copy for <strong><code>campaign-summary.md</code></strong> (<strong>Metadata</strong>, <strong>Snapshot digest</strong>, <strong>Member run index</strong>, <strong>Generated reports</strong>, <strong>Longitudinal follow-up</strong>), <strong><code>campaign-semantic-summary.md</code></strong> (<strong>Campaign semantic summary</strong>, <strong>Executive snapshot</strong>), <strong><code>reports/campaign-report.md</code></strong> (<strong>Executive summary</strong>, intro blurb), <strong><code>pack-compare-report.md</code></strong> / <strong><code>campaign-compare-report.md</code></strong> (Δ convention upfront). <strong><code>campaign_result_pack</code> <code>INDEX.md</code>:</strong> <strong>Pack snapshot</strong> (was “At a glance”). <strong>No scoring math changes.</strong></p>
+<p><strong>Examples:</strong> Regenerated <strong><code>examples/campaign_runs/{minimal_offline,multi_suite,browser_evidence_compare}/</code></strong>, <strong><code>examples/campaign_result_packs/{minimal_offline,multi_suite}/</code></strong>, <strong><code>examples/campaign_result_packs/compare_minimal_vs_multi/</code></strong>, <strong><code>examples/campaign_compares/minimal_offline_vs_multi_suite/</code></strong>. Docs <strong><code>docs/workflows/benchmark-campaigns.md</code></strong>. Tests <strong><code>tests/test_benchmark_campaign.py</code></strong>, <strong><code>tests/test_campaign_reporting.py</code></strong>, <strong><code>tests/test_report_markdown_readability.py</code></strong>, <strong><code>tests/test_campaign_directory_compare.py</code></strong>, <strong><code>tests/test_campaign_result_pack_compare.py</code></strong>.</p>
+<p><strong>Verification:</strong> <code>uv run pytest tests/ --ignore=tests/integration</code>.</p>
+<h2 id="2026-04-17-packcampaign-compare-reader-interpretation-json-markdown">2026-04-17 — Pack/campaign compare: reader interpretation JSON + Markdown<a class="headerlink" href="#2026-04-17-packcampaign-compare-reader-interpretation-json-markdown" title="Permanent link">&para;</a></h2>
+<p><strong>Delivered:</strong> <strong><code>campaign_compare_core.py</code></strong> — <strong><code>build_reader_interpretation</code></strong>, <strong><code>format_reader_interpretation_markdown</code></strong> (non-scoring narratives, cautious <strong><code>evidence_strength</code></strong>, <strong><code>uncertainty_caveats</code></strong>). <strong><code>campaign_result_pack_compare.py</code></strong> / <strong><code>campaign_directory_compare.py</code></strong> attach <strong><code>reader_interpretation</code></strong> to compare JSON and prepend the Markdown section. <strong><code>CampaignResultPackComparisonV1</code></strong> / <strong><code>CampaignCompareV1</code></strong> optional field; <strong><code>schemas/v1/campaign_{result_pack_comparison,compare}.schema.json</code></strong> — additive <strong><code>reader_interpretation</code></strong>. Docs <strong><code>docs/workflows/campaign-result-pack-publication.md</code></strong>. Regenerated <strong><code>examples/campaign_result_packs/compare_minimal_vs_multi/</code></strong>, <strong><code>examples/campaign_compares/minimal_offline_vs_multi_suite/</code></strong>. Tests <strong><code>tests/test_campaign_result_pack_compare.py</code></strong>, <strong><code>tests/test_campaign_directory_compare.py</code></strong>.</p>
+<p><strong>Backward compatibility:</strong> <strong><code>schema_version</code></strong> <strong>1</strong>; older JSON without <strong><code>reader_interpretation</code></strong> still validates; Markdown skips the section when absent.</p>
+<p><strong>Verification:</strong> <code>uv run just ci</code> (or equivalent ruff/mypy/pytest on default suite).</p>
+<h2 id="2026-04-19-campaign-result-pack-reviewer-first-index-optional-dry-run-path">2026-04-19 — Campaign result pack: reviewer-first INDEX + optional dry-run path<a class="headerlink" href="#2026-04-19-campaign-result-pack-reviewer-first-index-optional-dry-run-path" title="Permanent link">&para;</a></h2>
+<p><strong>Delivered:</strong> <strong><code>CampaignResultPackArtifacts.campaign_dry_run_json</code></strong> (optional; set when <strong><code>campaign-dry-run.json</code></strong> is copied into the pack). <strong><code>_render_pack_index_md</code></strong> — <strong>Start here (cold read)</strong>, <strong>Bundle completeness</strong> table, expanded <strong>Publish-ready checklist</strong>, subset callout; <strong><code>INDEX.md</code></strong> validate block includes <strong><code>campaign-summary.json</code></strong>. Docs <strong><code>docs/workflows/campaign-result-pack-publication.md</code></strong>, <strong><code>docs/workflows/benchmark-campaigns.md</code></strong>, <strong><code>docs/architecture/data-model.md</code></strong>, <strong><code>examples/campaign_result_packs/README.md</code></strong>. Regenerated <strong><code>examples/campaign_result_packs/{minimal_offline,multi_suite}/</code></strong>. Tests <strong><code>tests/test_campaign_result_pack.py</code></strong>.</p>
+<p><strong>Verification:</strong> <code>uv run pytest tests/test_campaign_result_pack.py tests/test_schema_drift_contracts.py</code>; <code>uv run ruff check</code> / <code>mypy</code> on touched modules.</p>
+<h2 id="2026-04-19-milestone-rollover-v023-shipped-v024-active">2026-04-19 — Milestone rollover: v0.2.3 shipped, v0.2.4 active<a class="headerlink" href="#2026-04-19-milestone-rollover-v023-shipped-v024-active" title="Permanent link">&para;</a></h2>
+<p><strong>Delivered:</strong> <strong><a href="../CHANGELOG.md">CHANGELOG.md</a></strong> — <strong><code>[0.2.3]</code></strong> section; empty <strong><code>[Unreleased]</code></strong> for new work. <strong><code>docs/releases/v0.2.3.md</code></strong>. <strong><code>docs/roadmap/v0.2.3.md</code></strong>, <strong><code>docs/tracking/v0.2.3-campaign.md</code></strong> marked <strong>closed</strong> / complete. <strong><code>docs/roadmap/v0.2.4.md</code></strong>, <strong><code>docs/tracking/v0.2.4-campaign.md</code></strong> — publication + E2E workflow focus. <strong><code>README.md</code></strong>, <strong><code>AGENTS.md</code></strong> — <strong>Latest shipped</strong> <strong>v0.2.3</strong>, <strong>in-flight</strong> <strong>v0.2.4</strong>. <strong><code>docs/releases/v0.2.2.md</code></strong> next-milestone pointer. <strong><code>pyproject.toml</code></strong>, <strong><code>agent_llm_wiki_matrix.__init__</code></strong>, <strong><code>uv.lock</code></strong> → <strong>0.2.3</strong>; example <strong><code>alwm_version</code></strong> in <strong><code>examples/campaign_result_packs/{minimal_offline,multi_suite}/</code></strong> aligned.</p>
+<p><strong>Verification:</strong> docs-only pass; <code>uv run alwm version</code> (optional sanity).</p>
+<h2 id="2026-04-19-packdirectory-compare-browser-evidence-pairing">2026-04-19 — Pack/directory compare: browser evidence pairing<a class="headerlink" href="#2026-04-19-packdirectory-compare-browser-evidence-pairing" title="Permanent link">&para;</a></h2>
+<p><strong>Delivered:</strong> <strong><code>campaign_compare_core.py</code></strong> — <strong><code>build_browser_evidence_member_cells_comparison_block</code></strong>, <strong><code>render_browser_evidence_member_cells_comparison_markdown</code></strong>; merged into <strong><code>build_analysis_comparison_block</code></strong> as <strong><code>browser_evidence_comparison</code></strong>. <strong><code>campaign_result_pack_compare.py</code></strong> / <strong><code>campaign_directory_compare.py</code></strong> render the Markdown section after semantic instability (directory: <strong><code>top_heading_level=2</code></strong>); directory report drops the older duplicate browser bullets in favor of the paired table. Example <strong><code>examples/campaign_result_packs/compare_minimal_vs_multi/</code></strong> regenerated. Schema note on <strong><code>browser_evidence_comparison</code></strong>; docs <strong><code>docs/workflows/benchmark-campaigns.md</code></strong>, <strong><code>docs/architecture/data-model.md</code></strong>. Tests <strong><code>tests/test_campaign_result_pack_compare.py</code></strong>, <strong><code>tests/test_campaign_directory_compare.py</code></strong>.</p>
+<p><strong>Verification:</strong> <code>uv run pytest tests/test_campaign_result_pack_compare.py tests/test_campaign_directory_compare.py</code>; <code>uv run ruff check</code> / <code>mypy</code> on touched modules.</p>
+<h2 id="2026-04-19-campaign-to-campaign-comparison-directories">2026-04-19 — Campaign-to-campaign comparison (directories)<a class="headerlink" href="#2026-04-19-campaign-to-campaign-comparison-directories" title="Permanent link">&para;</a></h2>
+<p><strong>Delivered:</strong> <strong><code>benchmark/campaign_compare_core.py</code></strong> — shared analysis/semantic/FT-<em> diff blocks for pack and campaign workflows. </em><em><code>benchmark/campaign_directory_compare.py</code></em><em> — </em><em><code>build_campaign_directory_comparison</code></em><em>, </em><em><code>render_campaign_compare_markdown</code></em><em>, </em><em><code>write_campaign_compare_artifacts</code></em><em>; sweep dimensions via </em><em><code>summarize_campaign_dimensions</code></em><em>; </em><em><code>fingerprint_axis_insights</code></em><em> diff; </em><em><code>browser_evidence_member_cells</code></em><em> rollups. </em><em><code>CampaignCompareV1</code></em><em> + </em><em><code>schemas/v1/campaign_compare.schema.json</code></em><em>; kind </em><em><code>campaign_compare</code></em><em> in </em><em><code>artifacts.py</code></em><em>. CLI </em><em><code>alwm benchmark campaign compare</code></em><em> ( </em><em><code>--repo-root</code></em><em>, </em><em><code>--created-at</code></em><em> ). Example </em><em><code>examples/campaign_compares/minimal_offline_vs_multi_suite/</code></em><em>. Tests </em><em><code>tests/test_campaign_directory_compare.py</code></em><em>; </em><em><code>tests/test_schema_drift_contracts.py</code></em><em> loads </em><em><code>campaign-compare.json</code></em><em>. Docs </em><em><code>docs/workflows/benchmark-campaigns.md</code></em><em>, </em><em><code>examples/campaign_compares/README.md</code></em><em>, </em><em><code>README.md</code></em><em>, </em><em><code>AGENTS.md</code></em>*.</p>
+<p><strong>Verification:</strong> <code>uv run pytest tests/test_campaign_directory_compare.py tests/test_campaign_result_pack_compare.py tests/test_schema_drift_contracts.py</code>; <code>uv run ruff check</code> on touched modules.</p>
+<h2 id="2026-04-19-fingerprint-interpretation-evidence-strength-explicit-uncertainty">2026-04-19 — Fingerprint interpretation: evidence strength + explicit uncertainty<a class="headerlink" href="#2026-04-19-fingerprint-interpretation-evidence-strength-explicit-uncertainty" title="Permanent link">&para;</a></h2>
+<p><strong>Delivered:</strong> <strong><code>campaign_fingerprint_compare.py</code></strong> — <strong><code>_compute_evidence_strength</code></strong>; <strong>attribution</strong> rows add <strong>attribution_label</strong>, <strong>evidence_strength</strong>, <strong>uncertainty_notes</strong>, <strong>metrics.min_bucket_cell_count</strong> / <strong>distinct_bucket_count</strong>; overview and caveats stress weak samples; <strong>groups</strong> gain <strong>run_count</strong>. Markdown: category legend, expanded table, <strong><em>Limit:</em></strong> lines. Docs <strong><code>docs/workflows/longitudinal-reporting.md</code></strong>, <strong><code>benchmark-campaigns.md</code></strong>. Tests <strong><code>tests/test_campaign_reporting.py</code></strong>, <strong><code>tests/test_fingerprint_interpretation_attribution.py</code></strong>.</p>
+<p><strong>Backward compatibility:</strong> <strong><code>schema_version</code></strong> <strong>1</strong>; additive JSON fields. Scoring unchanged.</p>
+<p><strong>Verification:</strong> <code>uv run pytest tests/ --ignore=tests/integration/</code>.</p>
+<h2 id="2026-04-18-campaign-result-pack-publication-workflow-docs-index">2026-04-18 — Campaign result pack publication workflow (docs + INDEX)<a class="headerlink" href="#2026-04-18-campaign-result-pack-publication-workflow-docs-index" title="Permanent link">&para;</a></h2>
+<p><strong>Delivered:</strong> <strong><code>docs/workflows/campaign-result-pack-publication.md</code></strong> — assemble, validate, compare-packs, interpret <strong><code>pack-compare-report.md</code></strong>. <strong><code>_render_pack_index_md</code></strong> — <strong>Publication workflow</strong> + <strong>Publish-ready checklist</strong> sections. <strong><code>docs/workflows/benchmark-campaigns.md</code></strong>, <strong><code>examples/campaign_result_packs/README.md</code></strong>, <strong><code>README.md</code></strong> — canonical outward-facing bundle, completeness table, walkthrough links.</p>
+<p><strong>Verification:</strong> <code>uv run ruff check src/agent_llm_wiki_matrix/benchmark/campaign_result_pack.py</code>; regenerate example packs (<code>alwm benchmark campaign pack …</code>) so <strong><code>INDEX.md</code></strong> matches the template.</p>
+<h2 id="2026-04-18-fingerprint-interpretation-attribution-uncertainty">2026-04-18 — Fingerprint interpretation: attribution + uncertainty<a class="headerlink" href="#2026-04-18-fingerprint-interpretation-attribution-uncertainty" title="Permanent link">&para;</a></h2>
+<p><strong>Delivered:</strong> <strong><code>classify_axis_difference_attribution</code></strong> — labels <strong>likely_configuration</strong>, <strong>likely_instability</strong>, <strong>mixed_config_and_instability</strong>, <strong>inconclusive</strong> with <strong>confidence</strong>; JSON adds <strong>attribution_by_axis</strong>, <strong>differentiation_overview</strong>, <strong>interpretation_caveats</strong>; hints gain <strong>signal_class</strong>. Markdown: uncertainty blockquote, summary, per-axis table + rationales, grouped raw signals. <strong>schema_version</strong> stays <strong>1</strong>. Tests <strong><code>tests/test_fingerprint_interpretation_attribution.py</code></strong>. <strong><code>campaign_result_pack_compare</code></strong> missing model imports fixed for <strong>mypy</strong>. Regenerated campaign + longitudinal examples.</p>
+<p><strong>Verification:</strong> <code>uv run pytest --ignore=tests/integration/</code>; <code>uv run ruff check src tests</code>; <code>uv run mypy src</code>.</p>
+<h2 id="2026-04-18-browser-reporting-signals-extension-digests-campaign-contrast">2026-04-18 — Browser reporting: signals, extension digests, campaign contrast<a class="headerlink" href="#2026-04-18-browser-reporting-signals-extension-digests-campaign-contrast" title="Permanent link">&para;</a></h2>
+<p><strong>Delivered:</strong> <strong><code>browser/formatting.py</code></strong> — <strong><code>signals_digest_line</code></strong>, <strong><code>extension_digest_short</code></strong>, <strong><code>format_extensions_compact_markdown</code></strong>; <strong><code>BrowserEvidenceReportRow</code></strong> gains <strong><code>signals_digest</code></strong> / <strong><code>extension_digest</code></strong>; benchmark + campaign tables and detail sections updated; <strong><code>_describe_runner_cell</code></strong>. <strong><code>campaign_browser_evidence.py</code></strong> — <strong><code>render_campaign_browser_cross_run_comparison</code></strong>; <strong><code>browser_evidence_member_cells</code></strong> rows add <strong><code>signals_digest</code></strong> / <strong><code>extension_digest</code></strong>. Example <strong><code>examples/campaigns/v1/browser_evidence_compare.v1.yaml</code></strong> + <strong><code>examples/campaign_runs/browser_evidence_compare/</code></strong>; refreshed <strong><code>examples/campaign_runs/multi_suite/</code></strong> and <strong><code>examples/campaign_result_packs/multi_suite/</code></strong>. Docs <strong><code>docs/workflows/benchmarking.md</code></strong>, <strong><code>benchmark-campaigns.md</code></strong>, <strong><code>examples/campaigns/v1/README.md</code></strong>. Tests <strong><code>tests/test_browser_formatting.py</code></strong>, <strong><code>tests/test_benchmark_browser.py</code></strong>.</p>
+<p><strong>Verification:</strong> <code>uv run pytest tests/ --ignore=tests/integration/</code>; <code>uv run ruff check</code> on touched modules.</p>
+<h2 id="2026-04-18-campaign-result-pack-comparison-cli-artifacts">2026-04-18 — Campaign result pack comparison (CLI + artifacts)<a class="headerlink" href="#2026-04-18-campaign-result-pack-comparison-cli-artifacts" title="Permanent link">&para;</a></h2>
+<p><strong>Delivered:</strong> <strong><code>benchmark/campaign_result_pack_compare.py</code></strong> — <strong><code>build_campaign_result_pack_comparison</code></strong>, <strong><code>render_campaign_result_pack_compare_markdown</code></strong>, <strong><code>write_campaign_result_pack_compare_artifacts</code></strong>; optional <strong><code>repo_root</code></strong> for portable paths in JSON/Markdown. <strong><code>CampaignResultPackComparisonV1</code></strong> + <strong><code>schemas/v1/campaign_result_pack_comparison.schema.json</code></strong>; kind <strong><code>campaign_result_pack_comparison</code></strong> in <strong><code>artifacts.py</code></strong>. CLI <strong><code>alwm benchmark campaign compare-packs</code></strong> ( <strong><code>--repo-root</code></strong> ). Example packs <strong><code>examples/campaign_result_packs/multi_suite/</code></strong> and <strong><code>examples/campaign_result_packs/compare_minimal_vs_multi/</code></strong>. Tests <strong><code>tests/test_campaign_result_pack_compare.py</code></strong>; <strong><code>tests/test_schema_drift_contracts.py</code></strong> loads <strong><code>pack-compare.json</code></strong>. Docs <strong><code>docs/workflows/benchmark-campaigns.md</code></strong>, <strong><code>docs/architecture/data-model.md</code></strong>, <strong><code>examples/campaign_result_packs/README.md</code></strong>.</p>
+<p><strong>Verification:</strong> <code>uv run just ci</code>.</p>
+<h2 id="2026-04-18-verification-surface-docs-canonical-fallback-live">2026-04-18 — Verification surface (docs): canonical, fallback, live<a class="headerlink" href="#2026-04-18-verification-surface-docs-canonical-fallback-live" title="Permanent link">&para;</a></h2>
+<p><strong>Delivered:</strong> <strong><code>docs/workflows/verification.md</code></strong> — matrix (<strong><code>just ci</code></strong>, <strong><code>just test</code></strong>, <strong><code>just validate-artifacts</code></strong>, live/smoke) with <strong><code>uv run</code></strong> fallbacks; clarifies <strong><code>validate-artifacts</code></strong> ⊂ full pytest, not a <strong><code>just ci</code></strong> replacement. Updated <strong><code>README.md</code></strong>, <strong><code>AGENTS.md</code></strong>, <strong><code>docs/workflows/local-dev.md</code></strong>, <strong><code>live-verification.md</code></strong>, <strong><code>benchmarking.md</code></strong>, <strong><code>docs/architecture/runtime.md</code></strong>, <strong><code>docs/audits/schema-drift-contracts-inventory.md</code></strong>.</p>
+<p><strong>Verification:</strong> docs-only; <strong><code>justfile</code></strong> unchanged.</p>
+<h2 id="2026-04-18-report-markdown-readability-campaign-benchmark-no-scoring-change">2026-04-18 — Report Markdown readability (campaign + benchmark; no scoring change)<a class="headerlink" href="#2026-04-18-report-markdown-readability-campaign-benchmark-no-scoring-change" title="Permanent link">&para;</a></h2>
+<p><strong>Delivered:</strong> <strong><code>suite_ref_benchmark_id_partition_coincide</code></strong> + <strong><code>_markdown_sweep_axis_keys</code></strong> in <strong><code>campaign_reporting.py</code></strong> — when suite and benchmark partitions match, Markdown omits duplicate <strong><code>benchmark_id</code></strong> sweep lines; dimensions table uses <strong><code>suite_ref (paired with benchmark_id)</code></strong>. Tighter copy for comparative + campaign-summary <strong>At a glance</strong>, FT-<em> digest, judge rollup bullets; </em><em><code>campaign_semantic_summary.md</code></em><em> (</em><em><code>## Snapshot</code></em><em>, merged coverage/range rows; removed duplicate </em><em><code>## Totals</code></em><em>). </em><em><code>campaign_browser_evidence</code></em><em>: shorter intro; per-cell headings drop </em><em><code>benchmark_id</code></em><em> when paired with suite. </em><em><code>browser/formatting.py</code></em><em>: shorter benchmark-run browser blurb. Tests </em><em><code>tests/test_report_markdown_readability.py</code></em>*.</p>
+<p><strong>Analysis JSON:</strong> unchanged (<strong><code>build_campaign_analysis_dict</code></strong> fields).</p>
+<p><strong>Verification:</strong> <code>uv run pytest tests/ --ignore=tests/integration/</code>.</p>
+<h2 id="2026-04-18-fingerprint-axis-interpretation-campaign-longitudinal">2026-04-18 — Fingerprint axis interpretation (campaign + longitudinal)<a class="headerlink" href="#2026-04-18-fingerprint-axis-interpretation-campaign-longitudinal" title="Permanent link">&para;</a></h2>
+<p><strong>Delivered:</strong> <strong><code>build_fingerprint_axis_interpretation</code></strong> in <strong><code>benchmark/campaign_fingerprint_compare.py</code></strong> — <strong><code>score_spread_ranking</code></strong>, <strong><code>instability_hotspots</code></strong>, <strong><code>drift_correlation_hints</code></strong>; <strong><code>cell_count</code></strong> on per-group insight rows. <strong><code>fingerprint_axis_interpretation</code></strong> in <strong><code>campaign-analysis.json</code></strong> and <strong><code>summary.json</code></strong> (longitudinal). Markdown: <strong><code>render_fingerprint_compare_markdown</code></strong>, <strong><code>render_provider_comparison_markdown</code></strong>. Examples: <strong><code>examples/campaign_runs/minimal_offline/</code></strong>, <strong><code>multi_suite/</code></strong>, <strong><code>campaign_result_packs/minimal_offline/</code></strong>, <strong><code>examples/reports/longitudinal/sample-output/</code></strong>. Tests <strong><code>tests/test_campaign_reporting.py</code></strong>, <strong><code>tests/test_longitudinal.py</code></strong>. Docs <strong><code>docs/workflows/benchmark-campaigns.md</code></strong>, <strong><code>longitudinal-reporting.md</code></strong>.</p>
+<p><strong>Verification:</strong> <code>uv run ruff check src tests</code>; <code>uv run mypy src</code>; <code>uv run pytest --ignore=tests/integration</code>.</p>
+<h2 id="2026-04-18-schemaruntime-drift-verification-committed-trees">2026-04-18 — Schema/runtime drift verification (committed trees)<a class="headerlink" href="#2026-04-18-schemaruntime-drift-verification-committed-trees" title="Permanent link">&para;</a></h2>
+<p><strong>Delivered:</strong> <strong><code>tests/test_schema_drift_contracts.py</code></strong> — deterministic sweep of <strong><code>examples/</code></strong> and <strong><code>fixtures/</code></strong> for <strong><code>benchmark_manifest</code></strong> / <strong><code>benchmark_campaign_manifest</code></strong>, campaign summaries, semantic summaries, <strong>result packs</strong>, browser evidence, cell I/O, <strong><code>evaluation_judge_provenance</code></strong>, <strong><code>reports/report.json</code></strong>, <strong><code>matrices/*.json</code></strong>, <strong><code>examples/dataset/rubrics/*.json</code></strong>; <strong><code>collect_committed_artifact_drift_errors()</code></strong> for reuse; regression tests for observability + <strong><code>generated_report_paths</code></strong>. <strong><code>just validate-artifacts</code></strong> recipe. Removed <strong><code>tests/test_schema_drift_examples.py</code></strong> (superseded). Audits <strong><code>docs/audits/schema-drift-contracts-inventory.md</code></strong>, updated <strong><code>docs/audits/schema-runtime-hardening-2026-04-18.md</code></strong>; pointers in <strong><code>docs/roadmap/v0.2.3.md</code></strong>, <strong><code>docs/tracking/v0.2.3-campaign.md</code></strong>, <strong><code>AGENTS.md</code></strong>.</p>
+<p><strong>Verification:</strong> <code>just validate-artifacts</code>; <code>uv run just ci</code>.</p>
+<h2 id="2026-04-18-mcp-stdio-docs-browser-realism-claims">2026-04-18 — MCP stdio docs + browser realism claims<a class="headerlink" href="#2026-04-18-mcp-stdio-docs-browser-realism-claims" title="Permanent link">&para;</a></h2>
+<p><strong>Delivered:</strong> <strong><code>fixtures/mcp_servers/stdio_browser_evidence_server.py</code></strong> — multi-scenario <strong><code>alwm_browser_evidence</code></strong> (<code>alwm:checkout_flow</code> / <code>alwm:form_validation</code> / URL hints → <strong><code>checkout_flow</code></strong> / <strong><code>form_validation</code></strong> / <strong><code>export_flow</code></strong>). <strong><code>tests/test_mcp_stdio.py</code></strong> — deterministic stdio path (rich <strong><code>BrowserEvidence</code></strong> + CLI <strong><code>--stdio</code></strong>). Docs <strong><code>README.md</code></strong>, <strong><code>AGENTS.md</code></strong>, <strong><code>docs/architecture/browser.md</code></strong>, <strong><code>docs/audits/capability-classification.md</code></strong>, <strong><code>docs/workflows/live-verification.md</code></strong>, <strong><code>examples/browser_evidence/v1/README.md</code></strong>, <strong><code>.env.example</code></strong>; <strong><code>browser/formatting.py</code></strong> report copy. <strong>No</strong> remote/IDE MCP implementation.</p>
+<p><strong>Verification:</strong> <code>uv run pytest tests/ --ignore=tests/integration</code>; <code>uv run ruff check src tests</code>; <code>uv run mypy src</code>.</p>
+<h2 id="2026-04-18-campaign-semantic-judge-confidence-instability-criteria-axes">2026-04-18 — Campaign semantic judge: confidence + instability (criteria + axes)<a class="headerlink" href="#2026-04-18-campaign-semantic-judge-confidence-instability-criteria-axes" title="Permanent link">&para;</a></h2>
+<p><strong>Delivered:</strong> <strong><code>CampaignSemanticSummaryV1</code></strong> gains <strong><code>criterion_instability</code></strong> (per-criterion <strong>score_range</strong> sums from <strong><code>repeat_aggregation.disagreement.per_criterion</code></strong>), <strong><code>instability_highlights</code></strong> (ranked unstable <strong>suites</strong> / <strong>providers</strong> / <strong>execution modes</strong>, <strong><code>confidence_flag_counts</code></strong>), <strong><code>totals.cells_flagged_judge_low_confidence</code></strong> vs <strong><code>cells_flagged_repeat_confidence_low</code></strong>, <strong><code>CampaignSemanticCellRow.repeat_confidence_low</code></strong>. <strong><code>CampaignSemanticSummaryV1</code></strong> Markdown leads with <strong>Judge confidence &amp; disagreement</strong>; <strong><code>campaign-report.md</code></strong> embeds <strong><code>render_campaign_semantic_judge_section_markdown</code></strong>; <strong><code>campaign-analysis.json</code></strong> adds <strong><code>judge_campaign_semantic</code></strong>. Pipeline order: semantic summary <strong>before</strong> comparative artifacts. <strong><code>schemas/v1/campaign_semantic_summary.schema.json</code></strong>. Regenerated <strong><code>examples/campaign_runs/minimal_offline/</code></strong>, <strong><code>multi_suite/</code></strong>, <strong><code>examples/campaign_result_packs/minimal_offline/</code></strong> <code>campaign-semantic-summary.json</code>. Tests <strong><code>tests/test_benchmark_campaign.py</code></strong>. Docs <strong><code>docs/workflows/benchmark-campaigns.md</code></strong>.</p>
+<p><strong>Verification:</strong> <code>uv run pytest tests/ --ignore=tests/integration</code>; <code>uv run mypy src</code>; <code>uv run ruff check src tests</code>.</p>
+<h2 id="2026-04-18-browser-evidence-reporting-legible-markdown-traces-suite">2026-04-18 — Browser evidence reporting (legible Markdown + traces suite)<a class="headerlink" href="#2026-04-18-browser-evidence-reporting-legible-markdown-traces-suite" title="Permanent link">&para;</a></h2>
+<p><strong>Delivered:</strong> <strong><code>browser/formatting.py</code></strong> — <strong><code>format_extensions_markdown</code></strong>, <strong><code>render_dom_excerpts_markdown</code></strong>, <strong><code>render_screenshots_markdown</code></strong>, <strong><code>render_browser_evidence_detail_markdown</code></strong>, expanded <strong><code>render_benchmark_browser_evidence_markdown</code></strong> (summary + legible per-cell blocks; honest Playwright optional / MCP stdio copy). <strong><code>benchmark/runner.py</code></strong> passes <strong><code>(BrowserEvidenceReportRow, BrowserEvidence)</code></strong> pairs. <strong><code>benchmark/campaign_browser_evidence.py</code></strong> — campaign-level browser markdown + <strong><code>browser_evidence_member_cells</code></strong> for <strong><code>campaign-analysis.json</code></strong> via <strong><code>campaign_reporting</code></strong>. <strong><code>fixtures/benchmarks/browser_traces_compare.v1.yaml</code></strong>, <strong><code>examples/benchmark_suites/v1/suite.taxonomy.browser_traces_compare.v1.yaml</code></strong>, <strong><code>examples/benchmark_runs/browser-traces-compare/README.md</code></strong>. Tests <strong><code>tests/test_browser_formatting.py</code></strong>, <strong><code>tests/test_benchmark_browser.py</code></strong>; taxonomy list <strong><code>tests/test_benchmark_taxonomy.py</code></strong>. Docs <strong><code>docs/workflows/benchmarking.md</code></strong>, <strong><code>docs/workflows/benchmark-campaigns.md</code></strong>, <strong><code>docs/architecture/browser.md</code></strong>.</p>
+<p><strong>Verification:</strong> <code>uv run ruff check src tests</code>; <code>uv run mypy src</code>; <code>uv run pytest</code>.</p>
+<h2 id="2026-04-18-campaign-examples-result-pack-follow-up-schema-drift">2026-04-18 — Campaign examples + result pack follow-up (schema drift)<a class="headerlink" href="#2026-04-18-campaign-examples-result-pack-follow-up-schema-drift" title="Permanent link">&para;</a></h2>
+<p><strong>Delivered:</strong> Regenerated <strong><code>examples/campaign_runs/multi_suite/</code></strong> so <strong><code>campaign-semantic-summary.json</code></strong> matches the current <strong><code>campaign_semantic_summary</code></strong> schema (fixes <strong><code>test_schema_drift_examples</code></strong>). Rebuilt <strong><code>examples/campaign_result_packs/minimal_offline/</code></strong> from <strong><code>examples/campaign_runs/minimal_offline</code></strong>. Restored <strong><code>examples/campaign_runs/multi_suite/README.md</code></strong>. <strong><code>docs/workflows/campaign-walkthrough.md</code></strong> — Step 6 (result pack) + See also pointer.</p>
+<p><strong>Verification:</strong> <code>uv run pytest tests/ --ignore=tests/integration/</code>.</p>
+<h2 id="2026-04-18-campaign-result-packs-cli-artifact-example">2026-04-18 — Campaign result packs (CLI + artifact + example)<a class="headerlink" href="#2026-04-18-campaign-result-packs-cli-artifact-example" title="Permanent link">&para;</a></h2>
+<p><strong>Delivered:</strong> <strong><code>CampaignResultPackV1</code></strong> / <strong><code>CampaignResultPackArtifacts</code></strong> / <strong><code>CampaignResultPackMemberRun</code></strong> in <strong><code>models.py</code></strong>; <strong><code>schemas/v1/campaign_result_pack.schema.json</code></strong>; <strong><code>benchmark/campaign_result_pack.py</code></strong> (<strong><code>assemble_campaign_result_pack</code></strong>, <strong><code>INDEX.md</code></strong> with <strong><code>ALWM_REPO_ROOT</code></strong> + repo-relative longitudinal examples). <strong><code>alwm benchmark campaign pack</code></strong> (<code>--pack-id</code>, <strong><code>--title</code></strong>, <code>--source-label</code>, <code>--member-depth</code>, <code>--run-index</code>, <code>--include-failed-members</code>, <strong><code>--record-source-abspath</code></strong>). Default <strong>omit</strong> absolute source path for portable packs. <strong><code>artifacts.py</code></strong> kind <strong><code>campaign_result_pack</code></strong>. Tests <strong><code>tests/test_campaign_result_pack.py</code></strong>; <strong><code>tests/test_schema_drift_examples.py</code></strong> loads <strong><code>campaign-result-pack.json</code></strong>. Docs <strong><code>docs/workflows/benchmark-campaigns.md</code></strong>, <strong><code>docs/architecture/data-model.md</code></strong>, <strong><code>examples/campaign_result_packs/README.md</code></strong>, <strong><code>README.md</code></strong> command table.</p>
+<p><strong>Example:</strong> <strong><code>examples/campaign_result_packs/minimal_offline/</code></strong> (from <strong><code>examples/campaign_runs/minimal_offline</code></strong>).</p>
+<p><strong>Verification:</strong> <code>uv run pytest tests/test_campaign_result_pack.py tests/test_schema_drift_examples.py</code>; <code>uv run alwm validate examples/campaign_result_packs/minimal_offline/campaign-result-pack.json campaign_result_pack</code>.</p>
+<h2 id="2026-04-18-schema-runtime-drift-hardening-committed-artifacts">2026-04-18 — Schema / runtime drift hardening (committed artifacts)<a class="headerlink" href="#2026-04-18-schema-runtime-drift-hardening-committed-artifacts" title="Permanent link">&para;</a></h2>
+<p><strong>Delivered:</strong> <strong><code>tests/test_schema_drift_examples.py</code></strong> validates <strong><code>examples/</code></strong> + <strong><code>fixtures/</code></strong> for <strong><code>benchmark_manifest</code></strong>, <strong><code>benchmark_campaign_manifest</code></strong>, <strong><code>campaign_summary</code></strong>, <strong><code>campaign_semantic_summary</code></strong>, <strong><code>browser_evidence</code></strong>, <strong><code>evaluation</code></strong>, <strong><code>benchmark_request</code></strong>, <strong><code>benchmark_response</code></strong>; focused assertions for <strong><code>runtime_summary</code></strong>, <strong><code>retry_summary</code></strong>, <strong><code>generated_report_paths</code></strong>. Audit <strong><code>docs/audits/schema-runtime-hardening-2026-04-18.md</code></strong> (local <strong><code>out/</code></strong> may hold stale five-axis fingerprints—regenerate or delete).</p>
+<p><strong>Verification:</strong> <code>uv run pytest tests/test_schema_drift_examples.py -v</code>.</p>
+<h2 id="2026-04-18-campaign-reporting-readability-at-a-glance-member-score-rollups">2026-04-18 — Campaign reporting readability (at-a-glance + member-score rollups)<a class="headerlink" href="#2026-04-18-campaign-reporting-readability-at-a-glance-member-score-rollups" title="Permanent link">&para;</a></h2>
+<p><strong>Delivered:</strong> <strong><code>campaign_reporting</code></strong> — <strong><code>## At a glance</code></strong> lead section and <strong>member-run mean score</strong> tables on <strong><code>reports/campaign-report.md</code></strong>; <strong><code>member_mean_score_by_dimension</code></strong> in <strong><code>campaign-analysis.json</code></strong> (alongside existing <strong><code>mean_score_extremes_by_sweep_axis</code></strong>). <strong><code>campaign-summary.md</code></strong> embeds <strong><code>render_campaign_at_a_glance_markdown</code></strong> when longitudinal + semantic bundles are available after a full run. <strong><code>write_campaign_comparative_artifacts</code></strong> returns <strong><code>(paths, longitudinal_bundle)</code></strong> so the summary avoids a second analysis pass. <strong><code>campaign_semantic_summary.md</code></strong> already surfaces ranked instability hotspots; comparative narrative cross-links remain. Docs <strong><code>docs/workflows/benchmark-campaigns.md</code></strong>; log entry. Tests <strong><code>tests/test_campaign_reporting.py</code></strong>. Regenerated <strong><code>examples/campaign_runs/minimal_offline/</code></strong> and added <strong><code>examples/campaign_runs/multi_suite/</code></strong> (multi-suite sweep example).</p>
+<p><strong>Verification:</strong> <code>uv run just ci</code>.</p>
+<p><strong>Note:</strong> Scoring defaults unchanged; reporting-only.</p>
+<h2 id="2026-04-17-mcp-stdio-protocol-path-local-subprocess-v020-non-goal-for-ide-mcp">2026-04-17 — MCP stdio protocol path (local subprocess; v0.2.0 non-goal for IDE MCP)<a class="headerlink" href="#2026-04-17-mcp-stdio-protocol-path-local-subprocess-v020-non-goal-for-ide-mcp" title="Permanent link">&para;</a></h2>
+<p><strong>Delivered:</strong> <strong><code>browser/mcp_stdio.py</code></strong> — MCP client <code>call_tool</code> over <strong>stdio</strong> (<code>mcp</code> SDK), JSON text → <strong><code>BrowserEvidence</code></strong>. <strong><code>MCPBrowserRunner</code></strong> — fixture path first; if <strong><code>ALWM_MCP_BROWSER_COMMAND</code></strong> is set and no <code>scenario_id</code>/<code>fixture_relpath</code>, runs stdio path. <strong><code>fixtures/mcp_servers/stdio_browser_evidence_server.py</code></strong> (FastMCP) for tests. <strong><code>alwm browser run-mcp --stdio</code></strong>. <strong><code>mcp&gt;=1.27</code></strong> added to <strong><code>[project.optional-dependencies] dev</code></strong> (alongside <strong><code>[dependency-groups] dev</code></strong>). Docs: <strong><code>docs/architecture/browser.md</code></strong>, <strong><code>runtime.md</code></strong>, <strong><code>docs/roadmap/v0.2.0.md</code></strong> (non-goal: IDE-hosted MCP), <strong><code>capability-classification.md</code></strong>, <strong><code>AGENTS.md</code></strong>, <strong><code>README.md</code></strong>, <strong><code>CHANGELOG.md</code> [Unreleased]</strong>, <strong><code>.env.example</code></strong>.</p>
+<p><strong>Verification:</strong> <code>uv run pytest tests/test_browser.py</code>; <code>uv run ruff</code> / <code>mypy</code> on touched modules.</p>
+<h2 id="2026-04-17-browser-benchmark-realism-fixtures-prompts-report-table">2026-04-17 — Browser benchmark realism (fixtures; prompts + report table)<a class="headerlink" href="#2026-04-17-browser-benchmark-realism-fixtures-prompts-report-table" title="Permanent link">&para;</a></h2>
+<p><strong>Delivered:</strong> Extended <strong><code>BrowserEvidence</code></strong> / schema: <strong>a11y</strong> fields on <strong><code>dom_excerpts</code></strong>, <strong>screenshot</strong> scope/sequence/DPR; <strong><code>extensions</code></strong> <strong><code>$defs</code></strong> for <strong>network</strong> / <strong>accessibility</strong> / <strong>performance</strong>. <strong><code>evidence_to_prompt_block</code></strong> + <strong><code>render_benchmark_browser_evidence_markdown</code></strong>; <strong><code>run_benchmark</code></strong> appends browser summary to <strong><code>reports/report.md</code></strong>. Fixtures <strong><code>checkout_flow.json</code></strong>, <strong><code>form_validation.json</code></strong>; suites <strong><code>suite.taxonomy.browser_checkout.v1</code></strong>, <strong><code>suite.taxonomy.browser_form.v1</code></strong>, <strong><code>suite.agentic.browser_checkout.v1</code></strong>; <strong><code>fixtures/benchmarks/browser_checkout.v1.yaml</code></strong>, <strong><code>browser_form.v1.yaml</code></strong>. <strong><code>prompts/registry.yaml</code> 0.4.2</strong>; <strong><code>bench.task.browser_evidence.v1</code></strong> (honest MCP / optional Playwright wording). Docs <strong><code>docs/architecture/browser.md</code></strong>, <strong><code>benchmarking.md</code></strong>, <strong><code>data-model.md</code></strong>, <strong><code>examples/browser_evidence/v1/README.md</code></strong>. Tests <strong><code>tests/test_browser.py</code></strong>, <strong><code>test_benchmark_browser.py</code></strong>, <strong><code>test_benchmark_taxonomy.py</code></strong>.</p>
+<p><strong>Verification:</strong> <code>uv run ruff check src tests</code>; <code>uv run mypy src</code>; <code>uv run pytest tests/ --ignore=tests/integration</code>.</p>
+<h2 id="2026-04-17-campaign-fingerprint-axis-comparison-longitudinal-keys">2026-04-17 — Campaign fingerprint-axis comparison (longitudinal keys)<a class="headerlink" href="#2026-04-17-campaign-fingerprint-axis-comparison-longitudinal-keys" title="Permanent link">&para;</a></h2>
+<p><strong>Delivered:</strong> <strong><code>benchmark/campaign_fingerprint_compare.py</code></strong> — <strong><code>group_snapshots_by</code></strong> on provider / scoring config / execution mode / prompt registry / browser fingerprint keys; pooled mean scores; instability, regression, and mode-gap counts per bucket; narrative <strong>insights</strong> when an axis varies. Wired into <strong><code>campaign_reporting</code></strong> (<code>fingerprint_compare_axes</code>, <code>fingerprint_axis_insights</code> in JSON; Markdown section in <strong><code>reports/campaign-report.md</code></strong>). <strong><code>truncate_fingerprint_display</code></strong> exposed from <strong><code>pipelines/longitudinal.py</code></strong>. Example <strong><code>examples/campaigns/v1/fingerprint_axes_probe.v1.yaml</code></strong>. Tests <strong><code>tests/test_campaign_reporting.py</code></strong>. Docs <strong><code>docs/workflows/benchmark-campaigns.md</code></strong>, <strong><code>docs/workflows/longitudinal-reporting.md</code></strong>, <strong><code>examples/campaigns/v1/README.md</code></strong>.</p>
+<p><strong>Verification:</strong> <code>uv run ruff check src tests</code>; <code>uv run mypy src</code>; <code>uv run pytest</code>.</p>
+<h2 id="2026-04-18-campaign-comparative-reporting-markdown-json">2026-04-18 — Campaign comparative reporting (Markdown + JSON)<a class="headerlink" href="#2026-04-18-campaign-comparative-reporting-markdown-json" title="Permanent link">&para;</a></h2>
+<p><strong>Delivered:</strong> <strong><code>benchmark/campaign_reporting.py</code></strong> — after a full campaign, load <strong>succeeded</strong> member manifests with <strong><code>load_run_snapshots</code></strong>, run <strong><code>analyze_longitudinal</code></strong> (fixed thresholds aligned with longitudinal CLI defaults), emit <strong><code>reports/campaign-report.md</code></strong> (dimensions varied, backend means, scoring instability, mode gaps, <strong>FT-*</strong> ranking, <strong><code>render_failure_atlas</code></strong>) and <strong><code>reports/campaign-analysis.json</code></strong>. <strong><code>merge_generated_report_paths</code></strong> composes with semantic-summary paths. <strong><code>campaign-summary.md</code></strong> links comparative outputs. Docs <strong><code>docs/workflows/benchmark-campaigns.md</code></strong>, <strong><code>examples/campaigns/v1/README.md</code></strong>. Tests <strong><code>tests/test_campaign_reporting.py</code></strong>. Example <strong><code>examples/campaign_runs/minimal_offline/</code></strong> regenerated.</p>
+<p><strong>Verification:</strong> <code>uv run just ci</code>.</p>
+<h2 id="2026-04-17-browser-evidence-rubric-realism-fixtures-ci-deterministic">2026-04-17 — Browser evidence + rubric realism (fixtures; CI deterministic)<a class="headerlink" href="#2026-04-17-browser-evidence-rubric-realism-fixtures-ci-deterministic" title="Permanent link">&para;</a></h2>
+<p><strong>Delivered:</strong> <strong><code>BrowserEvidence</code></strong> gains <strong><code>dom_excerpts</code></strong>, <strong><code>screenshots</code></strong> (metadata), <strong><code>extensions</code></strong>; JSON Schema + <strong><code>DomExcerpt</code></strong> / <strong><code>ScreenshotMetadata</code></strong>. <strong><code>evidence_to_prompt_block</code></strong>, <strong><code>MockBrowserRunner</code></strong>, <strong><code>fixtures/browser_evidence/v1/export_flow.json</code></strong>. Rubric <strong><code>examples/dataset/rubrics/browser_realism.v1.json</code></strong> (grounding, hallucination_resistance, source_fidelity). Wired into <strong><code>suite.taxonomy.browser_evidence.v1</code></strong>, <strong><code>suite.agentic.browser_interpretation.v1</code></strong>, <strong><code>fixtures/benchmarks/browser_file.v1.yaml</code></strong>. <strong><code>prompts/registry.yaml</code> 0.4.1</strong> and <strong><code>bench.task.browser_evidence.v1</code></strong>. Regenerated <strong><code>examples/benchmark_runs/agentic-pack-browser-interpretation/</code></strong>. Docs: <strong><code>docs/architecture/browser.md</code></strong>, <strong><code>data-model.md</code></strong>, <strong><code>benchmarking.md</code></strong>, <strong><code>examples/dataset/README.md</code></strong>.</p>
+<p><strong>Verification:</strong> <code>uv run ruff check src tests</code>; <code>uv run mypy src</code>; <code>uv run pytest tests/ --ignore=tests/integration</code>; <code>uv run alwm prompts check</code>.</p>
+<h2 id="2026-04-17-benchmark-runtime-observability-timing-retryjudge-summaries">2026-04-17 — Benchmark runtime observability (timing + retry/judge summaries)<a class="headerlink" href="#2026-04-17-benchmark-runtime-observability-timing-retryjudge-summaries" title="Permanent link">&para;</a></h2>
+<p><strong>Delivered:</strong> <strong><code>BenchmarkRunTimingSummaryV1</code></strong>, <strong><code>BenchmarkRetrySummaryV1</code></strong>, <strong><code>BenchmarkCellRuntimeV1</code></strong> on <strong><code>manifest.json</code></strong> (<code>runtime_summary</code>, <code>retry_summary</code>, <strong><code>cells[].runtime</code></strong>); <strong><code>CampaignAggregatedRuntimeV1</code></strong> on <strong><code>campaign_manifest</code></strong> (<code>aggregated_runtime</code>). <strong><code>runner.py</code></strong> records wall time for browser phase, provider completion, deterministic evaluation, and semantic judge phase (<strong><code>EvaluationPhaseMetrics</code></strong> + <strong><code>_run_semantic_with_repeats</code></strong> timing). <strong><code>reports/report.md</code></strong> and <strong><code>campaign-summary.md</code></strong> append Markdown tables (<strong><code>benchmark/observability.py</code></strong>). <strong><code>evaluate_with_scoring_backend</code></strong> returns <strong><code>(evaluation, provenance, metrics)</code></strong>. Schemas: <strong><code>manifest.schema.json</code></strong>, <strong><code>benchmark_campaign_manifest.schema.json</code></strong>. Tests: <strong><code>tests/test_benchmark_observability.py</code></strong>. Docs: <strong><code>docs/workflows/benchmarking.md</code></strong>.</p>
+<p><strong>Verification:</strong> <code>uv run pytest tests/ --ignore=tests/integration</code>; <code>uv run mypy src</code>.</p>
+<h2 id="2026-04-17-campaign-semantic-hybrid-scoring-summary">2026-04-17 — Campaign semantic / hybrid scoring summary<a class="headerlink" href="#2026-04-17-campaign-semantic-hybrid-scoring-summary" title="Permanent link">&para;</a></h2>
+<p><strong>Delivered:</strong> <strong><code>campaign_semantic_summary</code></strong> artifact kind + <strong><code>schemas/v1/campaign_semantic_summary.schema.json</code></strong>; <strong><code>benchmark/campaign_semantic_summary.py</code></strong> builds <strong><code>CampaignSemanticSummaryV1</code></strong> from succeeded member runs (repeat-judge disagreement, low-confidence flags, rollups by suite / provider / execution mode). <strong><code>run_benchmark_campaign</code></strong> writes <strong><code>campaign-semantic-summary.json</code></strong> / <strong><code>.md</code></strong> and merges paths into <strong><code>generated_report_paths</code></strong> (after comparative artifacts). <strong><code>campaign-summary.md</code></strong> links the semantic rollup when present. Example definition <strong><code>examples/campaigns/v1/semantic_repeats_offline.v1.yaml</code></strong>. Tests in <strong><code>tests/test_benchmark_campaign.py</code></strong>. Docs: <strong><code>docs/workflows/benchmark-campaigns.md</code></strong>, <strong><code>examples/campaigns/v1/README.md</code></strong>.</p>
+<p><strong>Note:</strong> Deterministic-only campaigns still emit a semantic summary with zero semantic cells; default scoring path is unchanged.</p>
+<p><strong>Verification:</strong> <code>uv run ruff check src tests</code> and <code>uv run pytest</code>.</p>
+<h2 id="2026-04-17-mcp-browser-runner-audit-cli-doc-alignment">2026-04-17 — MCP browser runner audit: CLI + doc alignment<a class="headerlink" href="#2026-04-17-mcp-browser-runner-audit-cli-doc-alignment" title="Permanent link">&para;</a></h2>
+<p><strong>Context:</strong> <code>MCPBrowserRunner</code> was already a <strong>fixture-backed bridge</strong> (delegates to <code>FileBrowserRunner</code> when <code>scenario_id</code> or <code>fixture_relpath</code> is set; <code>RuntimeError</code> without—remote MCP not wired). Several docs still claimed <strong><code>NotImplementedError</code></strong> / <strong>stub</strong>.</p>
+<p><strong>Delivered:</strong> <strong><code>alwm browser run-mcp</code></strong> (<code>cli.py</code>) with <code>--scenario-id</code> / <code>--fixture</code>; tests in <strong><code>tests/test_browser.py</code></strong>. <strong><code>docs/architecture/browser.md</code></strong> — accurate component table, <strong>Remote MCP</strong> section, <strong>roadmap</strong> list. Aligned <strong><code>AGENTS.md</code></strong>, <strong><code>README.md</code></strong>, <strong><code>docs/architecture/runtime.md</code></strong>, <strong><code>current-state.md</code></strong>, <strong><code>docs/audits/capability-classification.md</code></strong>, <strong><code>current-capability-status.md</code></strong>, <strong><code>mission-gap-audit.md</code></strong>, <strong><code>release-readiness.md</code></strong>; <strong><code>CHANGELOG.md</code> [Unreleased]</strong>.</p>
+<p><strong>Classification:</strong> <strong><code>MCPBrowserRunner</code></strong> = <strong>partial</strong> (fixture path only); remote MCP protocol execution = <strong>documented-only</strong> until roadmap items ship.</p>
+<p><strong>Verification:</strong> <code>uv run just ci</code>.</p>
+<h2 id="2026-04-18-v020-documentation-consolidation-fingerprints-campaigns">2026-04-18 — v0.2.0 documentation consolidation (fingerprints + campaigns)<a class="headerlink" href="#2026-04-18-v020-documentation-consolidation-fingerprints-campaigns" title="Permanent link">&para;</a></h2>
+<p><strong>Delivered:</strong> <strong><code>CHANGELOG.md</code></strong> <strong>[0.2.0]</strong> entry (comparison + campaign experiment fingerprints, longitudinal updates) plus <strong>Documentation</strong> subsection (campaign walkthrough). <strong><code>docs/workflows/campaign-walkthrough.md</code></strong> — committed-example steps for <strong>campaign manifest</strong> vs <strong>campaign summary</strong> vs member <strong><code>benchmark_manifest</code></strong>, <strong>six-axis</strong> <strong><code>campaign_experiment_fingerprints</code></strong> vs <strong><code>comparison_fingerprints</code></strong>, and <strong>longitudinal</strong> globs. Audited <strong><code>README.md</code></strong>, <strong><code>AGENTS.md</code></strong>, <strong><code>docs/roadmap/v0.2.0.md</code></strong>, workflows (notably <strong><code>benchmarking.md</code></strong>, <strong><code>benchmark-campaigns.md</code></strong>, <strong><code>longitudinal-reporting.md</code></strong>), <strong><code>docs/architecture/data-model.md</code></strong>, <strong><code>docs/wiki/campaign-orchestration.md</code></strong>, <strong><code>docs/wiki/benchmark-campaigns.md</code></strong>, <strong><code>docs/tracking/campaign-orchestration.md</code></strong>, <strong><code>docs/tracking/benchmark-campaign-orchestration.md</code></strong>, <strong><code>docs/audits/capability-classification.md</code></strong>, ADRs <strong><code>docs/adr/0001-campaign-orchestration.md</code></strong> and <strong><code>docs/architecture/adr/0001-benchmark-campaign-orchestration.md</code></strong>, <strong><code>examples/campaigns/v1/README.md</code></strong> for consistent <strong>six-axis</strong> <code>comparison_fingerprints</code>, <strong><code>campaign_experiment_fingerprints</code></strong>, and <strong><code>prompt_registry_state_fingerprint</code></strong> wording. Removed duplicate milestone block from <strong><code>README.md</code></strong> (earlier pass).</p>
+<p><strong>Verification:</strong> documentation-only pass; <code>uv run alwm validate examples/campaign_runs/minimal_offline/manifest.json campaign_manifest</code> (paths cited in walkthrough).</p>
+<h2 id="2026-04-17-v020-fingerprints-prompt-registry-state-campaign-experiment-axes">2026-04-17 — v0.2.0 fingerprints: prompt registry state + campaign experiment axes<a class="headerlink" href="#2026-04-17-v020-fingerprints-prompt-registry-state-campaign-experiment-axes" title="Permanent link">&para;</a></h2>
+<p><strong>Delivered:</strong> <strong><code>BenchmarkComparisonFingerprints.prompt_registry_state</code></strong> — hash of effective registry YAML (or inline-only sentinel). <strong><code>CampaignExperimentFingerprints</code></strong> on <strong><code>BenchmarkCampaignManifest</code></strong> / <strong><code>CampaignSummaryV1</code></strong> (campaign definition, suite stack, provider files, scoring axis, browser axis, registry override). Canonical <strong><code>fingerprint_campaign_definition</code></strong> excludes cosmetic fields and sorts list fields. <strong><code>build_campaign_experiment_fingerprints</code></strong>, <strong><code>fingerprint_prompt_registry_effective_state</code></strong> in <strong><code>benchmark/fingerprints.py</code></strong>. Longitudinal <strong><code>group_snapshots_by</code></strong> key <strong><code>prompt_registry_state_fingerprint</code></strong>; <strong><code>render_provider_comparison_markdown</code></strong> registry column. Schemas: <strong><code>manifest.schema.json</code></strong>, <strong><code>benchmark_campaign_manifest.schema.json</code></strong>, <strong><code>campaign_summary.schema.json</code></strong>. Roadmap <strong><code>docs/roadmap/v0.2.0.md</code></strong>; <strong><code>README</code></strong> milestone blurb. Regenerated <strong><code>examples/campaign_runs/minimal_offline/</code></strong>, <strong><code>examples/reports/longitudinal/sample-output/</code></strong>, longitudinal fixtures.</p>
+<p><strong>Verification:</strong> <code>uv run just ci</code>.</p>
+<h2 id="2026-04-17-ollama-gpt-oss20b-first-class-workflow">2026-04-17 — Ollama gpt-oss:20b first-class workflow<a class="headerlink" href="#2026-04-17-ollama-gpt-oss20b-first-class-workflow" title="Permanent link">&para;</a></h2>
+<p><strong>Delivered:</strong> Default <strong><code>OLLAMA_MODEL</code></strong> / <strong><code>OllamaSection.model</code></strong> → <strong><code>gpt-oss:20b</code></strong>; <strong><code>benchmarks/v1/ollama.v1.yaml</code></strong>, <strong><code>config/providers.example.yaml</code></strong>, <strong><code>alwm benchmark probe</code></strong> default, integration test default aligned. <strong><code>scripts/ollama-gptoss-setup.sh</code></strong> (start Compose Ollama, pull, <strong><code>alwm benchmark probe</code></strong>), <strong><code>scripts/smoke-ollama-live.sh</code></strong> (minimal live benchmark + validate). <strong><code>just ollama-gptoss-setup</code></strong>, <strong><code>just smoke-ollama-live</code></strong>; <strong><code>verify-ollama-gptoss-smoke</code></strong> calls the live smoke script. Docs: <strong><code>docs/workflows/benchmarking.md</code></strong> (workflow + migration from named volume <strong><code>ollama_models</code></strong> → bind <strong><code>./.ollama-models</code></strong>), <strong><code>README.md</code></strong>, <strong><code>AGENTS.md</code></strong>, <strong><code>docs/workflows/live-verification.md</code></strong>, <strong><code>docs/workflows/local-dev.md</code></strong>, <strong><code>.env.example</code></strong>.</p>
+<p><strong>Verification:</strong> <code>uv run just ci</code> (deterministic); live path opt-in.</p>
+<h2 id="2026-04-17-campaign-orchestration-dry-run-wiki-adr-tracking">2026-04-17 — Campaign orchestration: dry-run, wiki, ADR, tracking<a class="headerlink" href="#2026-04-17-campaign-orchestration-dry-run-wiki-adr-tracking" title="Permanent link">&para;</a></h2>
+<p><strong>Delivered:</strong> <strong><code>alwm benchmark campaign run --dry-run</code></strong> (wraps <code>run_benchmark_campaign(..., dry_run=True)</code>; no separate <code>plan</code> command). Extended <strong>campaign manifest</strong> / <strong><code>CampaignSummaryV1</code></strong> + <strong><code>schemas/v1/campaign_summary.schema.json</code></strong>; artifact kinds <strong><code>campaign_definition</code></strong>, <strong><code>campaign_manifest</code></strong>, <strong><code>campaign_summary</code></strong>. <strong>Docs:</strong> <strong><code>docs/wiki/campaign-orchestration.md</code></strong>, <strong><code>docs/tracking/campaign-orchestration.md</code></strong>, <strong><code>docs/adr/0001-campaign-orchestration.md</code></strong>; updates to <strong><code>docs/workflows/benchmark-campaigns.md</code></strong>, <strong><code>docs/workflows/benchmarking.md</code></strong>, <strong><code>docs/architecture/evaluation-pipeline.md</code></strong>, <strong><code>README.md</code></strong>, <strong><code>CHANGELOG.md</code></strong>, <strong><code>docs/architecture/adr/0001-benchmark-campaign-orchestration.md</code></strong>, <strong><code>examples/campaigns/v1/README.md</code></strong>. Tests: <strong><code>tests/test_benchmark_campaign.py</code></strong> (dry-run writes <code>campaign-dry-run.json</code>, manifest, summary).</p>
+<p><strong>Verification:</strong> <code>uv run just ci</code>.</p>
+<h2 id="2026-04-17-benchmark-comparison-fingerprints-manifest-campaign">2026-04-17 — Benchmark comparison fingerprints (manifest + campaign)<a class="headerlink" href="#2026-04-17-benchmark-comparison-fingerprints-manifest-campaign" title="Permanent link">&para;</a></h2>
+<p><strong>Delivered:</strong> <strong><code>benchmark/fingerprints.py</code></strong> — SHA-256 over canonical JSON for <strong>suite definition</strong> (title excluded; sorted tags), <strong>prompt set</strong> (resolved prompt ids + text digests + registry provenance), <strong>provider config</strong> (per-variant sorted), <strong>scoring config</strong> (effective backend, eval_scoring, judge repeat, judge provider), <strong>browser config</strong> (per-variant sorted). <strong><code>BenchmarkComparisonFingerprints</code></strong> on <strong><code>BenchmarkRunManifest</code></strong> and <strong><code>BenchmarkCampaignRunEntry</code></strong>; <strong><code>schemas/v1/manifest.schema.json</code></strong>, <strong><code>schemas/v1/benchmark_campaign_manifest.schema.json</code></strong>. <strong><code>run_benchmark</code></strong> always emits fingerprints; <strong><code>campaign_runner</code></strong> copies them from member manifests. <strong><code>RunSnapshot.comparison_fingerprints</code></strong>, <strong><code>group_snapshots_by</code></strong> keys <strong><code>suite_definition_fingerprint</code></strong> … <strong><code>browser_config_fingerprint</code></strong>, <strong><code>provider-comparison.md</code></strong> + <strong><code>summary.json</code></strong> updates. Fixture <strong><code>fixtures/benchmarks/longitudinal.v1.yaml</code></strong>, longitudinal manifests updated. Tests <strong><code>tests/test_fingerprints.py</code></strong>, <strong><code>tests/test_longitudinal.py</code></strong>, <strong><code>tests/test_manifest.py</code></strong>, <strong><code>tests/test_benchmark_campaign.py</code></strong>. Docs: <strong><code>data-model.md</code></strong>, <strong><code>longitudinal-reporting.md</code></strong>, <strong><code>benchmarking.md</code></strong>, <strong><code>examples/reports/longitudinal/README.md</code></strong>.</p>
+<p><strong>Note:</strong> Extended in <strong>v0.2.0</strong> with <strong><code>prompt_registry_state</code></strong>, <strong><code>campaign_experiment_fingerprints</code></strong>, and <strong><code>prompt_registry_state_fingerprint</code></strong> (see log entries above).</p>
+<p><strong>Verification:</strong> <code>uv run pytest</code> (full suite).</p>
+<h2 id="2026-04-17-benchmark-campaign-sweeps">2026-04-17 — Benchmark campaign sweeps<a class="headerlink" href="#2026-04-17-benchmark-campaign-sweeps" title="Permanent link">&para;</a></h2>
+<p><strong>Delivered:</strong> <strong><code>BenchmarkCampaignDefinitionV1</code></strong> + <strong><code>schemas/v1/benchmark_campaign.schema.json</code></strong>; <strong><code>BenchmarkCampaignManifest</code></strong> / <strong><code>BenchmarkCampaignRunEntry</code></strong> + <strong><code>schemas/v1/benchmark_campaign_manifest.schema.json</code></strong>. <strong><code>benchmark/campaign_definitions.py</code></strong>, <strong><code>benchmark/campaign_runner.py</code></strong>. CLI <strong><code>alwm benchmark campaign run</code></strong>. Artifact kinds <strong><code>benchmark_campaign_definition</code></strong>, <strong><code>benchmark_campaign_manifest</code></strong>; <strong><code>write_benchmark_campaign_manifest</code></strong> in <strong><code>persistence.py</code></strong>. Fixture <strong><code>fixtures/benchmarks/campaign_micro.v1.yaml</code></strong>; examples <strong><code>examples/campaigns/v1/minimal_offline.v1.yaml</code></strong>, <strong><code>examples/campaign_runs/minimal_offline/</code></strong>. Docs <strong><code>docs/workflows/benchmark-campaigns.md</code></strong>, cross-link in <strong><code>docs/workflows/benchmarking.md</code></strong>, <strong><code>examples/campaigns/v1/README.md</code></strong>. Tests <strong><code>tests/test_benchmark_campaign.py</code></strong>.</p>
+<p><strong>Verification:</strong> <code>just ci</code>.</p>
+<h2 id="2026-04-17-agentic-benchmark-pack-cross-system-evaluation">2026-04-17 — Agentic benchmark pack (cross-system evaluation)<a class="headerlink" href="#2026-04-17-agentic-benchmark-pack-cross-system-evaluation" title="Permanent link">&para;</a></h2>
+<p><strong>Delivered:</strong> <strong><code>BenchmarkDefinitionV1</code> / <code>BenchmarkRunManifest</code></strong> optional <strong><code>success_criteria</code></strong> and <strong><code>failure_taxonomy_hints</code></strong> (metadata; JSON Schema + Pydantic + runner copy-through). <strong>Prompt registry 0.4.0</strong> — <code>bench.task.repo_implementation.v1</code>, <code>bench.task.docs_drift_repair.v1</code>, <code>bench.task.benchmark_authoring.v1</code>. Five suites under <strong><code>examples/benchmark_suites/v1/agentic/</code></strong> (repo implementation, docs drift, benchmark authoring, browser interpretation with file-backed evidence, multi-agent coordination). Committed offline runs <strong><code>examples/benchmark_runs/agentic-pack-*</code></strong>. Docs: <strong><code>docs/workflows/agentic-benchmark-pack.md</code></strong>, <strong><code>examples/benchmark_suites/v1/agentic/README.md</code></strong>, updates to <strong><code>benchmarking.md</code></strong>, <strong><code>benchmarks/v1/README.md</code></strong>, <strong><code>examples/benchmark_suites/v1/README.md</code></strong>, <strong><code>data-model.md</code></strong>. Tests: <strong><code>tests/test_agentic_benchmark_pack.py</code></strong>, manifest validation in <strong><code>tests/test_manifest.py</code></strong>.</p>
+<p><strong>Verification:</strong> <code>just ci</code> or <code>uv run just ci</code>.</p>
+<h2 id="2026-04-17-uv-canonical-workflow-enforced-in-docs-justfile">2026-04-17 — uv canonical workflow (enforced in docs + <code>justfile</code>)<a class="headerlink" href="#2026-04-17-uv-canonical-workflow-enforced-in-docs-justfile" title="Permanent link">&para;</a></h2>
+<p><strong>Policy:</strong> Host development <strong>must</strong> use <strong><a href="https://docs.astral.sh/uv/">uv</a></strong> for virtualenv creation (<code>uv venv</code>), installs (<code>uv pip install …</code>), and running tools (<code>uv run …</code>). <strong><code>AGENTS.md</code></strong> states this explicitly; <strong><code>README.md</code></strong> and <strong><code>docs/workflows/local-dev.md</code></strong> / <strong><code>walkthrough-v0.1.0.md</code></strong> default to <code>uv run alwm</code> and <code>uv run just ci</code> without requiring <code>python -m venv</code> or bare <code>pip</code>. <strong><code>justfile</code></strong> recipes now use <strong><code>uv pip</code></strong> for <code>install</code> / <code>install-dev</code> and <strong><code>uv run</code></strong> for pytest, ruff, and mypy (no <code>python -m pip</code> fallback). <strong>Runtime:</strong> <code>src/.../cli.py</code> and <strong><code>playwright_runner.py</code></strong> user-facing messages updated to <code>uv pip</code>. Docker image builds unchanged (<code>Dockerfile</code> still uses pip inside the image).</p>
+<p><strong>Verification:</strong> <code>uv run just ci</code>.</p>
+<h2 id="2026-04-17-repeated-semantic-judge-aggregation-disagreement-low-confidence-flags">2026-04-17 — Repeated semantic judge: aggregation, disagreement, low-confidence flags<a class="headerlink" href="#2026-04-17-repeated-semantic-judge-aggregation-disagreement-low-confidence-flags" title="Permanent link">&para;</a></h2>
+<p><strong>Delivered:</strong> <code>pipelines/judge_repeat.py</code> — <strong>mean</strong>, <strong>median</strong>, <strong>trimmed_mean</strong> aggregation; per-criterion and total-weighted disagreement; threshold-based <strong><code>assess_low_confidence</code></strong>. <code>Evaluation</code> gains optional <strong><code>judge_repeat_count</code></strong>, <strong><code>judge_semantic_aggregation</code></strong>, <strong><code>judge_low_confidence</code></strong>; <strong><code>JudgeRepeatAggregation</code></strong> + nested models on <strong><code>EvaluationJudgeProvenance.repeat_aggregation</code></strong> (omitted when <code>judge_repeats</code> is 1). <code>evaluate_with_scoring_backend</code> accepts <strong><code>JudgeRepeatParams</code></strong>; mock semantic scores vary by <strong><code>run_index</code></strong> for stable multi-run tests. <strong><code>EvalScoringSpec</code></strong> + <strong><code>schemas/v1/benchmark_definition.schema.json</code></strong>: <strong><code>judge_repeats</code></strong>, <strong><code>semantic_aggregation</code></strong>, <strong><code>trim_fraction</code></strong>, optional stdev/range thresholds. <strong><code>alwm evaluate</code></strong> flags mirror repeat/aggregation/thresholds. Example: <strong><code>examples/benchmarks/v1/semantic_repeats.v1.yaml</code></strong>. Tests: <strong><code>tests/test_evaluation_backends.py</code></strong>, <strong><code>tests/test_benchmark.py</code></strong>. Docs: <strong><code>data-model.md</code></strong>, <strong><code>benchmarking.md</code></strong>, <strong><code>evaluation-pipeline.md</code></strong>, <strong><code>benchmarks/v1/README.md</code></strong>.</p>
+<p><strong>Verification:</strong> <code>uv run pytest</code> (full suite).</p>
+<h2 id="2026-04-17-longitudinal-benchmark-reporting">2026-04-17 — Longitudinal benchmark reporting<a class="headerlink" href="#2026-04-17-longitudinal-benchmark-reporting" title="Permanent link">&para;</a></h2>
+<p><strong>Delivered:</strong> <code>pipelines/longitudinal.py</code> — load runs from manifests + evaluations + optional grid and judge provenance; <strong>weekly</strong> and <strong>longitudinal</strong> Markdown; <strong>failure taxonomy</strong> (<code>FT-*</code>) and <strong>failure atlas</strong>; regression-focused <strong><code>regression.md</code></strong> and <strong><code>provider-comparison.md</code></strong>; optional <strong><code>run_context.json</code></strong> grouping via <code>group_snapshots_by</code>. CLI <strong><code>alwm benchmark longitudinal</code></strong> (<code>--runs-glob</code>, thresholds for regression, semantic instability, series swing). Lazy <strong><code>benchmark_run_context</code></strong> registration in <strong><code>artifacts.py</code></strong> to break an import cycle. <strong><code>schemas/v1/evaluation.schema.json</code></strong> — nullable semantic judge fields aligned with <code>Evaluation</code>. Fixtures <strong><code>fixtures/longitudinal/paired/</code></strong>; example bundle <strong><code>examples/reports/longitudinal/sample-output/</code></strong>; tests <strong><code>tests/test_longitudinal.py</code></strong>. Docs <strong><code>docs/workflows/longitudinal-reporting.md</code></strong>, <strong><code>examples/reports/longitudinal/README.md</code></strong>.</p>
+<p><strong>Verification:</strong> <code>just ci</code>.</p>
+<h2 id="2026-04-17-semantic-and-hybrid-rubric-scoring-optional">2026-04-17 — Semantic and hybrid rubric scoring (optional)<a class="headerlink" href="#2026-04-17-semantic-and-hybrid-rubric-scoring-optional" title="Permanent link">&para;</a></h2>
+<p><strong>Delivered:</strong> <code>pipelines/evaluation_backends.py</code> — backends <strong><code>deterministic</code></strong> (default), <strong><code>semantic_judge</code></strong>, <strong><code>hybrid</code></strong>; <code>EvaluationJudgeProvenance</code> model + <strong><code>schemas/v1/evaluation_judge_provenance.schema.json</code></strong>; artifact kind <strong><code>evaluation_judge_provenance</code></strong>. <code>Evaluation</code> gains <strong><code>scoring_backend</code></strong>, <strong><code>judge_provenance_relpath</code></strong>. <code>BenchmarkDefinitionV1.eval_scoring</code> (<code>EvalScoringSpec</code>, <code>EvalHybridWeights</code>); <code>load_judge_provider_config</code> in <code>providers/benchmark_config.py</code>. Benchmark cells write <strong><code>evaluation_judge_provenance.json</code></strong> when non-deterministic; manifest cells include optional <strong><code>judge_provenance_relpath</code></strong>. CLI: <strong><code>alwm evaluate</code></strong> (<code>--scoring-backend</code>, <code>--judge-provider-config</code>, <code>--judge-live</code>, <code>--hybrid-deterministic-weight</code>); <strong><code>alwm benchmark run</code></strong> (<code>--eval-scoring-backend</code>, <code>--judge-provider-config</code>). Opt-in live judge: <strong><code>ALWM_JUDGE_LIVE=1</code></strong>; fixture mode keeps mock judge unless set. Tests: <strong><code>tests/test_evaluation_backends.py</code></strong>. Docs: <strong><code>data-model.md</code></strong>, <strong><code>evaluation-pipeline.md</code></strong>, <strong><code>benchmarking.md</code></strong>. Fixtures: <strong><code>fixtures/v1/evaluation_judge_provenance.json</code></strong>.</p>
+<p><strong>Verification:</strong> <code>just ci</code>.</p>
+<h2 id="2026-04-17-browser-backed-benchmark-execution">2026-04-17 — Browser-backed benchmark execution<a class="headerlink" href="#2026-04-17-browser-backed-benchmark-execution" title="Permanent link">&para;</a></h2>
+<p><strong>Why:</strong> <code>browser_mock</code> previously only tagged LLM output; benchmarks did not exercise <code>BrowserRunner</code> or persist evidence.</p>
+<p><strong>Delivered:</strong> <code>BrowserBenchConfig</code> + optional <code>variant.browser</code> in <code>benchmark/definitions.py</code> and <code>schemas/v1/benchmark_definition.schema.json</code>. <code>run_benchmark</code> calls <code>run_benchmark_browser_phase</code> for <code>execution_mode: browser_mock</code>, writes <strong><code>cells/.../browser_evidence.json</code></strong>, augments the provider prompt, and records <strong><code>browser_runner</code></strong> / <strong><code>browser_evidence_relpath</code></strong> on request/response/manifest cells. <strong><code>MCPBrowserRunner</code></strong> (<code>browser/mcp_runner.py</code>): fixture-backed bridge; remote MCP tools not wired. Playwright gated by <strong><code>ALWM_BENCHMARK_PLAYWRIGHT=1</code></strong>. Fixtures under <code>fixtures/benchmarks/browser_*.v1.yaml</code>; example <code>examples/benchmarks/v1/browser_file.v1.yaml</code>. Tests: <code>tests/test_benchmark_browser.py</code>. Docs: <code>docs/workflows/benchmarking.md</code>, <code>benchmarks/v1/README.md</code>, <code>docs/architecture/browser.md</code>, <code>docs/audits/capability-classification.md</code>. <strong><code>evaluation.schema.json</code>:</strong> optional <code>scoring_backend</code> / <code>judge_provenance_relpath</code> (not in <code>required</code>) for Pydantic alignment.</p>
+<p><strong>Verification:</strong> <code>just ci</code> (default tests; no Playwright in CI).</p>
+<h2 id="2026-04-17-benchmark-corpus-expansion-taxonomy-metadata-eight-tagged-suites">2026-04-17 — Benchmark corpus expansion: taxonomy metadata + eight tagged suites<a class="headerlink" href="#2026-04-17-benchmark-corpus-expansion-taxonomy-metadata-eight-tagged-suites" title="Permanent link">&para;</a></h2>
+<p><strong>Delivered:</strong> <code>BenchmarkTaxonomyV1</code>, optional <code>time_budget_seconds</code>, <code>token_budget</code>, <code>retry_policy</code>, <code>tags</code>, <code>expected_artifact_kinds</code> on <code>BenchmarkDefinitionV1</code>; same fields on <code>BenchmarkRunManifest</code> and <code>schemas/v1/manifest.schema.json</code> (optional). New prompts <code>bench.task.runtime_config.v1</code>, <code>bench.task.multi_agent_coord.v1</code>; registry <strong>0.3.0</strong>. Eight example suites under <code>examples/benchmark_suites/v1/suite.taxonomy.*.v1.yaml</code> covering repo, runtime, docs, browser evidence, matrix reasoning, multi-agent coordination, campaign sweep, and integration stress. Fixture <code>fixtures/benchmarks/suite_taxonomy_minimal.v1.yaml</code>; example runs <code>examples/benchmark_runs/taxonomy-repo-governance/</code>, <code>taxonomy-runtime-config/</code>. Tests: <code>tests/test_benchmark_taxonomy.py</code>, manifest validation. Docs: <code>docs/workflows/benchmarking.md</code>, <code>examples/benchmark_suites/v1/README.md</code>. <code>schemas/v1/benchmark_taxonomy.schema.json</code> for standalone taxonomy JSON.</p>
+<h2 id="2026-04-17-v010-release-preparation">2026-04-17 — v0.1.0 release preparation<a class="headerlink" href="#2026-04-17-v010-release-preparation" title="Permanent link">&para;</a></h2>
+<p><strong>Delivered:</strong> First semver release tag readiness: <code>CHANGELOG.md</code>, <code>docs/releases/v0.1.0.md</code>, <code>docs/release-readiness.md</code>, <code>docs/audits/release-readiness-audit.md</code>, <code>docs/workflows/walkthrough-v0.1.0.md</code>. README quickstarts (exact local, benchmark, prompt registry, manifest validate, optional live verification) and <code>pyproject.toml</code> <code>urls</code> + sdist <code>CHANGELOG.md</code> include. Version metadata remains <strong>0.1.0</strong> (<code>pyproject.toml</code>, <code>__version__</code>). Evidence: <code>just ci</code> (85 passed, 1 skipped), <code>just compose-help</code>, <code>docker buildx bake --print</code>.</p>
+<h2 id="2026-04-17-post-merge-stabilization-parallel-tracks">2026-04-17 — Post-merge stabilization (parallel tracks)<a class="headerlink" href="#2026-04-17-post-merge-stabilization-parallel-tracks" title="Permanent link">&para;</a></h2>
+<p><strong>Delivered:</strong> Single coherent tree on <code>main</code>: lazy <code>run_benchmark</code> in <code>benchmark/__init__.py</code> to avoid <code>artifacts</code> ↔ <code>pipelines</code> import cycles after manifest consolidation; audit docs refreshed (<code>mission-gap-audit.md</code>, <strong><code>current-capability-status.md</code></strong>) with <strong>85 passed, 1 skipped</strong> from <code>just ci</code>; staged governance and benchmark expansion artifacts (registry suites, example runs, <code>test_benchmark_expansion</code>).</p>
+<h2 id="2026-04-17-benchmark-manifest-json-schema-benchmark_manifest-artifact-kind">2026-04-17 — Benchmark manifest: JSON Schema + <code>benchmark_manifest</code> artifact kind<a class="headerlink" href="#2026-04-17-benchmark-manifest-json-schema-benchmark_manifest-artifact-kind" title="Permanent link">&para;</a></h2>
+<p><strong>Delivered:</strong> <code>schemas/v1/manifest.schema.json</code> (Draft 2020-12); <code>BenchmarkRunManifest</code> / <code>BenchmarkCellArtifactPaths</code> moved to <strong><code>models.py</code></strong> (re-exported from <code>benchmark/manifest.py</code>) to avoid import cycles with <code>artifacts.py</code>. Registered <code>benchmark_manifest</code> in <code>artifacts.py</code>; <code>write_benchmark_manifest</code> in <code>benchmark/persistence.py</code> validates against JSON Schema before writing; <code>run_benchmark</code> uses it. CLI: <code>alwm validate … benchmark_manifest</code>. Fixture <code>fixtures/v1/manifest.json</code>; tests <code>tests/test_manifest.py</code> + <code>test_domain</code> / <code>test_benchmark</code> hooks. Docs: <code>data-model.md</code>, <code>benchmarking.md</code>, <code>examples/v1/README.md</code>. Committed example runs under <code>examples/benchmark_runs/</code> unchanged (backward compatible: optional provenance keys omitted).</p>
+<h2 id="2026-04-17-benchmark-expansion-registry-suites-comparison-rubric-manifest-provenance">2026-04-17 — Benchmark expansion: registry suites, comparison rubric, manifest provenance<a class="headerlink" href="#2026-04-17-benchmark-expansion-registry-suites-comparison-rubric-manifest-provenance" title="Permanent link">&para;</a></h2>
+<p><strong>Delivered:</strong> Four versioned prompts under <code>prompts/versions/</code> (<code>bench.task.repo_governed.v1</code>, <code>markdown_synthesis</code>, <code>matrix_reasoning</code>, <code>browser_evidence</code>) registered in <code>prompts/registry.yaml</code> (<strong>0.2.0</strong>). New rubric <code>examples/dataset/rubrics/comparison.v1.json</code> (structure / task_fit / grounding / brevity). Three example suites: <code>suite.registry.four_modes.v1.yaml</code>, <code>suite.registry.strict_duo.v1.yaml</code>, <code>suite.registry.generous_duo.v1.yaml</code>; fixture mirror <code>fixtures/benchmarks/suite_four_modes.v1.yaml</code>. Committed offline runs under <code>examples/benchmark_runs/registry-four-modes</code>, <code>registry-strict-duo</code>, <code>registry-generous-duo</code>. <code>BenchmarkRunManifest</code> + <code>run_benchmark(..., definition_source_relpath=...)</code> + CLI wiring for optional manifest fields. Tests: <code>tests/test_benchmark_expansion.py</code>. Docs: <code>data-model.md</code>, <code>evaluation-pipeline.md</code>, <code>benchmarking.md</code>, <code>examples/benchmark_suites/v1/README.md</code>.</p>
+<h2 id="2026-04-17-runtime-hardening-live-verification-paths">2026-04-17 — Runtime hardening: live verification paths<a class="headerlink" href="#2026-04-17-runtime-hardening-live-verification-paths" title="Permanent link">&para;</a></h2>
+<p><strong>Delivered:</strong> <code>PlaywrightBrowserRunner</code> exported from <code>playwright_runner</code> (MCP-only stub file); <code>create_browser_runner(..., "playwright")</code>; Dockerfile target <strong><code>browser-test</code></strong> (Playwright + Chromium); Compose profile <strong><code>browser-verify</code></strong>; <code>docker-bake.hcl</code> target <code>browser-test</code> (linux/amd64); <code>just</code> recipes <code>verify-live-providers</code>, <code>verify-playwright-local</code>, <code>browser-verify</code>; <code>pytest</code> marker <strong><code>live_playwright</code></strong>; <code>tests/integration/test_playwright_browser.py</code> marked <code>integration</code> + <code>live_playwright</code>; <strong><code>docs/workflows/live-verification.md</code></strong>; <code>docs/architecture/runtime.md</code> refresh; workflow cross-links; <code>.env.example</code> notes <code>ALWM_PLAYWRIGHT_SMOKE</code>. Default <strong><code>just ci</code></strong> unchanged (<code>tests/integration/</code> still excluded).</p>
+<h2 id="2026-04-17-governance-agents-manual-multi-agent-workflow-capability-audit">2026-04-17 — Governance: AGENTS manual, multi-agent workflow, capability audit<a class="headerlink" href="#2026-04-17-governance-agents-manual-multi-agent-workflow-capability-audit" title="Permanent link">&para;</a></h2>
+<p><strong>Why:</strong> Reduce drift between docs and implementation; make parallel agent work predictable; require evidence-backed labels (“complete” vs partial/stub).</p>
+<p><strong>What changed:</strong></p>
+<ul>
+<li><strong><code>AGENTS.md</code></strong> — Stronger operating manual: non-goals folded into success criteria (evidence-backed claims), multi-agent rules (summary + pointer), expanded anti-patterns, verification table (Playwright opt-in), links to <strong><code>docs/audits/capability-classification.md</code></strong>, updated browser decision rule (Playwright optional; MCP stub), layout includes <code>docs/audits/</code>, <code>docs/examples/</code>, <code>docs/workflows/multi-agent-parallel.md</code>.</li>
+<li><strong><code>docs/workflows/multi-agent-parallel.md</code></strong> — Branch strategy, file ownership zones, conflict avoidance, merge order, required handoff template.</li>
+<li><strong><code>docs/audits/capability-classification.md</code></strong> — Taxonomy: complete / partial / stub / documented-only / broken + evidence bar and repository examples (re-verify after changes).</li>
+<li><strong><code>docs/examples/README.md</code></strong> — Clarifies repo-root <strong><code>examples/</code></strong> vs <code>docs/examples/</code>.</li>
+<li><strong>Drift repair</strong> — <strong><code>README.md</code></strong>: <code>alwm browser run-playwright</code>, optional <code>[browser]</code> install comment, pointer to multi-agent doc. <strong><code>docs/architecture/browser.md</code></strong>, <strong><code>current-state.md</code></strong>, <strong><code>runtime.md</code></strong>: Playwright optional; MCP stub; prompt registry <strong>implemented</strong> in current-state. <strong><code>docs/audits/mission-gap-audit.md</code></strong>: browser §3 and doc-drift rows updated; P3 reframed to MCP runner.</li>
+</ul>
+<p><strong>Verification:</strong> Documentation-only change set; command names cross-checked against <code>src/agent_llm_wiki_matrix/cli.py</code> (<code>browser run-playwright</code>, <code>benchmark probe</code>, <code>prompts</code> group).</p>
+<h2 id="2026-04-17-agentsmd-operating-manual">2026-04-17 — AGENTS.md operating manual<a class="headerlink" href="#2026-04-17-agentsmd-operating-manual" title="Permanent link">&para;</a></h2>
+<p><strong>Why:</strong> The old <code>AGENTS.md</code> was principles-only; agents needed actionable rules for this repo (benchmarks, prompt registry, integration tests, browser stubs, documentation touchpoints).</p>
+<p><strong>What changed:</strong> Expanded <code>AGENTS.md</code> with mission/success criteria, required contribution loop, decision table (including <strong>prefer <code>prompt_ref</code> over duplicated inline prompt text</strong> where appropriate), anti-patterns, verification/reporting table, documentation update rules, completion vs partial vs stubbed definitions, and project-specific examples (implementation, auditing, drift repair, benchmarks, browser). README now points contributors to <code>AGENTS.md</code> for the full manual.</p>
+<p><strong>How to use it:</strong> Before sizable work, read Mission, Contribution loop, and Prompt registry sections; after work, satisfy Verification + Documentation update rules and add an implementation-log entry when behavior or contracts shift.</p>
+<h2 id="2026-04-17-registry-backed-benchmark-prompts">2026-04-17 — Registry-backed benchmark prompts<a class="headerlink" href="#2026-04-17-registry-backed-benchmark-prompts" title="Permanent link">&para;</a></h2>
+<p><strong>Delivered:</strong> <code>PromptItem</code> supports <code>text</code> xor <code>prompt_ref</code> (+ optional <code>registry_version</code> pin); <code>BenchmarkDefinitionV1.prompt_registry_ref</code>; <code>resolve_benchmark_prompts</code> (<code>benchmark/prompt_resolution.py</code>) using <code>load_prompt_registry_yaml</code>; <code>run_benchmark(..., prompt_registry_path=...)</code> and CLI <code>--prompt-registry</code>; <code>BenchmarkRequestRecord</code> / <code>BenchmarkResponse</code> fields <code>prompt_source</code>, <code>prompt_registry_id</code>, <code>registry_document_version</code>, <code>prompt_source_relpath</code>; JSON Schema updates + <code>schemas/v1/benchmark_definition.schema.json</code>. Fixtures under <code>fixtures/prompt_registry/</code> and <code>fixtures/benchmarks/registry_*.yaml</code>; tests <code>tests/test_benchmark_prompt_registry.py</code>; example <code>examples/benchmark_suites/v1/registry.mixed.v1.yaml</code> + committed run <code>examples/benchmark_runs/registry-mixed/</code>. Prompt <code>bench.sample.prompt.v1</code> added under <code>prompts/</code>.</p>
+<h2 id="2026-04-17-live-benchmark-verification-compose-opt-in-integration-tests">2026-04-17 — Live benchmark verification (Compose + opt-in integration tests)<a class="headerlink" href="#2026-04-17-live-benchmark-verification-compose-opt-in-integration-tests" title="Permanent link">&para;</a></h2>
+<p><strong>Delivered:</strong> <code>benchmark/live_probe.py</code>; CLI <code>alwm benchmark probe</code>; Ollama healthcheck + <code>service_healthy</code> for <code>benchmark-ollama</code>; Compose profile <strong><code>benchmark-probe</code></strong> (<code>just benchmark-probe</code>); integration tests under <code>tests/integration/</code> gated by <code>ALWM_LIVE_BENCHMARK_OLLAMA</code> / <code>ALWM_LIVE_BENCHMARK_LLAMACPP</code> with skips when unreachable; <code>just test</code> ignores <code>tests/integration/</code>; <code>tests/test_live_probe.py</code> unit tests.</p>
+<h2 id="2026-04-17-mission-gap-audit-prompt-registry-cli">2026-04-17 — Mission gap audit + prompt registry CLI<a class="headerlink" href="#2026-04-17-mission-gap-audit-prompt-registry-cli" title="Permanent link">&para;</a></h2>
+<p><strong>Delivered:</strong> <code>docs/audits/mission-gap-audit.md</code> (code-verified status of CLI, providers, browser layer, Compose, Bake; drift notes). <strong>Prompt registry wiring:</strong> <code>schemas/v1/prompt_registry.schema.json</code>, <code>prompt_registry.py</code> (YAML load + JSON Schema + path safety), CLI <code>alwm prompts check|list|show</code>, tests <code>tests/test_prompt_registry.py</code>. README and <code>AGENTS.md</code> updated for new commands.</p>
+<h2 id="2026-04-17-browser-execution-abstraction">2026-04-17 — Browser execution abstraction<a class="headerlink" href="#2026-04-17-browser-execution-abstraction" title="Permanent link">&para;</a></h2>
+<p><strong>Delivered:</strong> <code>BrowserRunner</code> ABC; <code>BrowserEvidence</code> JSON Schema + Pydantic models; <code>MockBrowserRunner</code> and <code>FileBrowserRunner</code>; fixture <code>fixtures/browser_evidence/v1/export_flow.json</code>; <code>PlaywrightBrowserRunner</code> / <code>MCPBrowserRunner</code> stubs (<code>NotImplementedError</code>); <code>load_browser_evidence</code>, <code>evidence_to_prompt_block</code>; artifact kind <code>browser_evidence</code> for <code>alwm validate</code>; CLI <code>alwm browser prompt-block</code> and <code>alwm browser run-mock</code>; tests <code>tests/test_browser.py</code>; <code>docs/architecture/browser.md</code>.</p>
+<p><strong>Not in scope:</strong> live Playwright or MCP browser automation (stubs only).</p>
+<h2 id="2026-04-17-benchmark-run-artifact-persistence">2026-04-17 — Benchmark run artifact persistence<a class="headerlink" href="#2026-04-17-benchmark-run-artifact-persistence" title="Permanent link">&para;</a></h2>
+<p><strong>Delivered:</strong> Structured output under <code>cells/</code>, <code>matrices/</code>, <code>markdown/</code>, <code>reports/</code> with stable <code>cell_id</code> slugs, <strong>benchmark_request</strong> + raw/normalized response text files, aggregate <strong>benchmark_response</strong>, per-cell <strong>evaluation</strong>, <strong>matrix_grid_inputs</strong> / <strong>matrix_pairwise_inputs</strong>, and manifest <strong>cells[]</strong> index; execution layer returns raw vs normalized text.</p>
+<h2 id="2026-04-17-replace-makefile-with-justfile">2026-04-17 — Replace Makefile with justfile<a class="headerlink" href="#2026-04-17-replace-makefile-with-justfile" title="Permanent link">&para;</a></h2>
+<p><strong>Delivered:</strong> <a href="https://github.com/casey/just">just</a> <code>justfile</code> with the same recipes as the former Makefile (<code>ci</code>, lint, compose-help, benchmark profiles, etc.); removed <code>Makefile</code>; documentation and <code>AGENTS.md</code> now reference <code>just …</code>.</p>
+<h2 id="2026-04-17-benchmark-case-schema-v1-task-examples">2026-04-17 — Benchmark case schema (v1) + task examples<a class="headerlink" href="#2026-04-17-benchmark-case-schema-v1-task-examples" title="Permanent link">&para;</a></h2>
+<p><strong>Delivered:</strong></p>
+<ul>
+<li>JSON Schema <code>schemas/v1/benchmark_case.schema.json</code> and Pydantic <code>BenchmarkCase</code> / <code>BenchmarkExecutionMetadata</code> with validation that <code>expected_artifact_kinds</code> references registered <code>alwm validate</code> kinds.</li>
+<li>Loader <code>benchmark/cases.py</code> (<code>load_benchmark_case</code>, <code>validate_benchmark_case_file</code>).</li>
+<li>Catalog <code>benchmarks/cases/v1/</code> with four task kinds: repo scaffolding, Markdown synthesis, comparison matrix, browser-evidence interpretation; mirrored under <code>fixtures/benchmark_cases/v1/</code> and <code>examples/benchmark_cases/v1/</code>.</li>
+<li>Tests: <code>tests/test_benchmark_cases.py</code>.</li>
+</ul>
+<h2 id="2026-04-17-phase-5-complete-benchmark-harness">2026-04-17 — Phase 5 complete (benchmark harness)<a class="headerlink" href="#2026-04-17-phase-5-complete-benchmark-harness" title="Permanent link">&para;</a></h2>
+<p><strong>Delivered:</strong></p>
+<ul>
+<li><strong>Provider execution:</strong> <code>providers/execution.py</code> applies deterministic execution-mode tags (<code>cli</code>, <code>browser_mock</code>, <code>repo_governed</code>) on top of the same <code>CompletionRequest</code> for all backends.</li>
+<li><strong>Backend selection:</strong> <code>providers/benchmark_config.py</code> merges global YAML/env with per-variant <code>mock</code> / <code>ollama</code> / <code>openai_compatible</code> settings; <code>ALWM_FIXTURE_MODE=1</code> forces mock unless <code>--no-fixture-mock</code>.</li>
+<li><strong>Benchmark definitions:</strong> Pydantic <code>BenchmarkDefinitionV1</code> + <code>load_benchmark_definition</code> for YAML/JSON under <code>benchmarks/v1/</code> (mirrored in <code>fixtures/benchmarks/</code> for tests).</li>
+<li><strong>Artifacts:</strong> <code>schemas/v1/benchmark_response.schema.json</code>, <code>BenchmarkResponse</code> model, <code>alwm validate … benchmark_response</code>.</li>
+<li><strong>Pipeline:</strong> <code>benchmark/runner.py</code> stores raw responses, rubric-evaluates each cell, builds <strong>grid</strong> and <strong>pairwise</strong> <code>ComparisonMatrix</code> JSON + Markdown, <code>report.json</code> / <code>report.md</code>, and <code>manifest.json</code>.</li>
+<li><strong>CLI:</strong> <code>alwm benchmark run --definition … --output-dir …</code>.</li>
+<li><strong>Compose / just:</strong> profiles <strong><code>benchmark-offline</code></strong>, <strong><code>benchmark-ollama</code></strong> (+ <code>ollama</code> service), <strong><code>benchmark-llamacpp</code></strong>; recipes <code>just benchmark-offline</code>, <code>just benchmark-ollama</code>, <code>just benchmark-llamacpp</code>.</li>
+<li><strong>Tests:</strong> <code>tests/test_benchmark.py</code> asserts deterministic offline matrix output and validates artifacts.</li>
+</ul>
+<p><strong>Next:</strong> Richer prompt registry wiring; optional LLM rubric; real browser trace ingestion.</p>
+<h2 id="2026-04-17-phase-4-complete-pipelines-compose-test-image">2026-04-17 — Phase 4 complete (pipelines + Compose test image)<a class="headerlink" href="#2026-04-17-phase-4-complete-pipelines-compose-test-image" title="Permanent link">&para;</a></h2>
+<p><strong>Delivered:</strong></p>
+<ul>
+<li><strong>Rubric</strong> JSON Schema (<code>schemas/v1/rubric.schema.json</code>) + Pydantic models; <code>alwm validate … rubric</code>.</li>
+<li><strong>Pipelines:</strong> <code>ingest_markdown_pages</code>, deterministic <code>evaluate_subject</code>, <code>evaluations_to_matrix</code>, <code>build_report_from_matrix</code> + Markdown renderers for <code>templates/matrix.md</code> and <code>templates/report.md</code>.</li>
+<li><strong>CLI:</strong> <code>alwm ingest</code>, <code>evaluate</code>, <code>compare</code> (optional <code>--out-md</code>), <code>report</code>.</li>
+<li><strong>Docker:</strong> <code>Dockerfile</code> <code>test</code> stage (editable <code>.[dev]</code> + pytest); Compose services <code>orchestrator</code> (dev), <code>tests</code> (test), <code>benchmark</code> (benchmark); <code>just compose-help</code> validates all profiles.</li>
+<li><strong>Examples:</strong> <code>examples/dataset/</code> wiki pages, evaluations, thoughts, and <code>examples/generated/</code> matrix + report pair; tests validate checked-in generated JSON.</li>
+<li><strong>Docs:</strong> Updated <code>docs/workflows/*</code>, <code>docs/architecture/current-state.md</code>, <code>docs/architecture/evaluation-pipeline.md</code>, <code>docs/architecture/runtime.md</code>, and <code>README.md</code> with exact commands.</li>
+</ul>
+<p><strong>Next:</strong> Optional LLM-assisted scoring behind providers; richer ingest extraction; browser evidence fixtures.</p>
+<h2 id="2026-04-17-phase-3-complete-provider-abstraction">2026-04-17 — Phase 3 complete (provider abstraction)<a class="headerlink" href="#2026-04-17-phase-3-complete-provider-abstraction" title="Permanent link">&para;</a></h2>
+<p><strong>Delivered:</strong></p>
+<ul>
+<li><code>BaseProvider</code> + <code>CompletionRequest</code> contract.</li>
+<li><code>MockProvider</code> (deterministic, no network).</li>
+<li><code>OllamaProvider</code> (<code>/api/chat</code>) and <code>OpenAICompatibleProvider</code> (<code>/v1/chat/completions</code>) using <code>httpx</code> with injectable <code>MockTransport</code> for tests.</li>
+<li><code>ProviderConfig</code> loaded from optional YAML + environment overrides (<code>load_provider_config</code>).</li>
+<li>Example YAML: <code>config/providers.example.yaml</code>; local <code>config/providers.yaml</code> gitignored.</li>
+<li>CLI: <code>alwm providers show</code> prints redacted configuration.</li>
+<li>Tests in <code>tests/test_providers.py</code> (mocked HTTP only).</li>
+</ul>
+<p><strong>Next:</strong> Phase 4 — ingest pipeline, claim extraction stubs, rubric evaluation, matrix persistence.</p>
+<h2 id="2026-04-17-phase-2-complete-domain-models-schemas">2026-04-17 — Phase 2 complete (domain models + schemas)<a class="headerlink" href="#2026-04-17-phase-2-complete-domain-models-schemas" title="Permanent link">&para;</a></h2>
+<p><strong>Delivered:</strong></p>
+<ul>
+<li>JSON Schemas under <code>schemas/v1/</code> for <code>thought</code>, <code>event</code>, <code>experiment</code>, <code>evaluation</code>, <code>matrix</code>, <code>report</code> (plus existing <code>note</code>).</li>
+<li>Pydantic models in <code>src/agent_llm_wiki_matrix/models.py</code> with extra validation for matrix score shapes.</li>
+<li><code>src/agent_llm_wiki_matrix/artifacts.py</code> for dual JSON Schema + Pydantic validation.</li>
+<li>CLI: <code>alwm validate &lt;path&gt; &lt;kind&gt;</code>.</li>
+<li>Fixtures: <code>fixtures/v1/*.json</code>; examples mirrored under <code>examples/v1/</code>.</li>
+<li>Markdown templates: <code>templates/thought.md</code>, <code>event.md</code>, <code>experiment.md</code>, <code>evaluation.md</code>, <code>matrix.md</code>, <code>report.md</code> (plus weekly stub).</li>
+<li>Tests: <code>tests/test_domain.py</code>, <code>tests/conftest.py</code> (repo root + cwd for deterministic schema resolution).</li>
+</ul>
+<p><strong>Next:</strong> Phase 3 — provider abstraction (<code>BaseProvider</code>, Ollama, OpenAI-compatible HTTP, mock) with YAML/env configuration.</p>
+<h2 id="2026-04-17-phase-1-complete-scaffold">2026-04-17 — Phase 1 complete (scaffold)<a class="headerlink" href="#2026-04-17-phase-1-complete-scaffold" title="Permanent link">&para;</a></h2>
+<p><strong>Audit:</strong> Initial repository contained only <code>LICENSE</code>. No prior scaffold to migrate.</p>
+<p><strong>Delivered:</strong></p>
+<ul>
+<li>Repository layout: <code>src/agent_llm_wiki_matrix/</code>, <code>tests/</code>, <code>docs/</code>, <code>schemas/</code>, <code>templates/</code>, <code>prompts/</code>, <code>examples/</code>, <code>fixtures/</code>.</li>
+<li>Top-level: <code>README.md</code>, <code>AGENTS.md</code>, <code>pyproject.toml</code>, <code>justfile</code>, <code>.gitignore</code>, <code>.env.example</code>, <code>Dockerfile</code>, <code>docker-compose.yml</code>, <code>docker-bake.hcl</code>.</li>
+<li>Python package: Click CLI (<code>alwm</code>), structlog-based logging, JSON Schema helpers (<code>schema.py</code>) with path-aware caching.</li>
+<li>Schemas: <code>schemas/v1/note.schema.json</code>; example <code>examples/sample-note.json</code>.</li>
+<li>Prompt registry skeleton: <code>prompts/registry.yaml</code> + <code>prompts/versions/scaffold.echo.v1.txt</code>.</li>
+<li>Report template skeleton: <code>templates/report-weekly.md</code>.</li>
+<li>Smoke tests: <code>just smoke</code> runs <code>scripts/smoke.sh</code> — <code>pytest -m smoke</code>, host <code>alwm benchmark</code> + <code>benchmark campaign</code>, Docker Compose config + <code>dev</code> + <code>benchmark-offline</code> (optional; <code>SMOKE_SKIP_DOCKER=1</code>); prints <strong>failure recovery analysis</strong> on errors. Docs: <code>docs/workflows/smoke.md</code>. Dockerfile bundles <code>templates/</code> for runtime image matrix/report rendering.</li>
+<li>Docker: orchestrator image (<code>Dockerfile</code>); Compose profiles <code>dev</code>, <code>test</code>, <code>benchmark</code>; Bake targets for multi-arch and single-arch convenience (<code>orchestrator-amd64</code>, <code>orchestrator-arm64</code>).</li>
+</ul>
+<p><strong>Known gaps (by design until later phases):</strong></p>
+<ul>
+<li>Domain models beyond minimal <code>note</code> schema (Phase 2).</li>
+<li>Provider adapters (Phase 3).</li>
+<li>Ingest/evaluate/matrix/report pipelines (Phases 4–5).</li>
+<li>Compose services for Ollama / model endpoints (Phase 6; placeholder comment in <code>docker-compose.yml</code>).</li>
+</ul>
+<p><strong>Next:</strong> Phase 2 — domain models and schemas for thought, event, experiment, evaluation, matrix, report; validators; expanded fixtures and examples.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.tabs", "navigation.sections", "navigation.expand", "navigation.top", "search.suggest", "search.highlight", "content.code.copy", "toc.follow"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>
